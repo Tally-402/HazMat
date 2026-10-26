@@ -6,81 +6,81 @@
     {
       "file": "HZ-003.json",
       "id": "HZ-003",
-      "leaf": "1a19d91764d564e5d7221688bc90aaed6ac8c5b9d61573e6c140707c4d0c8463"
+      "leaf": "0x1a19d91764d564e5d7221688bc90aaed6ac8c5b9d61573e6c140707c4d0c8463"
     },
     {
       "file": "HZ-009.json",
       "id": "HZ-009",
-      "leaf": "2ea286137f13e313a088f5d97e655fa4df4f7cdd1f532529b785cc78fd7d9947"
+      "leaf": "0x2ea286137f13e313a088f5d97e655fa4df4f7cdd1f532529b785cc78fd7d9947"
     },
     {
       "file": "HZ-008.json",
       "id": "HZ-008",
-      "leaf": "42f919fda72d56783beeb61d3f4ea4e7171799922849ccff63e494ae6e79bf31"
+      "leaf": "0x42f919fda72d56783beeb61d3f4ea4e7171799922849ccff63e494ae6e79bf31"
     },
     {
       "file": "HZ-014.json",
       "id": "HZ-014",
-      "leaf": "490c3e264d509392f78a42c4db7f3d4915f856d03aa04b1b6516000492347577"
+      "leaf": "0x490c3e264d509392f78a42c4db7f3d4915f856d03aa04b1b6516000492347577"
     },
     {
       "file": "HZ-006.json",
       "id": "HZ-006",
-      "leaf": "54ec3807d1df8190c6b2d2f60f137cf763bc0a8e342273b9b6e6fd3c1bf2fbce"
+      "leaf": "0x54ec3807d1df8190c6b2d2f60f137cf763bc0a8e342273b9b6e6fd3c1bf2fbce"
     },
     {
       "file": "HZ-013.json",
       "id": "HZ-013",
-      "leaf": "67ff52c3ee7053677ae94edc55de0bb6444127bd8057fb3b4bb38ac563fdfe59"
+      "leaf": "0x67ff52c3ee7053677ae94edc55de0bb6444127bd8057fb3b4bb38ac563fdfe59"
     },
     {
       "file": "HZ-005.json",
       "id": "HZ-005",
-      "leaf": "744079c2c50b56d4189beb9bd13527cf85ae8d382a46d177449f2fb3db69c2c3"
+      "leaf": "0x744079c2c50b56d4189beb9bd13527cf85ae8d382a46d177449f2fb3db69c2c3"
     },
     {
       "file": "HZ-001.json",
       "id": "HZ-001",
-      "leaf": "8ae24ad25d519e433c040512d364cfc97faa027230781c8f68fd47e71a6fdcb2"
+      "leaf": "0x8ae24ad25d519e433c040512d364cfc97faa027230781c8f68fd47e71a6fdcb2"
     },
     {
       "file": "HZ-010.json",
       "id": "HZ-010",
-      "leaf": "8bd282352e352c953a0b75e03799b1a53ff706f20479e51281c3e062385c627b"
+      "leaf": "0x8bd282352e352c953a0b75e03799b1a53ff706f20479e51281c3e062385c627b"
     },
     {
       "file": "HZ-007.json",
       "id": "HZ-007",
-      "leaf": "998c235964c42d119ed1e7223c35addafa6c8a2298cf1bb73d808d27ff99b969"
+      "leaf": "0x998c235964c42d119ed1e7223c35addafa6c8a2298cf1bb73d808d27ff99b969"
     },
     {
       "file": "HZ-004.json",
       "id": "HZ-004",
-      "leaf": "d0c37c439451aec0f4e8b39c67b869fd5d97f1a71d02119e8e6b9722080f6ee4"
+      "leaf": "0xd0c37c439451aec0f4e8b39c67b869fd5d97f1a71d02119e8e6b9722080f6ee4"
     },
     {
       "file": "HZ-012.json",
       "id": "HZ-012",
-      "leaf": "e0dadf591358c7d59e7eedcc6eacefff1caac6f57816e14959be0447d5f56cb6"
+      "leaf": "0xe0dadf591358c7d59e7eedcc6eacefff1caac6f57816e14959be0447d5f56cb6"
     },
     {
       "file": "HZ-002.json",
       "id": "HZ-002",
-      "leaf": "e36fd325463455498bee87d2e31c344a4edac71884acc8df6b1ff0e11e55e1de"
+      "leaf": "0xe36fd325463455498bee87d2e31c344a4edac71884acc8df6b1ff0e11e55e1de"
     },
     {
       "file": "HZ-015.json",
       "id": "HZ-015",
-      "leaf": "e860b062b43ca3a23adff9609c7eea1899c3f1598f8f8387ee24feda27adc153"
+      "leaf": "0xe860b062b43ca3a23adff9609c7eea1899c3f1598f8f8387ee24feda27adc153"
     },
     {
       "file": "HZ-011.json",
       "id": "HZ-011",
-      "leaf": "f1d3dae44e3aa968b96df49178e08bd678eac48df61b648d321ef9077ec1fcef"
+      "leaf": "0xf1d3dae44e3aa968b96df49178e08bd678eac48df61b648d321ef9077ec1fcef"
     }
   ],
   "notes": null,
   "placards": 15,
   "register_digest": "0xe32091ed5e6533e9",
-  "root": "ab975bc60676ccca9b3160d18a0d6785c2f03dd17b73ddef77ad6e13395a5f21"
+  "root": "0xab975bc60676ccca9b3160d18a0d6785c2f03dd17b73ddef77ad6e13395a5f21"
 }

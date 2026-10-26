@@ -38,12 +38,16 @@ def leaves_of(register_dir):
     out = []
     for path in sorted(Path(register_dir).glob('*.json')):
         placard = json.loads(path.read_text())
-        out.append({'id': placard['id'], 'file': path.name, 'leaf': leaf_of(placard).hex()})
+        out.append({'id': placard['id'], 'file': path.name, 'leaf': '0x' + leaf_of(placard).hex()})
     return sorted(out, key=lambda row: row['leaf'])
 
 
+def bare(value):
+    return value[2:] if isinstance(value, str) and value.startswith('0x') else value
+
+
 def parent(left_hex, right_hex):
-    left, right = bytes.fromhex(left_hex), bytes.fromhex(right_hex)
+    left, right = bytes.fromhex(bare(left_hex)), bytes.fromhex(bare(right_hex))
     low, high = (left, right) if left <= right else (right, left)
     return keccak.keccak256(low + high).hex()
 
@@ -62,15 +66,19 @@ def next_level(level):
 
 
 def build(leaves):
-    """Levels of the tree, bottom up. An empty register has a root of None."""
+    """Levels of the tree, bottom up. An empty register has a root of None.
+
+    Roots and leaves carry a 0x prefix everywhere they are published, like every
+    other hash this repo prints; `parent` strips it because fromhex wants it gone.
+    """
     if not leaves:
         return [], None
-    level = sorted(leaves)
+    level = sorted(bare(leaf) for leaf in leaves)
     levels = [list(level)]
     while len(level) > 1:
         level = next_level(level)
         levels.append(sorted(level))
-    return levels, level[0]
+    return levels, '0x' + level[0]
 
 
 def proof(register_dir, placard_id):
@@ -80,8 +88,8 @@ def proof(register_dir, placard_id):
     target = next((row for row in rows if row['id'] == placard_id), None)
     if target is None:
         raise AnchorError('no such placard: %s' % placard_id)
-    node = target['leaf']
-    level = sorted(leaves)
+    node = bare(target['leaf'])                     # the walk is bare; the output is prefixed
+    level = sorted(bare(leaf) for leaf in leaves)
     siblings = []
     while len(level) > 1:
         ordered = sorted(level)
@@ -92,16 +100,17 @@ def proof(register_dir, placard_id):
         siblings.append(sibling)
         node = parent(ordered[index], sibling)
         level = [parent(ordered[i], ordered[i + 1]) for i in range(0, len(ordered), 2)]
-    return {'placard': placard_id, 'leaf': target['leaf'], 'proof': siblings, 'root': node,
+    return {'placard': placard_id, 'leaf': target['leaf'], 'proof': ['0x' + s for s in siblings],
+            'root': '0x' + node,
             'register_digest': match.register_digest(register_dir)}
 
 
 def verify(leaf_hex, siblings, root):
     """Recompute a root from a leaf and its siblings. Sorted pairs, so no sides."""
-    node = leaf_hex
+    node = bare(leaf_hex)
     for sibling in siblings:
         node = parent(node, sibling)
-    return node == root
+    return node == bare(root)
 
 
 def write_epoch(register_dir, out_dir=DEFAULT_DIR, epoch=1, note=None):

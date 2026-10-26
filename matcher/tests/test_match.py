@@ -333,7 +333,7 @@ class Anchor(unittest.TestCase):
         parents = anchor.next_level(leaves)
         self.assertEqual(sorted(parents),
                          sorted([anchor.parent(leaves[0], leaves[1]), anchor.parent(leaves[2], leaves[2])]))
-        self.assertEqual(root, anchor.next_level(parents)[0])
+        self.assertEqual(root, '0x' + anchor.next_level(parents)[0])   # build prefixes, the walk does not
         # and a proof for the duplicated leaf folds back to the same root
         proof = anchor.proof(REGISTER, 'HZ-001')               # separate walk, real register
         self.assertTrue(anchor.verify(proof['leaf'], proof['proof'], proof['root']))

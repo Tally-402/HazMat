@@ -23,8 +23,8 @@ def verify_sheet(path, expect=None, anchor=None):
     ]
     # if the sheet names an epoch, that epoch's record must back it - not the newest one,
     # or publishing a new epoch would invalidate every sheet already handed out
-    named = re.search(r'register \d+ placards v(0x[0-9a-f]{16})', page)
-    claimed_epoch = re.search(r'anchor epoch (\d+) root (0x[0-9a-f]{64})', page)
+    named = re.search(r'register [0-9]+ placards v(0x[0-9a-f]{16})', page)
+    claimed_epoch = re.search(r'anchor epoch ([0-9]+) root (0x[0-9a-f]{64})', page)
     record = anchor
     if record is None and claimed_epoch:
         try:
