@@ -73,6 +73,15 @@ Keccak-256 is implemented in-repo, so the matcher and the deriver have no depend
 
 A 40-character hex string is ambiguous: exactly an address, and also a plausible 20-byte code blob. `--as address` or `--as code` settles it; the default prefers the address and says so loudly when the chain has nothing there.
 
+## Confirming a placard
+
+A `confirmed` placard can be re-confirmed from scratch: source is fetched from Sourcify, rebuilt with the settings from the verification record, compared selector-for-selector against the deployed runtime, then its vendored reproduction is run against the rebuild.
+
+    python3 -m hazmat.confirm --placard HZ-001 --target 0xc2292af8B51109a27A4B4e28E9cF9f3AeDE4190C --chain mainnet \
+        --forge-std path/to/forge-std --lib openzeppelin-contracts=path/to/openzeppelin-contracts
+
+The record lands in `confirmations/`, one per placard and target, with every stage's own outcome. Verdicts: `confirmed`, `confirmed_with_selector_drift`, `refuted`, `blocked`. A probe that runs and fails is `refuted`, and an earlier stage failing is `blocked` - never silently confirmed.
+
 ## Contributing a placard
 
 1. Reproduce the hazard and keep the repro runnable.

@@ -22,7 +22,7 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeLiveEscrow.t.sol",
-    "source": "reproductions/HZ-001/ArgusProbeLiveEscrow.t.sol",
+    "source": "reproductions/HZ-001/ArgusProbeLiveEscrow.t.sol (vendored into HazMat from the investigation; runs against source rebuilt from the verification record)",
     "expected": "past the dispute window the attacker's timeout pays the worker 0 and the buyer's accept then reverts WrongState; with the reverse ordering the worker is paid in full"
   },
   "confirmed_on": [
@@ -31,7 +31,14 @@
       "source": "claus-network 8dbf692688da640a5dc275df58f1a58a405b508d",
       "equivalence": "published source verified byte-identical to the deployed runtime (394 differing bytes, all inside 23 immutable windows)",
       "attacker_gas": 100871,
-      "victim_loss": "one maximum-sized deal"
+      "victim_loss": "one maximum-sized deal",
+      "confirmation": {
+        "record": "confirmations/HZ-001-c2292af8.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-001 --target 0xc2292af8B51109a27A4B4e28E9cF9f3AeDE4190C --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "source fetched from Sourcify (exact_match on runtime and creation, verified 2026-10-14), rebuilt with the recorded settings (solc 0.8.27, via_ir, runs 200, cancun), rebuilt selector set 49/49 identical to the deployed runtime, and the vendored probe passed with the deployed parameters",
+        "not_a_fork": "the probe deploys the rebuilt contract locally with the live parameters; it is not a fork of mainnet state"
+      }
     }
   ],
   "fix": "Bound the still-valid exit by the same clock as the permissionless trigger, or document which exit is authoritative after the window.",

@@ -9,7 +9,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | P0 format freeze | done |
 | P1 corpus | 10 of 10 placards, self-check green |
 | P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
-| P3 confirmation runner | not started |
+| P3 confirmation runner | working end to end for HZ-001; nine more probes to vendor |
 | P4 product surface | not started |
 | P5 watch service | not started |
 | P6 anchoring | not started |
@@ -52,7 +52,7 @@ Done when: the matcher has no dependencies, runs offline against supplied code, 
 
 Promote `pattern` to `confirmed` mechanically: locate verified source, build with a pinned toolchain, generate a probe from a per-class template, run it in an isolated dir, record command and observed output into the placard.
 
-Done when: `HZ-001` confirms against a fresh clone with no hand-holding.
+Done for `HZ-001`: source fetched from Sourcify, rebuilt with the recorded settings, selector set identical to the deployed runtime, vendored probe green. The remaining work is one probe per placard, since probes are per hazard and cannot be generated from a matcher alone.
 
 ## P4 - product surface
 

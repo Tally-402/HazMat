@@ -8,9 +8,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ROOT = Path(__file__).resolve().parents[2]
 REGISTER = str(ROOT / 'register' / 'placards')
 
+import json
 import os
+import tempfile
+from pathlib import Path
 
-from hazmat import batch, chains, derive, keccak, match, sds  # noqa: E402
+from hazmat import batch, chains, confirm, derive, keccak, match, sds  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -73,6 +76,35 @@ class AmbiguousInput(unittest.TestCase):
     def test_an_unknown_as_is_loud(self):
         with self.assertRaises(match.MatchError):
             match.load_code('0x' + '00' * 20, as_='nonsense')
+
+
+class Confirm(unittest.TestCase):
+    def test_missing_libs_never_overwrite_verified_files(self):
+        with tempfile.TemporaryDirectory() as work, tempfile.TemporaryDirectory() as lib:
+            Path(work, 'lib', 'x').mkdir(parents=True)
+            Path(work, 'lib', 'x', 'keep.sol').write_text('verified')
+            Path(lib, 'keep.sol').write_text('local')
+            Path(lib, 'extra.sol').write_text('added')
+            added = confirm.add_missing_libs(work, {'x': lib})
+            self.assertEqual(Path(work, 'lib', 'x', 'keep.sol').read_text(), 'verified')
+            self.assertEqual(Path(work, 'lib', 'x', 'extra.sol').read_text(), 'added')
+            self.assertEqual(added, ['lib/x/extra.sol'])
+
+    def test_compare_reports_selector_agreement_and_immutable_drift(self):
+        selectors = b'\x63\xe4\x72\x5b\xa1' + b'\x63\x7c\x7a\x98\x04'
+        deployed, _ = match.strip_metadata(selectors + b'\x00\x11' + b'\x93\xa2')
+        with tempfile.TemporaryDirectory() as out:
+            art = Path(out, 'C.sol', 'C.json')
+            art.parent.mkdir(parents=True)
+            art.write_text(json.dumps({'deployedBytecode': {'object': '0x' + (selectors + b'\xff\xff').hex() + '00' + b'\x93\xa2'.hex()}}))
+            got = confirm.compare_rebuilt(out, 'C', deployed + b'\x00\x22' + b'\x93\xa2')
+            self.assertEqual(got['selectors_missing_from_rebuild'], [])
+            self.assertEqual(got['selectors_extra_in_rebuild'], [])
+            self.assertEqual(got['selectors_deployed'], 2)
+
+    def test_find_solc_returns_a_path_or_none(self):
+        got = confirm.find_solc('0.8.27')
+        self.assertTrue(got is None or os.path.isfile(got))
 
 
 class Sheet(unittest.TestCase):
