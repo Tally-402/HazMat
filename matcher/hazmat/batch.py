@@ -20,13 +20,13 @@ def lines(path):
     return out
 
 
-def run(path, register, rpc=None, chain=None, sheet_dir=None, quiet=False):
+def run(path, register, rpc=None, chain=None, sheet_dir=None, quiet=False, as_='auto'):
     if chain:
         rpc = chains.endpoint(chain)
     reports = []
     for target in lines(path):
         try:
-            report = match.scan(target, register, rpc)
+            report = match.scan(target, register, rpc, as_=as_)
         except match.MatchError as exc:
             report = {'target': target, 'state': 'blocked', 'error': str(exc), 'matches': []}
         if sheet_dir and report.get('matches'):
@@ -50,8 +50,9 @@ def main(argv=None):
     parser.add_argument('--rpc', default=None)
     parser.add_argument('--sheet-dir', default=None)
     parser.add_argument('--json', action='store_true')
+    parser.add_argument('--as', dest='as_', default='auto', choices=['auto', 'address', 'code'])
     args = parser.parse_args(argv)
-    reports = run(args.file, args.register, args.rpc, args.chain, args.sheet_dir, quiet=args.json)
+    reports = run(args.file, args.register, args.rpc, args.chain, args.sheet_dir, quiet=args.json, as_=args.as_)
     if args.json:
         print(json.dumps(reports, indent=2, sort_keys=True))
     return 0

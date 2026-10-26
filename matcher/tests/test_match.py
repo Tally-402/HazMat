@@ -60,6 +60,20 @@ class Matching(unittest.TestCase):
                             '%s has an empty matcher' % row['id'])
 
 
+class AmbiguousInput(unittest.TestCase):
+    def test_a_40_hex_blob_can_be_forced_to_raw_code(self):
+        blob = '0x' + ('63e4725ba1' * 3 + '637c7a9804' + '6382cbf88b')[:40]
+        found, _ = match.match_code(bytes.fromhex(blob[2:]), PLACARD)
+        self.assertEqual([m['id'] for m in found], [])          # truncated, so only the first selector survives
+        full = '0x' + '63e4725ba1637c7a98046382cbf88b' + '63' + '82cbf88b'
+        report = match.scan(full, REGISTER, as_='code')
+        self.assertEqual([m['id'] for m in report['matches']], ['HZ-001'])
+
+    def test_an_unknown_as_is_loud(self):
+        with self.assertRaises(match.MatchError):
+            match.load_code('0x' + '00' * 20, as_='nonsense')
+
+
 class Sheet(unittest.TestCase):
     def test_sheet_carries_the_evidence_and_its_own_hash(self):
         report = match.scan('0x' + code_with('0xe4725ba1', '0x7c7a9804', '0x82cbf88b').hex(), REGISTER)
@@ -107,7 +121,7 @@ class Batch(unittest.TestCase):
         path = tempfile.mktemp(suffix='.txt')
         open(path, 'w').write('# a comment\n%s\n\n%s\n' % (code, plain))
         with tempfile.TemporaryDirectory() as sheets:
-            reports = batch.run(path, REGISTER, sheet_dir=sheets, quiet=True)
+            reports = batch.run(path, REGISTER, sheet_dir=sheets, quiet=True, as_='code')
             self.assertEqual(len(reports), 2)
             self.assertEqual([m['id'] for m in reports[0]['matches']], ['HZ-001'])
             self.assertEqual(reports[1]['matches'], [])

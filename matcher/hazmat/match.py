@@ -52,8 +52,16 @@ def push4_constants(body):
     return found
 
 
-def load_code(source, rpc=None):
-    if re.fullmatch(r'0x[0-9a-fA-F]{40}', source):
+def load_code(source, rpc=None, as_='auto'):
+    """Read code from an address, raw hex, or a file.
+
+    A 40-character hex string is ambiguous: it is exactly an address and also a
+    plausible 20-byte code blob. `as_` settles it: 'auto' prefers the address and
+    says so loudly when the chain has nothing there, 'code' reads it as bytecode.
+    """
+    if as_ not in ('auto', 'address', 'code'):
+        raise MatchError('unknown as_: %s' % as_)
+    if as_ == 'address' or (as_ == 'auto' and re.fullmatch(r'0x[0-9a-fA-F]{40}', source)):
         payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'eth_getCode',
                               'params': [source, 'latest']}).encode()
         request = urllib.request.Request(rpc or DEFAULT_RPC, data=payload,
@@ -68,7 +76,7 @@ def load_code(source, rpc=None):
             raise MatchError('rpc error: %s' % body.get('error'))
         raw = body['result']
         if raw in ('0x', '0x0'):
-            raise MatchError('no code at %s' % source)
+            raise MatchError('no code at %s (an address with nothing deployed; pass as_/--as code to read it as bytecode)' % source)
         return bytes.fromhex(raw[2:])
     path = Path(source)
     if path.exists():
@@ -133,8 +141,8 @@ def match_code(code, placards, family='evm'):
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}
 
 
-def scan(source, register_dir, rpc=None, family='evm'):
-    code = load_code(source, rpc)
+def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
+    code = load_code(source, rpc, as_)
     placards = load_register(register_dir)
     matches, stats = match_code(code, placards, family)
     return {'target': source, 'family': family, 'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
@@ -152,11 +160,13 @@ def main(argv=None):
     parser.add_argument('--rpc', default=None)
     parser.add_argument('--chain', default=None, choices=sorted(chains.CHAINS))
     parser.add_argument('--family', default='evm', choices=list(FAMILIES))
+    parser.add_argument('--as', dest='as_', default='auto', choices=['auto', 'address', 'code'],
+                        help='how to read --code: an address, raw bytecode, or guess')
     args = parser.parse_args(argv)
     if args.chain:
         args.rpc = chains.endpoint(args.chain)
     try:
-        print(json.dumps(scan(args.code, args.register, args.rpc, args.family), indent=2, sort_keys=True))
+        print(json.dumps(scan(args.code, args.register, args.rpc, args.family, args.as_), indent=2, sort_keys=True))
         return 0
     except MatchError as exc:
         print(json.dumps({'state': 'blocked', 'error': str(exc)}))

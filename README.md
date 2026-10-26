@@ -71,6 +71,8 @@ One line per target: an address, raw code, or a path. Chains are named (`mainnet
 
 Keccak-256 is implemented in-repo, so the matcher and the deriver have no dependencies at all and no `cast` binary is needed.
 
+A 40-character hex string is ambiguous: exactly an address, and also a plausible 20-byte code blob. `--as address` or `--as code` settles it; the default prefers the address and says so loudly when the chain has nothing there.
+
 ## Contributing a placard
 
 1. Reproduce the hazard and keep the repro runnable.
