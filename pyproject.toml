@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hazmat"
+version = "0.1.0"
+description = "Match compiled smart contract code against a register of known bytecode hazards"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.scripts]
+hazmat = "hazmat.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "matcher"}
+packages = ["hazmat"]

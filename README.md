@@ -73,6 +73,21 @@ Keccak-256 is implemented in-repo, so the matcher and the deriver have no depend
 
 A 40-character hex string is ambiguous: exactly an address, and also a plausible 20-byte code blob. `--as address` or `--as code` settles it; the default prefers the address and says so loudly when the chain has nothing there.
 
+## What a scan returns
+
+A sheet, self-contained HTML with its own digest, plus the same content as JSON and as a PDF written by a dependency-free writer in this repo:
+
+    hazmat scan --code 0xADDRESS --chain mainnet --sheet out.html --pdf out.pdf
+    hazmat verify --sheet out.html              # re-derive the digest; non-zero if it was altered
+
+An example lives in `examples/` (sheet digest `0xc3deb7f83f06017b33912dc365a0b1e9369dc7699a164f79b10c0c8eccf1d9b4`), scanned from the live mainnet escrow.
+
+## Serve it
+
+    hazmat serve --port 8712
+
+`/` is a paste-a-target form, `/scan` is JSON, `/sheet` is HTML, `/pdf` is a PDF. Standard library only, read-only, and every response carries the code digest.
+
 ## Confirming a placard
 
 A `confirmed` placard can be re-confirmed from scratch: source is fetched from Sourcify, rebuilt with the settings from the verification record, compared selector-for-selector against the deployed runtime, then its vendored reproduction is run against the rebuild.

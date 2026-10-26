@@ -1,7 +1,16 @@
-"""Render a Safety Data Sheet: the shareable, self-contained report artifact."""
+"""Render a Safety Data Sheet: the shareable, self-contained report artifact.
+
+The sheet carries its own digest so a third party can re-derive it without
+trusting the producer. Tampering with any byte changes the digest.
+"""
 import hashlib
 import html
 import json
+import re
+import sys
+
+PLACEHOLDER = '{SHEET}'
+DIGEST_LINE = re.compile(r'sheet sha256 <code>([0-9a-f]{64})</code>')
 
 PAGE = """<!doctype html><meta charset="utf-8">
 <title>HazMat Safety Data Sheet {target}</title>
@@ -11,39 +20,72 @@ PAGE = """<!doctype html><meta charset="utf-8">
  table{{border-collapse:collapse;width:100%}} td,th{{border-bottom:1px solid #2a2a2a;padding:.5rem .4rem;text-align:left;vertical-align:top}}
  .id{{color:#ffb020;white-space:nowrap}} code{{color:#7fd1ff;word-break:break-all}} ul{{padding-left:1.2rem;color:#bdbdbd}}
  .banner{{border:1px solid #444;padding:.6rem .8rem;margin:1rem 0;background:#181818}}
+ .sel{{color:#9b9b9b;font-size:.85em}}
 </style>
 <h1>HazMat Safety Data Sheet</h1>
-<div>target <code>{target}</code></div>
+<div>target <code>{target}</code> &middot; family {family}</div>
 <div>code sha256 <code>{sha}</code></div>
-<div>register {register} placards &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
-<div class="banner"><b>Assertion level: pattern.</b> A match is a candidate. {assertion}</div>
+<div>register {register} placards v{register_digest} &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
+<div class="banner"><b>Assertion level: {assertion}.</b> A match is a candidate, not a clearance. {note}</div>
 <h2>Placards</h2>
-<table><tr><th>id</th><th>class</th><th>hazard</th><th>assertion</th><th>money</th></tr>
+<table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
 {rows}</table>
 <h2>Not checked</h2><ul>{notchecked}</ul>
-<footer><p>sheet sha256 <code>{sheet}</code></p></footer>
+<footer><p>sheet sha256 <code>{sheet}</code> &middot; re-derive with <code>hazmat verify</code>; cite the id, the code sha256 and the register digest.</p></footer>
 """
+
+
+def page_digest(page):
+    """The digest the sheet claims, recomputed from its own bytes."""
+    if PLACEHOLDER in page:
+        return '0x' + hashlib.sha256(page.encode()).hexdigest()
+    found = DIGEST_LINE.search(page)
+    if not found:
+        raise ValueError('no sheet digest line')
+    return '0x' + hashlib.sha256(page.replace(found.group(1), PLACEHOLDER, 1).encode()).hexdigest()
+
+
+def claimed_digest(page):
+    found = DIGEST_LINE.search(page)
+    return '0x' + found.group(1) if found else None
 
 
 def render(report):
     rows = []
     for m in report['matches']:
-        rows.append('<tr><td class="id">{}</td><td>{} {}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(
-            html.escape(m['id']), m['placard_class'], html.escape(m.get('placard_class_name') or ''),
-            html.escape(m['title']), html.escape(m['assertion']),
-            html.escape(m.get('money_bound', {}).get('expression', 'n/a'))))
+        selectors = ' '.join(m.get('matched_selectors') or [])
+        rows.append('<tr><td class="id">{}</td><td>{} {}</td><td>{}</td><td>{}</td><td>{}</td>'
+                    '<td class="sel">{}{}</td></tr>'.format(
+                        html.escape(m['id']), m['placard_class'], html.escape(m.get('placard_class_name') or ''),
+                        html.escape(m['title']), html.escape(m['assertion']),
+                        html.escape(m.get('money_bound', {}).get('expression', 'n/a')),
+                        html.escape(selectors),
+                        (' &middot; %d absence checks' % m['absent_checked']) if m.get('absent_checked') else ''))
     if not rows:
-        rows.append('<tr><td colspan="5">no placard matched. That is not the same as safe.</td></tr>')
-    page = PAGE.format(target=html.escape(report['target']), sha=html.escape(report['code_sha256']),
-                       register=report['register_size'], body=report['stats']['body_bytes'],
-                       meta=report['stats']['metadata_bytes'], consts=report['stats']['push4_constants'],
-                       assertion=html.escape(report['assertion']), rows='\n'.join(rows),
+        rows.append('<tr><td colspan="6">no placard matched. That is not the same as safe.</td></tr>')
+    page = PAGE.format(target=html.escape(report['target']), family=html.escape(report.get('family', 'evm')),
+                       sha=html.escape(report['code_sha256']), register=report['register_size'],
+                       register_digest=html.escape(report.get('register_digest', 'unpinned')),
+                       body=report['stats']['body_bytes'], meta=report['stats']['metadata_bytes'],
+                       consts=report['stats']['push4_constants'], assertion=html.escape(report['assertion']),
+                       note=html.escape(report['assertion'] + ' match only' if report['matches'] else 'nothing matched'),
+                       rows='\n'.join(rows),
                        notchecked=''.join('<li>%s</li>' % html.escape(x) for x in report['not_checked']),
-                       sheet='{SHEET}')
-    digest = hashlib.sha256(page.replace('{SHEET}', '').encode()).hexdigest()
-    return page.replace('{SHEET}', digest), '0x' + digest
+                       sheet=PLACEHOLDER)
+    digest = hashlib.sha256(page.encode()).hexdigest()
+    return page.replace(PLACEHOLDER, digest), '0x' + digest
+
+
+def verify(page, expect=None):
+    """Return (claimed, recomputed, ok). Optionally against an expected digest."""
+    claimed = claimed_digest(page)
+    recomputed = page_digest(page)
+    ok = bool(claimed) and claimed == recomputed and (expect is None or claimed == expect)
+    return claimed, recomputed, ok
 
 
 if __name__ == '__main__':
-    import sys
-    print(render(json.load(sys.stdin))[0])
+    page = sys.stdin.read()
+    claimed, recomputed, ok = verify(page, sys.argv[1] if len(sys.argv) > 1 else None)
+    print(json.dumps({'claimed': claimed, 'recomputed': recomputed, 'ok': ok}))
+    sys.exit(0 if ok else 1)

@@ -187,7 +187,7 @@
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeSameBlock.t.sol\nCompiling 44 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.87s\nCompiler run successful!\n\nRan 4 tests for test/ArgusProbeSameBlock.t.sol:ArgusProbeSameBlock\n[PASS] test_AB1_oneBlock_strangerTimeoutFirstDeniesTheBuyer() (gas: 784437)\n[PASS] test_AB2_oneBlock_buyerAcceptFirstPaysInFull() (gas: 812347)\n[PASS] test_AB3_oneBlock_lateArbiterSignatureLosesToo() (gas: 780254)\n[PASS] test_AB4_atTheBoundaryTimestampTheSignatureStillWins() (gas: 857893)\nSuite result: ok. 4 passed; 0 failed; 0 skipped; finished in 734.33\u00b5s (1.06ms CPU time)\n\nRan 1 test suite in 4.08ms (734.33\u00b5s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)\n",
+      "log_tail": "== ArgusProbeSameBlock.t.sol\nCompiling 44 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.86s\nCompiler run successful!\n\nRan 4 tests for test/ArgusProbeSameBlock.t.sol:ArgusProbeSameBlock\n[PASS] test_AB1_oneBlock_strangerTimeoutFirstDeniesTheBuyer() (gas: 784437)\n[PASS] test_AB2_oneBlock_buyerAcceptFirstPaysInFull() (gas: 812347)\n[PASS] test_AB3_oneBlock_lateArbiterSignatureLosesToo() (gas: 780254)\n[PASS] test_AB4_atTheBoundaryTimestampTheSignatureStillWins() (gas: 857893)\nSuite result: ok. 4 passed; 0 failed; 0 skipped; finished in 729.92\u00b5s (1.05ms CPU time)\n\nRan 1 test suite in 4.38ms (729.92\u00b5s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)\n",
       "match_test": "test_AB",
       "missing_lib_hint": null,
       "passed": [

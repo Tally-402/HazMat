@@ -13,7 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from hazmat import batch, chains, confirm, derive, keccak, match, sds  # noqa: E402
+from hazmat import batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -76,6 +76,87 @@ class AmbiguousInput(unittest.TestCase):
     def test_an_unknown_as_is_loud(self):
         with self.assertRaises(match.MatchError):
             match.load_code('0x' + '00' * 20, as_='nonsense')
+
+
+class Pdf(unittest.TestCase):
+    def report(self, matches=True):
+        return {'target': '0xdead', 'family': 'evm', 'code_sha256': '0x' + 'ab' * 32, 'register_size': 10,
+                'stats': {'body_bytes': 1, 'metadata_bytes': 2, 'push4_constants': 3},
+                'assertion': 'pattern match only; confirmation runs are separate',
+                'matches': ([{'id': 'HZ-001', 'title': 'a long hazard title that should wrap across the line',
+                              'placard_class': 2, 'placard_class_name': 'ordering', 'tier': 'confirmed',
+                              'assertion': 'pattern', 'matched_selectors': ['0xe4725ba1'], 'absent_checked': 2,
+                              'money_bound': {'expression': 'one deal'}}] if matches else []),
+                'not_checked': ['reachability', 'economic preconditions']}
+
+    def test_a_pdf_is_well_formed_and_carries_the_evidence(self):
+        body = pdf.render_pdf(self.report())
+        self.assertTrue(body.startswith(b'%PDF-1.4'))
+        self.assertTrue(body.rstrip().endswith(b'%%EOF'))
+        self.assertIn(b'/Type /Catalog', body)
+        self.assertIn(b'HZ-001', body)
+        self.assertIn(b'0xe4725ba1', body)
+        self.assertIn(b'NOT CHECKED', body)
+
+    def test_layout_is_deterministic_and_paginates(self):
+        self.assertEqual(pdf.render_pdf(self.report()), pdf.render_pdf(self.report()))
+        long_report = self.report()
+        long_report['not_checked'] = ['item %d' % i for i in range(200)]
+        self.assertGreater(pdf.page_count(pdf.render_pdf(long_report)), 1)
+
+    def test_escaping_handles_parentheses_and_backslashes(self):
+        line = pdf.escape('a (b) c\\d')
+        self.assertEqual(line, 'a \\(b\\) c\\\\d')
+
+
+class Verify(unittest.TestCase):
+    def test_a_sheet_verifies_then_fails_once_tampered_with(self):
+        report = Pdf().report()
+        page, digest = sds.render(report)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp, 'sheet.html')
+            path.write_text(page)
+            self.assertTrue(verify.verify_sheet(str(path))['ok'])
+            self.assertTrue(verify.verify_sheet(str(path), digest)['ok'])
+            self.assertFalse(verify.verify_sheet(str(path), '0x' + '00' * 32)['ok'])
+            path.write_text(page.replace('HZ-001', 'HZ-002'))
+            self.assertFalse(verify.verify_sheet(str(path))['ok'])
+
+    def test_a_record_with_a_bad_stage_is_not_ok(self):
+        record = {'target': '0xdead', 'verdict': 'blocked', 'stages': {'fetch': {'state': 'blocked'}}}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp, 'r.json')
+            path.write_text(json.dumps(record))
+            got = verify.verify_record(str(path))
+            self.assertFalse(got['ok'])
+            self.assertTrue(any('fetch' in c['check'] and not c['ok'] for c in got['checks']))
+
+    def test_the_register_digest_changes_when_a_placard_does(self):
+        before = match.register_digest(REGISTER)
+        self.assertEqual(before, match.register_digest(REGISTER))
+        self.assertTrue(before.startswith('0x') and len(before) == 18)
+
+
+class Serve(unittest.TestCase):
+    def test_the_server_answers_the_form_and_rejects_a_bad_chain(self):
+        import threading
+        import urllib.error
+        import urllib.request
+        server = serve.make_server(0, '127.0.0.1')
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            port = server.server_address[1]
+            form = urllib.request.urlopen('http://127.0.0.1:%d/' % port, timeout=10).read().decode()
+            self.assertIn('Paste a contract address', form)
+            self.assertIn('<select name="chain">', form)
+            try:
+                urllib.request.urlopen('http://127.0.0.1:%d/scan?target=0x1&chain=nope' % port, timeout=10)
+                self.fail('a bad chain should be a 400')
+            except urllib.error.HTTPError as exc:   # urllib raises on 4xx, so read the body off the error
+                self.assertEqual(exc.code, 400)
+                self.assertEqual(json.loads(exc.read())['state'], 'blocked')
+        finally:
+            server.shutdown()
 
 
 class Confirm(unittest.TestCase):
@@ -192,7 +273,10 @@ class Batch(unittest.TestCase):
             self.assertEqual(len(reports), 2)
             self.assertEqual([m['id'] for m in reports[0]['matches']], ['HZ-001'])
             self.assertEqual(reports[1]['matches'], [])
-            self.assertEqual(len(os.listdir(sheets)), 1)
+            self.assertEqual(len(os.listdir(sheets)), 2)   # a clean sheet is a document too
+            page = Path(sheets, os.listdir(sheets)[0]).read_text()
+            html = [p for p in Path(sheets).iterdir() if 'not the same as safe' in p.read_text()]
+            self.assertTrue(html)
 
 
 class Derive(unittest.TestCase):

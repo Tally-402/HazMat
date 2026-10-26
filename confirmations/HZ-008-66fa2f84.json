@@ -310,7 +310,7 @@
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeFuzz.t.sol\nCompiling 47 files with Solc 0.8.27\nSolc 0.8.27 finished in 2.89s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeFuzz.t.sol:ArgusProbeFuzzVault\n[PASS] test_P1_precompileRecipientsAreNotInert() (gas: 1073000641)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.03ms (769.38\u00b5s CPU time)\n\nRan 1 test suite in 4.00ms (1.03ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n\n== ArgusProbeGenAndGas.t.sol\nNo files changed, compilation skipped\nWarning: no tests match the provided pattern:\n\tmatch-test: `test_P1`\n\tmatch-path: `test/ArgusProbeGenAndGas.t.sol`\n\n",
+      "log_tail": "== ArgusProbeFuzz.t.sol\nCompiling 47 files with Solc 0.8.27\nSolc 0.8.27 finished in 2.89s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeFuzz.t.sol:ArgusProbeFuzzVault\n[PASS] test_P1_precompileRecipientsAreNotInert() (gas: 1073000641)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 383.00\u00b5s (144.12\u00b5s CPU time)\n\nRan 1 test suite in 3.88ms (383.00\u00b5s CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n\n== ArgusProbeGenAndGas.t.sol\nNo files changed, compilation skipped\nWarning: no tests match the provided pattern:\n\tmatch-test: `test_P1`\n\tmatch-path: `test/ArgusProbeGenAndGas.t.sol`\n\n",
       "match_test": "test_P1",
       "missing_lib_hint": null,
       "passed": [

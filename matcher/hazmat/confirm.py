@@ -336,6 +336,8 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
 
     # stage: compare
     deployed = match.load_code(target, rpc or chains.endpoint(chain))
+    record['target_code_sha256'] = '0x' + _sha256(deployed)
+    record['target_code_bytes'] = len(deployed)
     try:
         record['stages']['compare'] = compare_rebuilt(str(root / 'out'), compilation['name'], deployed)
     except ConfirmError as exc:

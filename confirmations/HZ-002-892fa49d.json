@@ -159,7 +159,7 @@
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.58s\nCompiler run successful!\n\nRan 2 tests for test/ArgusProbeGenAndGas.t.sol:ArgusProbeRecoveryGeneration\n[PASS] test_AG003_control_scheduleAloneLeavesTheSignatureInvalid() (gas: 137714)\n[PASS] test_AG003_preSignedFutureGenerationSurvivesAScheduleAndCancel() (gas: 411134)\nSuite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.05ms (1.33ms CPU time)\n\nRan 1 test suite in 4.06ms (3.05ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)\n",
+      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.57s\nCompiler run successful!\n\nRan 2 tests for test/ArgusProbeGenAndGas.t.sol:ArgusProbeRecoveryGeneration\n[PASS] test_AG003_control_scheduleAloneLeavesTheSignatureInvalid() (gas: 137714)\n[PASS] test_AG003_preSignedFutureGenerationSurvivesAScheduleAndCancel() (gas: 411134)\nSuite result: ok. 2 passed; 0 failed; 0 skipped; finished in 827.96\u00b5s (444.96\u00b5s CPU time)\n\nRan 1 test suite in 3.71ms (827.96\u00b5s CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)\n",
       "match_test": "test_AG003",
       "missing_lib_hint": null,
       "passed": [

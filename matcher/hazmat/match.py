@@ -141,6 +141,13 @@ def match_code(code, placards, family='evm'):
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}
 
 
+def register_digest(register_dir):
+    """One digest over the whole register, so a sheet names the revision it used."""
+    rows = sorted(Path(register_dir).glob('*.json'))
+    blob = b''.join(p.read_bytes() for p in rows)
+    return '0x' + hashlib.sha256(blob).hexdigest()[:16]
+
+
 def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
     code = load_code(source, rpc, as_)
     placards = load_register(register_dir)
@@ -148,7 +155,8 @@ def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
     return {'target': source, 'family': family, 'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
             'register_size': len(placards), 'stats': stats, 'matches': matches,
             'assertion': 'pattern match only; confirmation runs are separate',
-            'not_checked': ['reachability', 'economic preconditions',
+            'register_digest': register_digest(register_dir),
+    'not_checked': ['reachability', 'economic preconditions',
                             'state at any particular block', 'source-level reasoning',
                             'anything not covered by a placard']}
 
@@ -162,11 +170,24 @@ def main(argv=None):
     parser.add_argument('--family', default='evm', choices=list(FAMILIES))
     parser.add_argument('--as', dest='as_', default='auto', choices=['auto', 'address', 'code'],
                         help='how to read --code: an address, raw bytecode, or guess')
+    parser.add_argument('--pdf', dest='pdf_out', default=None, help='also write the sheet as a PDF')
+    parser.add_argument('--sheet', dest='sheet_out', default=None, help='also write the sheet as HTML')
     args = parser.parse_args(argv)
     if args.chain:
         args.rpc = chains.endpoint(args.chain)
     try:
-        print(json.dumps(scan(args.code, args.register, args.rpc, args.family, args.as_), indent=2, sort_keys=True))
+        report = scan(args.code, args.register, args.rpc, args.family, args.as_)
+        if args.pdf_out or args.sheet_out:
+            from . import pdf as pdfmod
+            from . import sds as sdsmod
+            page, digest = sdsmod.render(report)
+            if args.sheet_out:
+                Path(args.sheet_out).write_text(page)
+                report['sheet'] = args.sheet_out
+            if args.pdf_out:
+                Path(args.pdf_out).write_bytes(pdfmod.render_pdf(report))
+                report['pdf'] = args.pdf_out
+        print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     except MatchError as exc:
         print(json.dumps({'state': 'blocked', 'error': str(exc)}))

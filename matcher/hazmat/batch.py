@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path
 
 from . import chains, match, sds
 
@@ -29,12 +30,15 @@ def run(path, register, rpc=None, chain=None, sheet_dir=None, quiet=False, as_='
             report = match.scan(target, register, rpc, as_=as_)
         except match.MatchError as exc:
             report = {'target': target, 'state': 'blocked', 'error': str(exc), 'matches': []}
-        if sheet_dir and report.get('matches'):
+        if sheet_dir:
+            # a clean sheet is still a document, so one is always written
             os.makedirs(sheet_dir, exist_ok=True)
             page, digest = sds.render(report)
-            name = os.path.join(sheet_dir, (report.get('code_sha256', target)[:18].replace('0x', '')) + '.html')
+            stem = report.get('code_sha256', target)[:18].replace('0x', '')
+            name = os.path.join(sheet_dir, stem + '.html')
             open(name, 'w').write(page)
             report['sheet'] = name
+            report['sheet_digest'] = digest
         reports.append(report)
         if not quiet:
             ids = [m['id'] for m in report.get('matches', [])]

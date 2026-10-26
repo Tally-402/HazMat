@@ -27,5 +27,20 @@ jobs:
           PY
       - name: matcher tests
         run: cd matcher && python -m unittest discover -s tests -v
+      - name: a sheet renders offline and its digest verifies (then fails once tampered with)
+        run: |
+          PYTHONPATH=matcher python -m hazmat.cli scan --as code --code 0x63e4725ba1637c7a98046382cbf88b6382cbf88b \
+            --sheet /tmp/sheet.html --pdf /tmp/sheet.pdf > /dev/null
+          PYTHONPATH=matcher python -m hazmat.cli verify --sheet /tmp/sheet.html | tail -20
+          python - <<'PY'
+          import pathlib, subprocess
+          page = pathlib.Path('/tmp/sheet.html')
+          page.write_text(page.read_text().replace('HZ-001', 'HZ-999'))
+          out = subprocess.run(['python', '-m', 'hazmat.cli', 'verify', '--sheet', str(page)],
+                               env={'PYTHONPATH': 'matcher', 'PATH': '/usr/bin:/bin:/usr/local/bin'},
+                               capture_output=True, text=True)
+          assert out.returncode == 1, 'a tampered sheet must fail verification'
+          print('tamper detected')
+          PY
       - name: every placard fires on its own target and stays quiet on the others
         run: PYTHONPATH=matcher python -m hazmat.selfcheck

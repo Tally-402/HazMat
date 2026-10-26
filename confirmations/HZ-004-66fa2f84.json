@@ -95,7 +95,7 @@
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.57s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeGenAndGas.t.sol:ArgusProbeVaultConfigGas\n[PASS] test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration() (gas: 2902382)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.31ms (1.20ms CPU time)\n\nRan 1 test suite in 3.91ms (1.31ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n",
+      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.58s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeGenAndGas.t.sol:ArgusProbeVaultConfigGas\n[PASS] test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration() (gas: 2902382)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.14ms (1.02ms CPU time)\n\nRan 1 test suite in 3.88ms (1.14ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n",
       "match_test": "test_AG002",
       "missing_lib_hint": null,
       "passed": [
