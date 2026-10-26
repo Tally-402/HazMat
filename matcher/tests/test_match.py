@@ -214,6 +214,36 @@ class Watch(unittest.TestCase):
         rows = json.loads(Path(self.alerts).read_text().strip().splitlines()[-1])
         self.assertEqual((rows['kind'], rows['address']), ('upgrade', '0xccc'))
 
+    def test_an_address_in_both_the_feed_and_the_watchlist_alerts_its_upgrade_once(self):
+        watchlist = os.path.join(self.tmp.name, 'w.json')
+        Path(watchlist).write_text(json.dumps({'addresses': [{'chain': 'mainnet', 'address': '0xdual'}]}))
+        new_code = [{'code_sha256': '0x' + '22' * 32, 'placards': []}]
+        same_code = [{'code_sha256': '0x' + '11' * 32, 'placards': []}]
+        def first(address):
+            return same_code[0]
+        def second(address):
+            return new_code[0]
+        entry = [{'address': '0xdual', 'verifiedAt': '2026-07-01T00:00:00Z'}]
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(*entry), inspect_fn=first,
+                        sink=self.alerts, watchlist=watchlist)          # first sight: no alert
+        self.assertEqual(watch.status(self.db)['alerts'], 0)
+        got = watch.pass_once(self.db, 'mainnet', feed=self.feed(), inspect_fn=second,
+                              sink=self.alerts, watchlist=watchlist)     # the watchlist sees the change
+        self.assertEqual(got['upgrades'], 1)
+        self.assertEqual(watch.status(self.db)['alerts'], 1)
+
+    def test_an_upgrade_on_a_matching_address_alerts_and_keeps_the_match(self):
+        hashes = iter(['0x' + 'a1' * 32, '0x' + 'b2' * 32])   # one inspection per pass
+        def inspector(address):
+            return {'code_sha256': next(hashes), 'placards': ['HZ-001']}
+        # the second entry is a re-verification, which is how a feed shows an upgrade
+        entry = [{'address': '0xmatch', 'verifiedAt': '2026-08-01T00:00:00Z'}]
+        again = [{'address': '0xmatch', 'verifiedAt': '2026-08-02T00:00:00Z'}]
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(*entry), inspect_fn=inspector, sink=self.alerts)
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(*again), inspect_fn=inspector, sink=self.alerts)
+        kinds = [json.loads(l)['kind'] for l in Path(self.alerts).read_text().strip().splitlines()]
+        self.assertEqual(kinds, ['new', 'upgrade'])
+
     def test_the_cursor_does_not_move_backwards(self):
         watch.pass_once(self.db, 'mainnet', feed=self.feed({'address': '0x1', 'verifiedAt': '2026-05-01T00:00:00Z'}),
                         inspect_fn=self.inspector(), sink=self.alerts)

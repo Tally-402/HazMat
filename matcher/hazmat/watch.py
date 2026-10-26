@@ -60,7 +60,13 @@ def fetch_feed(chain, limit=200, chain_id=None):
 
 
 def candidates(db, chain, entries):
-    """Entries past the cursor and not already in the table."""
+    """Entries past the cursor.
+
+    Deliberately not filtered against `seen`: a contract can be verified again
+    after being upgraded, and that re-appearance is exactly how a feed notices a
+    code change. Deduplication inside a pass happens because the first
+    observation records the hash the second one then compares against.
+    """
     row = db.execute('select verified_at from cursors where chain = ?', (chain,)).fetchone()
     since = row['verified_at'] if row else ''
     out = []
@@ -68,12 +74,16 @@ def candidates(db, chain, entries):
         if (entry.get('verifiedAt') or '') <= since:
             continue
         address = (entry.get('address') or '').lower()
-        if not address:
-            continue
-        if db.execute('select 1 from seen where address = ? and chain = ?', (address, chain)).fetchone():
-            continue
-        out.append(dict(entry, address=address))
+        if address:
+            out.append(dict(entry, address=address))
     return out
+
+
+def changed(db, chain, address, code_sha256):
+    """True when this address was seen before with a different code hash."""
+    row = db.execute('select code_sha256 from seen where address = ? and chain = ?',
+                     (address.lower(), chain)).fetchone()
+    return bool(row and row['code_sha256'] and code_sha256 and row['code_sha256'] != code_sha256)
 
 
 def record(db, chain, address, code_sha256, placards, kind='new'):
@@ -83,6 +93,22 @@ def record(db, chain, address, code_sha256, placards, kind='new'):
                   placards = excluded.placards, kind = excluded.kind""",
                (address.lower(), chain, code_sha256, time.time(), ','.join(placards), kind))
     db.commit()
+
+
+def observe(db, chain, address, code_sha256, placards, kind='new', sink=None, webhook=None):
+    """Record an observation, alerting if this address's code changed under us.
+
+    Both the feed and the watchlist go through here, so an address that appears in
+    both cannot have its hash quietly overwritten before the change is noticed.
+    """
+    row = db.execute('select code_sha256 from seen where address = ? and chain = ?',
+                     (address.lower(), chain)).fetchone()
+    upgraded = 0
+    if row and row['code_sha256'] and code_sha256 and row['code_sha256'] != code_sha256:
+        alert(db, chain, address, code_sha256, placards, 'upgrade', None, None, sink, webhook)
+        upgraded = 1
+    record(db, chain, address, code_sha256, placards, kind)
+    return upgraded
 
 
 def alert(db, chain, address, code_sha256, placards, kind='new', sheet=None, digest=None,
@@ -135,6 +161,7 @@ def pass_once(db, chain='mainnet', register='register/placards', limit=200, rpc=
         entries = []
     todo = candidates(db, chain, entries)
     matched = 0
+    upgraded = 0
     for entry in todo:
         address = entry['address']
         try:
@@ -143,24 +170,30 @@ def pass_once(db, chain='mainnet', register='register/placards', limit=200, rpc=
             errors.append('%s: %s' % (address, exc))
             record(db, chain, address, None, [])
             continue
-        record(db, chain, address, found['code_sha256'], found['placards'])
+        # one alert per address per pass: an upgrade outranks a first sighting
+        is_upgrade = changed(db, chain, address, found['code_sha256'])
+        if not found['placards'] and not is_upgrade:
+            record(db, chain, address, found['code_sha256'], found['placards'])
+            continue
+        sheet = digest = None
+        if found['placards'] and sheet_dir:
+            report = match.scan(address, register, rpc or chains.endpoint(chain))
+            Path(sheet_dir).mkdir(parents=True, exist_ok=True)
+            page, digest = sds.render(report)
+            sheet = os.path.join(sheet_dir, found['code_sha256'][:18].replace('0x', '') + '.html')
+            Path(sheet).write_text(page)
         if found['placards']:
             matched += 1
-            sheet = digest = None
-            if sheet_dir:
-                report = match.scan(address, register, rpc or chains.endpoint(chain))
-                Path(sheet_dir).mkdir(parents=True, exist_ok=True)
-                page, digest = sds.render(report)
-                sheet = os.path.join(sheet_dir, found['code_sha256'][:18].replace('0x', '') + '.html')
-                Path(sheet).write_text(page)
-            alert(db, chain, address, found['code_sha256'], found['placards'], 'new', sheet, digest,
-                  sink, webhook)
+        upgraded += 1 if is_upgrade else 0
+        alert(db, chain, address, found['code_sha256'], found['placards'],
+              'upgrade' if is_upgrade else 'new', sheet, digest, sink, webhook)
+        record(db, chain, address, found['code_sha256'], found['placards'])
     newest = max([e.get('verifiedAt') or '' for e in entries] or [''])
     if newest:
         db.execute("""insert into cursors (chain, verified_at) values (?, ?)
                       on conflict(chain) do update set verified_at = excluded.verified_at""", (chain, newest))
         db.commit()
-    upgraded = check_watchlist(db, register, chain, rpc, sink, webhook, inspector, watchlist)
+    upgraded += check_watchlist(db, register, chain, rpc, sink, webhook, inspector, watchlist)
     db.execute('insert into runs (created, chain, kind, candidates, matched, errors) values (?, ?, ?, ?, ?, ?)',
                (time.time(), chain, 'new+upgrade', len(todo), matched, '; '.join(errors[:10])))
     db.commit()
@@ -180,13 +213,7 @@ def check_watchlist(db, register, chain, rpc, sink, webhook, inspector, path=WAT
             found = inspector(address)
         except match.MatchError:
             continue
-        row = db.execute('select code_sha256 from seen where address = ? and chain = ?',
-                         (address, chain)).fetchone()
-        if row and row['code_sha256'] and row['code_sha256'] != found['code_sha256']:
-            alert(db, chain, address, found['code_sha256'], found['placards'], 'upgrade', None, None,
-                  sink, webhook)
-            hits += 1
-        record(db, chain, address, found['code_sha256'], found['placards'], kind='watch')
+        hits += observe(db, chain, address, found['code_sha256'], found['placards'], 'watch', sink, webhook)
     return hits
 
 
