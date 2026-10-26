@@ -62,9 +62,10 @@ class Matching(unittest.TestCase):
 
 class AmbiguousInput(unittest.TestCase):
     def test_a_40_hex_blob_can_be_forced_to_raw_code(self):
-        blob = '0x' + ('63e4725ba1' * 3 + '637c7a9804' + '6382cbf88b')[:40]
+        blob = '0x' + ('63e4725ba1' * 3 + '637c7a9804')[:40]   # both required selectors survive the truncation
+        self.assertEqual(len(blob), 42)                        # exactly 40 hex characters: address-shaped
         found, _ = match.match_code(bytes.fromhex(blob[2:]), PLACARD)
-        self.assertEqual([m['id'] for m in found], [])          # truncated, so only the first selector survives
+        self.assertEqual([m['id'] for m in found], ['HZ-001'])
         full = '0x' + '63e4725ba1637c7a98046382cbf88b' + '63' + '82cbf88b'
         report = match.scan(full, REGISTER, as_='code')
         self.assertEqual([m['id'] for m in report['matches']], ['HZ-001'])
