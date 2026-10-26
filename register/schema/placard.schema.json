@@ -145,6 +145,13 @@
             "type": "string"
           },
           "description": "every verified source the probe needs, target included"
+        },
+        "add_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "sibling source files the verified bundle cannot carry, resolved from --source-root"
         }
       },
       "additionalProperties": false

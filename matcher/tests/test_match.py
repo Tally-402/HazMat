@@ -502,6 +502,27 @@ class ScanSubject(unittest.TestCase):
         self.assertIn('Addresses scanned', page)
 
 
+class Schema(unittest.TestCase):
+    def test_the_validator_catches_what_ci_would_catch(self):
+        import sys as _sys
+        _sys.path.insert(0, str(ROOT / 'matcher'))
+        from hazmat import schema_check
+        self.assertEqual(schema_check.check(REGISTER), [])          # the register as shipped
+        # a field the schema does not know must be an error, not a shrug
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, 'HZ-900.json').write_text(json.dumps(
+                {**json.loads(Path(REGISTER, 'HZ-001.json').read_text()), 'invented': True}))
+            errors = schema_check.check(tmp, None, tmp)
+            self.assertTrue(any('invented' in e for e in errors), errors)
+        # a matcher that asks for nothing, and a bad selector, are errors too
+        with tempfile.TemporaryDirectory() as tmp:
+            row = json.loads(Path(REGISTER, 'HZ-001.json').read_text())
+            row['matcher']['require_all'] = ['0xZZZ']
+            Path(tmp, 'HZ-001.json').write_text(json.dumps(row))
+            errors = schema_check.check(tmp, None, tmp)
+            self.assertTrue(any('selector' in e for e in errors), errors)
+
+
 class NoPersonalPaths(unittest.TestCase):
     def test_no_artifact_carries_this_machines_home_directory(self):
         report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
