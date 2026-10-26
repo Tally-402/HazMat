@@ -59,8 +59,14 @@ class Sheet(unittest.TestCase):
         report = match.scan('0x' + code_with('0xe4725ba1', '0x7c7a9804', '0x82cbf88b').hex(), REGISTER)
         page, digest = sds.render(report)
         self.assertIn('HZ-001', page)
-        self.assertIn('not the same as safe', page)
+        self.assertIn('Assertion level: pattern', page)
         self.assertTrue(digest.startswith('0x') and len(digest) == 66)
+
+    def test_a_clean_sheet_still_says_it_is_not_a_clean_bill(self):
+        report = match.scan('0x' + code_with('0x11111111').hex(), REGISTER)
+        page, _ = sds.render(report)
+        self.assertEqual(report['matches'], [])
+        self.assertIn('not the same as safe', page)
 
 
 if __name__ == '__main__':
