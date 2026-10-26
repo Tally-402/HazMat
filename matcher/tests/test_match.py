@@ -308,6 +308,21 @@ class Anchor(unittest.TestCase):
             self.assertEqual(got['root'], root)
             self.assertTrue(anchor.verify(got['leaf'], got['proof'], root))
 
+    def test_a_proof_into_an_old_epoch_uses_that_epochs_leaves(self):
+        # the register has grown since epoch 1 was published, so today's tree cannot
+        # reproduce an epoch-1 proof - only the leaves epoch 1 recorded can
+        old = anchor.load_epoch(1)
+        got = anchor.proof(REGISTER, old['leaves'][0]['id'], epoch=1)
+        self.assertEqual(got['epoch'], 1)
+        self.assertTrue(anchor.verify(got['leaf'], got['proof'], old['root']))
+        self.assertFalse(anchor.verify(got['leaf'], got['proof'], anchor.load_epoch(2)['root']))
+        today = anchor.proof(REGISTER, old['leaves'][0]['id'])          # today's tree
+        self.assertEqual(today['epoch'], 2)
+        self.assertTrue(anchor.verify(today['leaf'], today['proof'], anchor.load_epoch(2)['root']))
+        self.assertFalse(anchor.verify(today['leaf'], today['proof'], old['root']))
+        with self.assertRaises(anchor.AnchorError):
+            anchor.proof(REGISTER, 'HZ-015', epoch=1)                    # not in that epoch
+
     def test_a_stranger_leaf_and_an_empty_register(self):
         rows = anchor.leaves_of(REGISTER)
         _, root = anchor.build([r['leaf'] for r in rows])

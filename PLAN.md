@@ -92,3 +92,17 @@ Trigger: 25 published EVM classes, or a paying Solana-native customer. Then: `sb
 ## Explicitly not yet
 
 Pricing, payment plumbing, accounts, a human-review tier, insurance data products, multi-language sheets, and any claim of coverage beyond "matched against register version N".
+
+## CI and epochs (measured, not assumed)
+
+- `validate` runs five gates on every push: schema validation, the forge proof cross-check,
+  the test suite, an offline sheet render + verify + tamper, and the self-check. It is green
+  at `dd339cb`. Before that it had failed on **every push** and I had not checked: the schema
+  did not know the `add_sources` key, `jsonschema` is not installed locally so the local run
+  never disagreed, and forge was not installed on the runner.
+- The register is therefore validated by `matcher/hazmat/schema_check.py`, a dependency-free
+  validator that fails on any schema keyword it does not implement. CI and a laptop now run
+  the same code, so a schema drift cannot hide behind "CI covers it".
+- Publishing an epoch does not invalidate older ones. A sheet is verified against the epoch
+  it names, and a proof into a closed epoch is computed from that epoch's recorded leaves,
+  because today's register can no longer reproduce an old tree.

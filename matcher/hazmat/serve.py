@@ -88,9 +88,11 @@ def placard_payload(placard_id, register=None):
 def proof_payload(placard_id, register=None, anchor_dir=None):
     register = register or Handler.register
     anchor_dir = anchor_dir or str(rooted('anchors'))
-    record = anchor.load_epoch(max(1, len(list(Path(anchor_dir).glob('epoch-*.json')))), anchor_dir)
-    got = anchor.proof(register, placard_id)
+    got = anchor.proof(register, placard_id, anchor_dir=anchor_dir)
+    epoch = got['epoch'] or max(1, len(list(Path(anchor_dir).glob('epoch-*.json'))))
+    record = anchor.load_epoch(epoch, anchor_dir)
     return {'epoch': record['epoch'], 'leaf': got['leaf'], 'proof': got['proof'], 'root': got['root'],
+            'backed_by_a_published_epoch': got['epoch'] is not None,
             'verified': got['root'] == record['root'] and anchor.verify(got['leaf'], got['proof'], record['root'])}
 
 

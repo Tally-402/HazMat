@@ -81,9 +81,34 @@ def build(leaves):
     return levels, '0x' + level[0]
 
 
-def proof(register_dir, placard_id):
-    """Sibling hashes from the leaf to the root, no side flags: pairs are sorted."""
-    rows = leaves_of(register_dir)
+def published_epoch_for(root, anchor_dir=None):
+    """Which published epoch, if any, has this root. A root nobody published is not a claim."""
+    for path in sorted(Path(anchor_dir or DEFAULT_DIR).glob('epoch-*.json')):
+        try:
+            record = json.loads(path.read_text())
+        except ValueError:
+            continue
+        if record.get('root') == root:
+            return record['epoch']
+    return None
+
+
+def proof(register_dir, placard_id, epoch=None, anchor_dir=None):
+    """Sibling hashes from the leaf to the root, no side flags: pairs are sorted.
+
+    With no epoch the tree is today's register. With one it is the leaf set that epoch
+    published: once the register grows, a proof into an old epoch cannot be recomputed
+    from today's tree, only from the leaves that epoch actually recorded.
+    """
+    if epoch is None:
+        rows = leaves_of(register_dir)
+        digest = match.register_digest(register_dir)
+    else:
+        record = load_epoch(epoch, anchor_dir) if anchor_dir else load_epoch(epoch)
+        rows = record['leaves']
+        digest = record['register_digest']
+        if not any(row['id'] == placard_id for row in rows):
+            raise AnchorError('%s is not in epoch %s' % (placard_id, record['epoch']))
     leaves = [row['leaf'] for row in rows]
     target = next((row for row in rows if row['id'] == placard_id), None)
     if target is None:
@@ -100,9 +125,10 @@ def proof(register_dir, placard_id):
         siblings.append(sibling)
         node = parent(ordered[index], sibling)
         level = [parent(ordered[i], ordered[i + 1]) for i in range(0, len(ordered), 2)]
+    root = '0x' + node
     return {'placard': placard_id, 'leaf': target['leaf'], 'proof': ['0x' + s for s in siblings],
-            'root': '0x' + node,
-            'register_digest': match.register_digest(register_dir)}
+            'root': root, 'epoch': epoch if epoch is not None else published_epoch_for(root, anchor_dir),
+            'register_digest': digest}
 
 
 def verify(leaf_hex, siblings, root):
@@ -164,7 +190,9 @@ def main(argv=None):
     if args.action == 'prove':
         if not args.placard:
             parser.error('prove wants --placard')
-        print(json.dumps(proof(args.register, args.placard), indent=2, sort_keys=True))
+        got = proof(args.register, args.placard, epoch=int(args.epoch) if args.epoch else None,
+                    anchor_dir=args.dir)
+        print(json.dumps(got, indent=2, sort_keys=True))
         return 0
     if args.action == 'verify':
         if not (args.proof and args.root and args.leaf) and not args.proof:
