@@ -63,8 +63,7 @@ def anchor_line(report):
     anchor = report.get('register_anchor')
     if not anchor:
         return 'no epoch published yet'
-    from . import paths
-    return 'epoch %s root %s (%s)' % (anchor.get('epoch'), anchor.get('root'), paths.display(anchor.get('file')))
+    return 'epoch %s root %s (%s)' % (anchor.get('epoch'), anchor.get('root'), anchor.get('file'))
 
 
 def render(report):

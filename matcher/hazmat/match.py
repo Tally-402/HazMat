@@ -159,7 +159,7 @@ def latest_anchor(anchor_dir=None):
         return None
     record = _json.loads(paths[-1].read_text())
     return {'epoch': record.get('epoch'), 'root': record.get('root'),
-            'register_digest': record.get('register_digest'), 'file': str(paths[-1])}
+            'register_digest': record.get('register_digest'), 'file': paths[-1].name}
 
 
 def load_selector_names(register_dir):

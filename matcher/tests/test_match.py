@@ -13,7 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from hazmat import anchor, batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify, watch  # noqa: E402
+from hazmat import anchor, batch, chains, confirm, derive, keccak, match, paths, pdf, sds, serve, verify, watch  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -348,6 +348,22 @@ class Coverage(unittest.TestCase):
         self.assertIn('What was read', page)
         self.assertIn('otherwise unaccounted', page)
         self.assertEqual(report['matches'], [])
+
+
+class NoPersonalPaths(unittest.TestCase):
+    def test_no_artifact_carries_this_machines_home_directory(self):
+        report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
+        blob = json.dumps(report)
+        self.assertNotIn('/Users/', blob)
+        self.assertNotIn(str(Path.home()), blob)
+        page, _ = sds.render(report)
+        self.assertNotIn('/Users/', page)
+        self.assertIn('epoch-1.json', page)                       # named by file, not by path
+
+    def test_a_displayed_path_prefers_relative_then_tilde(self):
+        self.assertEqual(paths.display(Path(REGISTER, 'HZ-001.json')), 'register/placards/HZ-001.json')
+        self.assertTrue(paths.display(Path.home() / 'x').startswith('~/'))
+        self.assertEqual(paths.display('/etc/hosts'), '/etc/hosts')
 
 
 class Api(unittest.TestCase):
