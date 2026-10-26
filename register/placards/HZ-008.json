@@ -1,0 +1,46 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-008",
+  "placard_class": 6,
+  "placard_class_name": "asset-handling",
+  "title": "A value paying out to a precompile-range address reverts because the recipient refuses the call",
+  "summary": "Paying out with a bare value transfer assumes the recipient accepts it. Addresses 0x01 through 0x08, 0x0b through 0x0f accept, while 0x09 (blake2f) and 0x0a (kzg point evaluation) refuse a value-only call, so a withdrawal aimed at them reverts until the recipient is changed.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xd0e30db0",
+      "0x4b1533b2",
+      "0x1658af37"
+    ],
+    "notes": "deposit() 0xd0e30db0, totalPrincipal() 0x4b1533b2, evaluate(bytes) 0x1658af37. selectors derived from source and ABI, membership checked against the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "per-event",
+    "expression": "one withdrawal, recoverable only by an owner action once the recipient address is changed"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeFuzz.t.sol --match-test test_P1",
+    "source": "claus-network/contracts/test/ArgusProbeFuzz.t.sol::ArgusProbeFuzzVault::test_P1_precompileRecipientsAreNotInert",
+    "expected": "a sweep of 0x01 to 0x10 finds exactly two addresses that refuse a value-only call, 0x09 and 0x0a, with TransferFailed"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111"
+    }
+  ],
+  "fix": "Fall back to a push that tolerates refusal, or document which recipient addresses are inert.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "contracts/src/ClausNativeVault.sol (payout path)",
+    "deployed_verified": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
+    "evidence": [
+      "sweep of 0x01 to 0x10: only 0x09 and 0x0a refuse",
+      "the refusal surfaces as TransferFailed, not as a silent loss"
+    ]
+  }
+}

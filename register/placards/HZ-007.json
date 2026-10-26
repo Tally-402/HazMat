@@ -1,0 +1,46 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-007",
+  "placard_class": 3,
+  "placard_class_name": "authority",
+  "title": "Renewing a live session in place resets its spending window under the same session id",
+  "summary": "Re-authorizing an unrevoked session id advances its generation and resets the per-window spend counter while keeping the cumulative total. The same id, live the whole time, regains a fresh allowance, and every payment signed against the previous generation dies.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x35ed738d",
+      "0xa7fed385",
+      "0x6f3d8f09"
+    ],
+    "notes": "authorizeSession(Session,bytes) 0x35ed738d, revokeSession(bytes32) 0xa7fed385, pay(Payment,bytes) 0x6f3d8f09. selectors derived from source and ABI, membership checked against the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "the per-window allowance, reset on demand while the total survives, so the effective spend between revocations is limited by the session total and not by the window"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeWallet.t.sol",
+    "source": "claus-network/contracts/test/ArgusProbeWallet.t.sol::test_W1a, test_W1b, control test_W1_control",
+    "expected": "the control shows the total is a hard stop; the renewal resets the window counter under the same id and refuses a payment signed under the old generation"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausProjectWallet 0x182905eea41b06f63adef50cee6f104255474ecf chainId 11155111, all six ABI functions present in the runtime"
+    }
+  ],
+  "fix": "State that renewal is an allowance reset, or carry the window across renewals.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "docs/wallets.md and contracts/src/ClausProjectWallet.sol",
+    "deployed_verified": "0x182905eea41b06f63adef50cee6f104255474ecf chainId 11155111",
+    "evidence": [
+      "every generation is a fresh allowance (fuzz, testFuzzF1)",
+      "renewal under the same live id succeeds without a revoke"
+    ]
+  }
+}

@@ -30,7 +30,8 @@
   "confirmed_on": [
     {
       "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
-      "threshold_measured": "3072 admitted / 3520 denied"
+      "threshold_measured": "3072 admitted / 3520 denied",
+      "revision_drift": "the deployed runtime is an earlier revision than the published source: withdraw(uint256,address) is in the current ABI and absent from the deployed code, and four deployed selectors match nothing in the current source, so the measured threshold describes the current build rather than provably this deployment"
     }
   ],
   "fix": "Document the real ceiling for a vault policy, or size the envelope from the configuration length.",
@@ -39,7 +40,8 @@
     "specimen": "github.com/contractclaus/claus-network@8dbf692",
     "published_source": "contracts/src/ClausNativeVault.sol:15, :56-78",
     "evidence": [
-      "the 3072 to 3520 flip reproduces the project claim of 3520"
+      "the 3072 to 3520 flip reproduces the project claim of 3520",
+      "threshold measured on the current source build; the deployment record and Sourcify confirm the address, not the revision"
     ]
   }
 }

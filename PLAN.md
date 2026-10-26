@@ -7,7 +7,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | phase | state |
 |---|---|
 | P0 format freeze | done |
-| P1 corpus | 5 of 10 placards, self-check green |
+| P1 corpus | 10 of 10 placards, self-check green |
 | P2 engine hardening | partially done: derive.py, require_none_of, family gate |
 | P3 confirmation runner | not started |
 | P4 product surface | not started |
@@ -37,7 +37,7 @@ Done when: schema validates every placard, CI rejects a confirmed placard withou
 
 Goal: ten confirmed placards. Below roughly ten, a register is a demo.
 
-1. `HZ-002`..`HZ-009` from the session findings and public post-mortems.
+1. `HZ-002`..`HZ-010` from the session findings and public post-mortems. Done.
 2. A self-check harness: each placard must fire on its own target codehash and stay quiet on controls.
 
 Done when: `matcher --self-check` passes for all placards, and each confirmed placard's command has been run and its output recorded.

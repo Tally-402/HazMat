@@ -7,7 +7,8 @@
       "target": "0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c",
       "expect": [
         "HZ-001",
-        "HZ-005"
+        "HZ-005",
+        "HZ-009"
       ]
     },
     {
@@ -16,7 +17,8 @@
       "target": "0x892FA49D0c38E949DEb827Db66590fbaEAA34af8",
       "expect": [
         "HZ-002",
-        "HZ-003"
+        "HZ-003",
+        "HZ-010"
       ]
     },
     {
@@ -25,7 +27,18 @@
       "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
       "target": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4",
       "expect": [
-        "HZ-004"
+        "HZ-004",
+        "HZ-006",
+        "HZ-008"
+      ]
+    },
+    {
+      "label": "ClausProjectWallet sepolia",
+      "family": "evm",
+      "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
+      "target": "0x182905eea41b06f63adef50cee6f104255474ecf",
+      "expect": [
+        "HZ-007"
       ]
     }
   ]

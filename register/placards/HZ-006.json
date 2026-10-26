@@ -1,0 +1,49 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-006",
+  "placard_class": 5,
+  "placard_class_name": "encoding",
+  "title": "A delivered response is admitted at one size and refused one byte over, and a non-canonical header is refused",
+  "summary": "The shape rule and the advertised bound are different numbers. A correctly formed response is admitted at exactly 8192 bytes and refused at 8193, while a response whose ABI header is well formed but non-canonical is refused outright. Which number governs is discoverable only by probing.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x20e684b6",
+      "0x2ce0f9d6",
+      "0x4b1533b2",
+      "0x193e2b45"
+    ],
+    "notes": "admissionPolicy() 0x20e684b6, principal(address) 0x2ce0f9d6, totalPrincipal() 0x4b1533b2, POLICY_GAS() 0x193e2b45. selectors derived from source and ABI, membership checked against the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "capacity",
+    "expression": "a policy that is correct but one byte over the enforced shape cannot admit deposits"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeVaultShape.t.sol",
+    "source": "claus-network/contracts/test/ArgusProbeVaultShape.t.sol::test_H4a, test_H4b, test_H4c",
+    "expected": "exactly 8192 admitted, 8193 refused, non-canonical header refused, shipped module admitted"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111 (recorded in the projects own deployments.json, verified through Sourcify and Etherscan as exact_match)",
+      "revision_drift": "the deployed runtime carries 11 four-byte constants; 5 match the current ABI, 1 is the Solidity Panic selector, and 4 match no function in the current source or artifacts. withdraw(uint256,address) is in the current ABI but absent from the deployed code, so the deployment is an earlier revision than the published source",
+      "attacker_cost": "zero, the refusal is passive"
+    }
+  ],
+  "fix": "Make the enforced shape and the advertised bound the same number, and say which headers are canonical.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "contracts/src/ClausNativeVault.sol (shape rule, exactly 128 bytes)",
+    "deployed_verified": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
+    "evidence": [
+      "8192 admitted, 8193 refused, so the boundary is exact and not rounded",
+      "a non-canonical ABI header is refused though the payload decodes"
+    ]
+  }
+}

@@ -75,4 +75,4 @@ Code MIT. Placards CC-BY-4.0: cite the id, the target code hash and the register
 
 ## Status
 
-Early. Five placards, a working matcher, selector derivation, a self-check with negative controls. No anchoring yet.
+Ten placards across seven classes, a working matcher, selector derivation from source and ABI, and a self-check where every listed target is a negative control for every placard it does not expect. No anchoring yet.

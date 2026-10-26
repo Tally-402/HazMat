@@ -1,0 +1,50 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-009",
+  "placard_class": 2,
+  "placard_class_name": "ordering",
+  "title": "Two permissionless exits are both legal in one block and pay opposite amounts",
+  "summary": "Inside one block a stranger trigger and the buyer exit are both valid and settle the deal differently. Block ordering alone decides who is paid, and the loser cannot repair afterwards because the other path is already closed by its own clock.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xc9566ca9",
+      "0x7249fbb6"
+    ],
+    "require_any": [
+      "0xe4725ba1",
+      "0x7c7a9804"
+    ],
+    "notes": "expirePlan(bytes32) 0xc9566ca9, refund(bytes32) 0x7249fbb6, accept(bytes32) 0xe4725ba1, settleExpired(bytes32) 0x7c7a9804. selectors derived from source and ABI, membership checked against the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "per-deal",
+    "expression": "one deal: full price on one ordering, zero on the other"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeSameBlock.t.sol",
+    "source": "claus-network/contracts/test/ArgusProbeSameBlock.t.sol::test_AB1 to test_AB4",
+    "expected": "both transactions in one block with timestamp and block number asserted unmoved: stranger first denies the buyer, buyer first pays in full, a late arbiter signature also loses, and at the boundary timestamp still the buyer wins"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausTokenDealEscrow 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c chainId 1",
+      "equivalence": "published source reproduces the deployed runtime, 18 of 19 derived selectors present"
+    }
+  ],
+  "fix": "Define the authoritative exit for the overlap, or bound both paths by the same clock.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "contracts/src/ClausTokenDealEscrow.sol (accept and settleExpired)",
+    "deployed_verified": "0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c chainId 1",
+    "evidence": [
+      "both orders reproduced in a single block",
+      "no repair path survives the losing order"
+    ]
+  }
+}

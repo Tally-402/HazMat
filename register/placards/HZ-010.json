@@ -1,0 +1,49 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-010",
+  "placard_class": 3,
+  "placard_class_name": "authority",
+  "title": "A permissionless cancel invalidates queued approvals it does not name",
+  "summary": "A cancellation anyone may send advances the project generation and kills every queued approval for that project, not only the one the caller names. Work already queued by other parties silently needs re-queueing, and the cancel costs its sender nothing.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xbca486bc",
+      "0x9fc3c7eb"
+    ],
+    "require_any": [
+      "0x9a17cce7",
+      "0xd84a83ff"
+    ],
+    "notes": "cancelApproval(bytes32,uint256) 0xbca486bc, queue(Approval,bytes) 0x9fc3c7eb, execute(Approval,bytes,bytes) 0x9a17cce7, registerProject(Registration,bytes,bytes) 0xd84a83ff. selectors derived from source and ABI, membership checked against the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "no money moves; the loss is work and the queue position of every approval for that project"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A1",
+    "source": "claus-network/contracts/test/ArgusProbeAssessment.t.sol::test_A1_cancelWithNoPendingRecoveryKillsAQueuedApproval",
+    "expected": "a cancel sent while nothing is pending still advances the generation and an already queued approval can no longer execute"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1, all 15 derived selectors present"
+    }
+  ],
+  "fix": "Scope the generation bump to the approval named, or document that a cancel clears the project queue.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "contracts/src/ClausApprovalExecutor.sol (cancel path)",
+    "deployed_verified": "0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1",
+    "evidence": [
+      "the cancel succeeds with nothing pending and still bumps the generation",
+      "every generation is a fresh allowance (fuzz, testFuzzF1)"
+    ]
+  }
+}
