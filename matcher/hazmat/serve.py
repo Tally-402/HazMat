@@ -14,7 +14,7 @@ from urllib.parse import parse_qs, urlparse
 import json as _json
 from pathlib import Path
 
-from . import anchor, chains, match, pdf, sds
+from . import anchor, chains, match, paths, pdf, sds
 
 DEFAULT_PORT = 8712
 # anchored to the repo, not the current directory: the server has to work wherever
@@ -77,7 +77,7 @@ def placard_payload(placard_id, register=None):
         record = _json.loads(records[-1].read_text())
         stages = record.get('stages', {})
         row['confirmation'] = {
-            'verdict': record.get('verdict'), 'record': str(records[-1]),
+            'verdict': record.get('verdict'), 'record': paths.display(records[-1]),
             'probe_tests': (stages.get('probe') or {}).get('passed', []),
             'evidence': (row.get('confirmed_on') or [{}])[0].get('confirmation', {}).get('evidence'),
             'selector_agreement': (row.get('confirmed_on') or [{}])[0].get('confirmation', {}).get('selector_agreement'),

@@ -2,15 +2,15 @@
   "chain": "mainnet",
   "chain_id": 1,
   "forge": {
-    "path": "/Users/israelperez/.foundry/bin/forge",
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
     "version": "forge Version: 1.8.6"
   },
   "placard": "HZ-005",
-  "source_root": "/Users/israelperez/code/claus-network-specimen/contracts/src",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
   "stages": {
     "build": {
       "exit_code": 0,
-      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
       "log_tail": "ertain the cast is safe\n    \u2502       \n    \u2502       // casting to 'uint64' is safe because [explain why]\n    \u2502       // forge-lint: disable-next-line(unsafe-typecast)\n    \u2502       \n    \u2502       \n    \u2570 help: https://getfoundry.sh/forge/linting/unsafe-typecast\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausTokenDealEscrow.sol:217:38\n    \u2502\n217 \u2502         if (p.buyer == address(0) || block.timestamp < p.expiresAt) revert WrongState();\n    \u2502                                      \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[incorrect-strict-equality]: dangerous strict equality check on an externally-influenced value\n    \u256d\u25b8 src/ClausTokenDealEscrow.sol:227:13\n    \u2502\n227 \u2502 \u2026     if (token.balanceOf(address(this)) != held - amount || token.balanceOf(recipient) != received + amount) revert TransferFailed();\n    \u2502           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/incorrect-strict-equality\n\nwarning[incorrect-strict-equality]: dangerous strict equality check on an externally-influenced value\n    \u256d\u25b8 src/ClausTokenDealEscrow.sol:227:64\n    \u2502\n227 \u2502 \u2026     if (token.balanceOf(address(this)) != held - amount || token.balanceOf(recipient) != received + amount) revert TransferFailed();\n    \u2502                                                              \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/incorrect-strict-equality\n\nwarning[incorrect-strict-equality]: dangerous strict equality check on an externally-influenced value\n    \u256d\u25b8 src/ClausTokenDealEscrow.sol:240:13\n    \u2502\n240 \u2502 \u2026     if (token.balanceOf(address(this)) != held + amount || token.balanceOf(msg.sender) != payerBalance - amount) revert TransferFai\u2026\n    \u2502           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/incorrect-strict-equality\n\nwarning[incorrect-strict-equality]: dangerous strict equality check on an externally-influenced value\n    \u256d\u25b8 src/ClausTokenDealEscrow.sol:240:64\n    \u2502\n240 \u2502 \u2026     if (token.balanceOf(address(this)) != held + amount || token.balanceOf(msg.sender) != payerBalance - amount) revert TransferFai\u2026\n    \u2502                                                              \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/incorrect-strict-equality\n\n",
       "state": "ok"
     },
@@ -170,24 +170,24 @@
         ],
         "viaIR": true
       },
-      "solc_local": "/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27",
+      "solc_local": "~/Library/Application Support/svm/0.8.27/solc-0.8.27",
       "state": "ok",
       "verified_at": "2026-10-14T23:05:16Z"
     },
     "libs": {
       "files_added": 26,
       "state": "ok",
-      "supplied": [
-        "forge-std",
-        "openzeppelin-contracts"
-      ]
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
     },
     "probe": {
       "exit_codes": [
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeStrayFunds.t.sol\nCompiling 47 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.93s\nCompiler run successful!\n\nRan 3 tests for test/ArgusProbeStrayFunds.t.sol:ArgusProbeStrayFunds\n[PASS] test_H6a_bareEthTransferIsRejected() (gas: 33438)\n[PASS] test_H6b_forcedEthIsUnaccountedAndStranded() (gas: 458300)\n[PASS] test_H6c_directTokenTransferIsUnaccountedAndStranded() (gas: 585401)\nSuite result: ok. 3 passed; 0 failed; 0 skipped; finished in 610.96\u00b5s (384.25\u00b5s CPU time)\n\nRan 1 test suite in 4.65ms (610.96\u00b5s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)\n",
+      "log_tail": "== ArgusProbeStrayFunds.t.sol\nCompiling 47 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.96s\nCompiler run successful!\n\nRan 3 tests for test/ArgusProbeStrayFunds.t.sol:ArgusProbeStrayFunds\n[PASS] test_H6a_bareEthTransferIsRejected() (gas: 33438)\n[PASS] test_H6b_forcedEthIsUnaccountedAndStranded() (gas: 458300)\n[PASS] test_H6c_directTokenTransferIsUnaccountedAndStranded() (gas: 585401)\nSuite result: ok. 3 passed; 0 failed; 0 skipped; finished in 637.71\u00b5s (538.92\u00b5s CPU time)\n\nRan 1 test suite in 4.43ms (637.71\u00b5s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)\n",
       "match_test": "test_H6",
       "missing_lib_hint": null,
       "passed": [
@@ -205,7 +205,7 @@
         {
           "path": "src/ClausDealEscrow.sol",
           "sha256": "6ad3cc0f81e30369640aa939d68da55e58914cd3aed4f33b20e1bb469bb7533c",
-          "source": "/Users/israelperez/code/claus-network-specimen/contracts/src/ClausDealEscrow.sol"
+          "source": "~/code/claus-network-specimen/contracts/src/ClausDealEscrow.sol"
         }
       ],
       "skipped": "a file the bundle already carries is never overwritten",
@@ -213,6 +213,8 @@
     }
   },
   "target": "0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c",
+  "target_code_bytes": 11619,
+  "target_code_sha256": "0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139",
   "verdict": "confirmed",
   "workdir": "work/HZ-005-c2292af8"
 }

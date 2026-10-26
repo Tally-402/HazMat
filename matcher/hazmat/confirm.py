@@ -24,7 +24,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from . import chains, match
+from . import chains, match, paths
 
 SOURCIFY = 'https://sourcify.dev/server/v2/contract/%s/%s?fields=sources,compilation'
 ROOT = Path(__file__).resolve().parents[2]
@@ -242,9 +242,10 @@ def compare_rebuilt(out_dir, contract_name, deployed_code):
     }
 
 
-def run(placard_id, target, register='register/placards', chain='mainnet', workdir='work',
+def run(placard_id, target, register=None, chain='mainnet', workdir='work',
         forge=DEFAULT_FORGE, forge_std=None, rpc=None, timeout=900, libs=None, sources=None,
         add=None, source_root=None):
+    register = register or DEFAULT_REGISTER
     placards = {p['id']: p for p in match.load_register(register)}
     if placard_id not in placards:
         raise ConfirmError('no such placard: %s' % placard_id)
@@ -266,7 +267,8 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
         record['stages']['build'] = {'state': 'blocked', 'error': 'no forge at %s' % forge}
         record['forge'] = {'path': forge, 'version': 'missing'}
         return _finish(record, root)
-    record['forge'] = {'path': forge, 'version': _run([forge, '--version'], str(root))[1].strip().splitlines()[0]}
+    record['forge'] = {'path': paths.display(forge),
+                       'version': _run([forge, '--version'], str(root))[1].strip().splitlines()[0]}
 
     # stage: fetch (the target, plus any extra verified sources the probe needs)
     wanted = [target] + [s for s in (sources or []) if s.lower() != target.lower()]
@@ -285,6 +287,9 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
                             'contract': (body.get('compilation') or {}).get('name')})
             if address == target:
                 src = body
+        for item in fetches:
+            if item.get('solc_local'):
+                item['solc_local'] = paths.display(item['solc_local'])
         record['stages']['fetch'] = {'state': 'ok', 'fetches': fetches}
     except ConfirmError as exc:
         record['stages']['fetch'] = {'state': 'blocked', 'error': str(exc), 'fetches': fetches}
@@ -296,12 +301,12 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
     record['stages']['fetch']['verified_at'] = src.get('verifiedAt')
     version = compilation['compilerVersion'].split('+')[0]
     solc = find_solc(version)
-    record['stages']['fetch']['solc_local'] = solc
+    record['stages']['fetch']['solc_local'] = paths.display(solc)
 
     # stage: supplements (sibling sources the bundle cannot carry)
     source_root = discover_source_root(source_root)
     if source_root:
-        record['source_root'] = source_root
+        record['source_root'] = paths.display(source_root)
     pairs = list((add or []))
     for rel in (placard.get('reproduction') or {}).get('add_sources') or []:
         if source_root:
@@ -310,6 +315,8 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
                 pairs.append((rel, str(candidate)))
     try:
         supplemented = add_sources(str(root), pairs)
+        for item in supplemented:
+            item['source'] = paths.display(item['source'])
         record['stages']['supplement'] = {'state': 'ok', 'files': supplemented,
                                           'skipped': 'a file the bundle already carries is never overwritten'}
     except OSError as exc:
@@ -322,17 +329,19 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
         supply['forge-std'] = forge_std
     try:
         added = add_missing_libs(str(root), supply)
-        record['stages']['libs'] = {'state': 'ok', 'supplied': sorted(supply), 'files_added': len(added)}
+        record['stages']['libs'] = {'state': 'ok',
+                                    'supplied': {k: paths.display(v) for k, v in sorted(supply.items())},
+                                    'files_added': len(added)}
     except ConfirmError as exc:
         record['stages']['libs'] = {'state': 'blocked', 'error': str(exc)}
         return _finish(record, root)
 
     # stage: build
     toml = write_foundry_toml(str(root), compilation.get('compilerSettings') or {}, solc, version)
-    record['stages']['build'] = {'foundry_toml': toml}
+    record['stages']['build'] = {'foundry_toml': paths.shorten(toml)}
     code, log = _run([forge, 'build'], str(root), timeout)
     record['stages']['build'].update({'state': 'ok' if code == 0 else 'blocked', 'exit_code': code,
-                                      'log_tail': log[-2500:]})
+                                      'log_tail': paths.shorten(log[-2500:])})
     if code != 0:
         return _finish(record, root)
 
@@ -379,7 +388,7 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
     record['stages']['probe'] = {'state': 'ok' if not any(codes) and passed else 'failed',
                                  'exit_codes': codes, 'sources': names, 'match_test': match_test,
                                  'passed': passed, 'failed': failed, 'missing_lib_hint': hint,
-                                 'log_tail': joined[-3000:]}
+                                 'log_tail': paths.shorten(joined[-3000:])}
 
     if record['stages']['build']['state'] != 'ok':
         record['verdict'] = 'blocked'
@@ -393,11 +402,11 @@ def run(placard_id, target, register='register/placards', chain='mainnet', workd
 
 
 def _finish(record, root):
-    record['workdir'] = str(root)
+    record['workdir'] = paths.display(root)
     out = Path('confirmations', '%s-%s.json' % (record['placard'], record['target'][2:10].lower()))
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n')
-    record['record'] = str(out)
+    record['record'] = paths.display(out)
     return record
 
 

@@ -2,16 +2,16 @@
   "chain": "sepolia",
   "chain_id": 11155111,
   "forge": {
-    "path": "/Users/israelperez/.foundry/bin/forge",
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
     "version": "forge Version: 1.8.6"
   },
   "placard": "HZ-006",
-  "source_root": "/Users/israelperez/code/claus-network-specimen/contracts/src",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
   "stages": {
     "build": {
       "exit_code": 0,
-      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
-      "log_tail": "Compiling 3 files with Solc 0.8.27\nSolc 0.8.27 finished in 223.20ms\nCompiler run successful!\nwarning[missing-events-access-control]: `principal` is changed without an event but is used for access control\n   \u256d\u25b8 src/ClausNativeVault.sol:39:9\n   \u2502\n39 \u2502         principal[msg.sender] = nextPrincipal;\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-events-access-control\n\nwarning[missing-events-access-control]: `totalPrincipal` is changed without an event but is used for access control\n   \u256d\u25b8 src/ClausNativeVault.sol:40:9\n   \u2502\n40 \u2502         totalPrincipal += msg.value;\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-events-access-control\n\nwarning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check\n   \u256d\u25b8 src/ClausNativeVault.sol:23:17\n   \u2502\n23 \u2502     constructor(address policy) {\n   \u2502                 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-zero-check\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n   \u256d\u25b8 src/ClausNativeVault.sol:41:9\n   \u2502\n41 \u2502         emit Deposited(msg.sender, msg.value);\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\nwarning[arbitrary-send-eth]: ETH is sent to a user-controlled destination; restrict the destination or the caller\n   \u256d\u25b8 src/ClausNativeVault.sol:51:27\n   \u2502\n51 \u2502         (bool success,) = recipient.call{value: amount}(\"\");\n   \u2502                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/arbitrary-send-eth\n\nwarning[reentrancy-eth]: uncapped ETH transfer can be reentered before `entered` is updated\n   \u256d\u25b8 src/ClausNativeVault.sol:51:27\n   \u2502\n51 \u2502         (bool success,) = recipient.call{value: amount}(\"\");\n   \u2502                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-eth\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n   \u256d\u25b8 src/ClausNativeVault.sol:53:9\n   \u2502\n53 \u2502         emit Withdrawn(msg.sender, recipient, amount);\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\n",
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
+      "log_tail": "Compiling 3 files with Solc 0.8.27\nSolc 0.8.27 finished in 223.38ms\nCompiler run successful!\nwarning[missing-events-access-control]: `principal` is changed without an event but is used for access control\n   \u256d\u25b8 src/ClausNativeVault.sol:39:9\n   \u2502\n39 \u2502         principal[msg.sender] = nextPrincipal;\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-events-access-control\n\nwarning[missing-events-access-control]: `totalPrincipal` is changed without an event but is used for access control\n   \u256d\u25b8 src/ClausNativeVault.sol:40:9\n   \u2502\n40 \u2502         totalPrincipal += msg.value;\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-events-access-control\n\nwarning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check\n   \u256d\u25b8 src/ClausNativeVault.sol:23:17\n   \u2502\n23 \u2502     constructor(address policy) {\n   \u2502                 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/missing-zero-check\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n   \u256d\u25b8 src/ClausNativeVault.sol:41:9\n   \u2502\n41 \u2502         emit Deposited(msg.sender, msg.value);\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\nwarning[arbitrary-send-eth]: ETH is sent to a user-controlled destination; restrict the destination or the caller\n   \u256d\u25b8 src/ClausNativeVault.sol:51:27\n   \u2502\n51 \u2502         (bool success,) = recipient.call{value: amount}(\"\");\n   \u2502                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/arbitrary-send-eth\n\nwarning[reentrancy-eth]: uncapped ETH transfer can be reentered before `entered` is updated\n   \u256d\u25b8 src/ClausNativeVault.sol:51:27\n   \u2502\n51 \u2502         (bool success,) = recipient.call{value: amount}(\"\");\n   \u2502                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-eth\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n   \u256d\u25b8 src/ClausNativeVault.sol:53:9\n   \u2502\n53 \u2502         emit Withdrawn(msg.sender, recipient, amount);\n   \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\n",
       "state": "ok"
     },
     "compare": {
@@ -78,24 +78,24 @@
         ],
         "viaIR": true
       },
-      "solc_local": "/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27",
+      "solc_local": "~/Library/Application Support/svm/0.8.27/solc-0.8.27",
       "state": "ok",
       "verified_at": "2026-10-12T07:00:28Z"
     },
     "libs": {
       "files_added": 48,
       "state": "ok",
-      "supplied": [
-        "forge-std",
-        "openzeppelin-contracts"
-      ]
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
     },
     "probe": {
       "exit_codes": [
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeVaultShape.t.sol\nCompiling 23 files with Solc 0.8.27\nSolc 0.8.27 finished in 863.36ms\nCompiler run successful!\n\nRan 6 tests for test/ArgusProbeVaultShape.t.sol:ArgusProbeVaultShape\n[PASS] test_H4a_projectAdmitsAPayloadOfExactly8192() (gas: 766758)\n[PASS] test_H4b_onePayloadByteOverIsRejected() (gas: 761186)\n[PASS] test_H4c_nonCanonicalAbiHeaderIsRejected() (gas: 153035)\n[PASS] test_H4d_shippedAdmissionModuleIsAViablePolicy() (gas: 106600)\n[PASS] test_H4e_largeOutputModuleIsDeniedByTheShippedShapeRule() (gas: 299786)\n[PASS] test_H4f_gasEnvelopeForACorrectShapePolicy() (gas: 2858972)\nSuite result: ok. 6 passed; 0 failed; 0 skipped; finished in 2.64ms (4.08ms CPU time)\n\nRan 1 test suite in 3.96ms (2.64ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)\n",
+      "log_tail": "== ArgusProbeVaultShape.t.sol\nCompiling 23 files with Solc 0.8.27\nSolc 0.8.27 finished in 875.70ms\nCompiler run successful!\n\nRan 6 tests for test/ArgusProbeVaultShape.t.sol:ArgusProbeVaultShape\n[PASS] test_H4a_projectAdmitsAPayloadOfExactly8192() (gas: 766758)\n[PASS] test_H4b_onePayloadByteOverIsRejected() (gas: 761186)\n[PASS] test_H4c_nonCanonicalAbiHeaderIsRejected() (gas: 153035)\n[PASS] test_H4d_shippedAdmissionModuleIsAViablePolicy() (gas: 106600)\n[PASS] test_H4e_largeOutputModuleIsDeniedByTheShippedShapeRule() (gas: 299786)\n[PASS] test_H4f_gasEnvelopeForACorrectShapePolicy() (gas: 2858972)\nSuite result: ok. 6 passed; 0 failed; 0 skipped; finished in 3.00ms (5.04ms CPU time)\n\nRan 1 test suite in 4.42ms (3.00ms CPU time): 6 tests passed, 0 failed, 0 skipped (6 total tests)\n",
       "match_test": "test_H4",
       "missing_lib_hint": null,
       "passed": [
@@ -116,12 +116,12 @@
         {
           "path": "src/ClausReadonlyProject.sol",
           "sha256": "7c7fe172382a767b3700daac415fedb297b57ffe5c932deba561fffc1bbe75a1",
-          "source": "/Users/israelperez/code/claus-network-specimen/contracts/src/ClausReadonlyProject.sol"
+          "source": "~/code/claus-network-specimen/contracts/src/ClausReadonlyProject.sol"
         },
         {
           "path": "src/ClausVaultAdmission.sol",
           "sha256": "d8068a7565a659ed3047dcd78b0e0738cebd5662ce2a0811ef7d638494a0e804",
-          "source": "/Users/israelperez/code/claus-network-specimen/contracts/src/ClausVaultAdmission.sol"
+          "source": "~/code/claus-network-specimen/contracts/src/ClausVaultAdmission.sol"
         }
       ],
       "skipped": "a file the bundle already carries is never overwritten",
@@ -129,6 +129,8 @@
     }
   },
   "target": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4",
+  "target_code_bytes": 1669,
+  "target_code_sha256": "0x32bdc703cbcd2fe30ec0ca8c5905516540a4c5590b8df187c92e514229b97d86",
   "verdict": "confirmed",
   "workdir": "work/HZ-006-66fa2f84"
 }

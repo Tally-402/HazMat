@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from . import chains, match, sds
+from . import chains, match, paths, sds
 
 
 class VerifyError(Exception):
@@ -28,7 +28,7 @@ def verify_sheet(path, expect=None, anchor=None):
                        'ok': named.group(1) == record.get('register_digest'),
                        'sheet': named.group(1), 'epoch': record.get('epoch'),
                        'root': record.get('root')})
-    return {'kind': 'sheet', 'file': str(path), 'claimed': claimed, 'recomputed': recomputed,
+    return {'kind': 'sheet', 'file': paths.display(path), 'claimed': claimed, 'recomputed': recomputed,
             'expected': expect, 'ok': ok and all(c['ok'] for c in checks), 'checks': checks}
 
 
@@ -48,7 +48,7 @@ def verify_record(path, rpc=None, chain='mainnet'):
         recomputed = '0x' + __import__('hashlib').sha256(code).hexdigest()
         checks.append({'check': 'the target code still hashes to what the record pinned',
                        'ok': recomputed == promised, 'pinned': promised, 'now': recomputed})
-    return {'kind': 'record', 'file': str(path), 'placard': record.get('placard'), 'target': target,
+    return {'kind': 'record', 'file': paths.display(path), 'placard': record.get('placard'), 'target': target,
             'verdict': record.get('verdict'), 'ok': all(c['ok'] for c in checks), 'checks': checks}
 
 

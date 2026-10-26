@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hazmat"
+authors = [{name = "Tally-402", email = "Tally-402@users.noreply.github.com"}]
 version = "0.1.0"
 description = "Match compiled smart contract code against a register of known bytecode hazards"
 requires-python = ">=3.9"

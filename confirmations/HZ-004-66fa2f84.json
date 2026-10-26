@@ -2,15 +2,15 @@
   "chain": "sepolia",
   "chain_id": 11155111,
   "forge": {
-    "path": "/Users/israelperez/.foundry/bin/forge",
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
     "version": "forge Version: 1.8.6"
   },
   "placard": "HZ-004",
-  "source_root": "/Users/israelperez/code/claus-network-specimen/contracts/src",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
   "stages": {
     "build": {
       "exit_code": 0,
-      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
       "log_tail": "sol:150:13\n    \u2502\n150 \u2502             emit ApprovalQueued(a.projectId, hash, readyAt[hash], a.nonce);\n    \u2502             \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausApprovalExecutor.sol:157:35\n    \u2502\n157 \u2502         if (readyAt[hash] == 0 || block.timestamp < readyAt[hash]) revert NotReady();\n    \u2502                                   \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n    \u256d\u25b8 src/ClausApprovalExecutor.sol:163:9\n    \u2502\n163 \u2502         emit UpgradeExecuted(a.projectId, hash, a.implementation, ClausReadonlyProject(a.target).version());\n    \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\nwarning[unsafe-typecast]: typecast can truncate values\n    \u256d\u25b8 src/ClausApprovalExecutor.sol:220:27\n    \u2502\n220 \u2502         recoveryReadyAt = uint64(block.timestamp) + recoveryDelay;\n    \u2502                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u251c note: consider disabling this lint if you're certain the cast is safe\n    \u2502       \n    \u2502       // casting to 'uint64' is safe because [explain why]\n    \u2502       // forge-lint: disable-next-line(unsafe-typecast)\n    \u2502       \n    \u2502       \n    \u2570 help: https://getfoundry.sh/forge/linting/unsafe-typecast\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausApprovalExecutor.sol:232:44\n    \u2502\n232 \u2502         if (pendingSigner == address(0) || block.timestamp < recoveryReadyAt) revert NotReady();\n    \u2502                                            \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausApprovalExecutor.sol:248:58\n    \u2502\n248 \u2502             || a.dependencySnapshotHash == bytes32(0) || a.expiresAt <= block.timestamp\n    \u2502                                                          \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\n",
       "state": "ok"
     },
@@ -78,24 +78,24 @@
         ],
         "viaIR": true
       },
-      "solc_local": "/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27",
+      "solc_local": "~/Library/Application Support/svm/0.8.27/solc-0.8.27",
       "state": "ok",
       "verified_at": "2026-10-12T07:00:28Z"
     },
     "libs": {
       "files_added": 48,
       "state": "ok",
-      "supplied": [
-        "forge-std",
-        "openzeppelin-contracts"
-      ]
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
     },
     "probe": {
       "exit_codes": [
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.58s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeGenAndGas.t.sol:ArgusProbeVaultConfigGas\n[PASS] test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration() (gas: 2902382)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.14ms (1.02ms CPU time)\n\nRan 1 test suite in 3.88ms (1.14ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n",
+      "log_tail": "== ArgusProbeGenAndGas.t.sol\nCompiling 38 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.59s\nCompiler run successful!\n\nRan 1 test for test/ArgusProbeGenAndGas.t.sol:ArgusProbeVaultConfigGas\n[PASS] test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration() (gas: 2902382)\nSuite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.06ms (945.83\u00b5s CPU time)\n\nRan 1 test suite in 4.46ms (1.06ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)\n",
       "match_test": "test_AG002",
       "missing_lib_hint": null,
       "passed": [
@@ -111,12 +111,12 @@
         {
           "path": "src/ClausReadonlyProject.sol",
           "sha256": "7c7fe172382a767b3700daac415fedb297b57ffe5c932deba561fffc1bbe75a1",
-          "source": "/Users/israelperez/code/claus-network-specimen/contracts/src/ClausReadonlyProject.sol"
+          "source": "~/code/claus-network-specimen/contracts/src/ClausReadonlyProject.sol"
         },
         {
           "path": "src/ClausApprovalExecutor.sol",
           "sha256": "92df12300de383b7a5c113f43160ee95eb7f3edf25e83178d8bfbf005446a6df",
-          "source": "/Users/israelperez/code/claus-network-specimen/contracts/src/ClausApprovalExecutor.sol"
+          "source": "~/code/claus-network-specimen/contracts/src/ClausApprovalExecutor.sol"
         }
       ],
       "skipped": "a file the bundle already carries is never overwritten",
@@ -124,6 +124,8 @@
     }
   },
   "target": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4",
+  "target_code_bytes": 1669,
+  "target_code_sha256": "0x32bdc703cbcd2fe30ec0ca8c5905516540a4c5590b8df187c92e514229b97d86",
   "verdict": "confirmed",
   "workdir": "work/HZ-004-66fa2f84"
 }

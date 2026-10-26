@@ -19,7 +19,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from . import chains, match, sds
+from . import chains, match, paths, sds
 
 FEED = 'https://sourcify.dev/server/v2/contracts/%s?limit=%d'
 ROOT = Path(__file__).resolve().parents[2]
@@ -121,6 +121,7 @@ def alert(db, chain, address, code_sha256, placards, kind='new', sheet=None, dig
                (time.time(), chain, address, code_sha256, ','.join(placards), kind, sheet, digest))
     db.execute('update seen set alerted = 1 where address = ? and chain = ?', (address.lower(), chain))
     db.commit()
+    row['sheet'] = paths.display(row.get('sheet'))
     if sink:
         Path(sink).parent.mkdir(parents=True, exist_ok=True)
         with open(sink, 'a') as handle:

@@ -2,15 +2,15 @@
   "chain": "sepolia",
   "chain_id": 11155111,
   "forge": {
-    "path": "/Users/israelperez/.foundry/bin/forge",
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
     "version": "forge Version: 1.8.6"
   },
   "placard": "HZ-007",
-  "source_root": "/Users/israelperez/code/claus-network-specimen/contracts/src",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
   "stages": {
     "build": {
       "exit_code": 0,
-      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.8.27/solc-0.8.27\"\nvia_ir = true\noptimizer = true\noptimizer_runs = 200\nevm_version = \"cancun\"",
       "log_tail": "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/arbitrary-send-eth\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausProjectWallet.sol:113:16\n    \u2502\n113 \u2502             || block.timestamp < s.validAfter || block.timestamp >= s.validUntil\n    \u2502                \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausProjectWallet.sol:113:50\n    \u2502\n113 \u2502             || block.timestamp < s.validAfter || block.timestamp >= s.validUntil\n    \u2502                                                  \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 src/ClausProjectWallet.sol:114:16\n    \u2502\n114 \u2502             || block.timestamp > p.deadline || p.deadline > s.validUntil || p.quoteHash == bytes32(0)\n    \u2502                \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/block-timestamp\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n    \u256d\u25b8 src/ClausProjectWallet.sol:126:9\n    \u2502\n126 \u2502         emit PaymentMade(p.quoteHash, p.sessionId, p.asset, p.recipient, p.amount, p.nonce, p.generation);\n    \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\nwarning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check\n    \u256d\u25b8 src/ClausProjectWallet.sol:129:24\n    \u2502\n129 \u2502     function ownerCall(address target, uint256 value, bytes calldata data) external nonReentrant returns (bytes memory) {\n    \u2502                        \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/missing-zero-check\n\nwarning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on\n    \u256d\u25b8 src/ClausProjectWallet.sol:133:9\n    \u2502\n133 \u2502         emit OwnerCall(target, value, keccak256(data));\n    \u2502         \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://getfoundry.sh/forge/linting/reentrancy-events\n\n",
       "state": "ok"
     },
@@ -166,24 +166,24 @@
         ],
         "viaIR": true
       },
-      "solc_local": "/Users/israelperez/Library/Application Support/svm/0.8.27/solc-0.8.27",
+      "solc_local": "~/Library/Application Support/svm/0.8.27/solc-0.8.27",
       "state": "ok",
       "verified_at": "2026-10-12T06:17:52Z"
     },
     "libs": {
       "files_added": 26,
       "state": "ok",
-      "supplied": [
-        "forge-std",
-        "openzeppelin-contracts"
-      ]
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
     },
     "probe": {
       "exit_codes": [
         0
       ],
       "failed": [],
-      "log_tail": "== ArgusProbeWallet.t.sol\nCompiling 43 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.01s\nCompiler run successful!\n\nRan 3 tests for test/ArgusProbeWallet.t.sol:ArgusProbeWallet\n[PASS] test_W1_control_totalIsAHardStopWithoutRenewal() (gas: 522860)\n[PASS] test_W1a_inPlaceRenewalResetsTheSpendCapUnderTheSameId() (gas: 707168)\n[PASS] test_W1b_renewalKillsPaymentsSignedUnderTheOldGeneration() (gas: 449008)\nSuite result: ok. 3 passed; 0 failed; 0 skipped; finished in 913.54\u00b5s (1.59ms CPU time)\n\nRan 1 test suite in 3.83ms (913.54\u00b5s CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)\n",
+      "log_tail": "== ArgusProbeWallet.t.sol\nCompiling 43 files with Solc 0.8.27\nSolc 0.8.27 finished in 1.05s\nCompiler run successful!\n\nRan 3 tests for test/ArgusProbeWallet.t.sol:ArgusProbeWallet\n[PASS] test_W1_control_totalIsAHardStopWithoutRenewal() (gas: 522860)\n[PASS] test_W1a_inPlaceRenewalResetsTheSpendCapUnderTheSameId() (gas: 707168)\n[PASS] test_W1b_renewalKillsPaymentsSignedUnderTheOldGeneration() (gas: 449008)\nSuite result: ok. 3 passed; 0 failed; 0 skipped; finished in 1.13ms (2.23ms CPU time)\n\nRan 1 test suite in 3.82ms (1.13ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)\n",
       "match_test": "test_W1",
       "missing_lib_hint": null,
       "passed": [
@@ -203,6 +203,8 @@
     }
   },
   "target": "0x182905eea41b06f63adef50cee6f104255474ecf",
+  "target_code_bytes": 6599,
+  "target_code_sha256": "0x81475cc163c2d91c87fc958dc01a9c7ea0bd34f4eff194518dc924b52550667e",
   "verdict": "confirmed",
   "workdir": "work/HZ-007-182905ee"
 }
