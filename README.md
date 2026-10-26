@@ -80,7 +80,7 @@ A sheet, self-contained HTML with its own digest, plus the same content as JSON 
     hazmat scan --code 0xADDRESS --chain mainnet --sheet out.html --pdf out.pdf
     hazmat verify --sheet out.html              # re-derive the digest; non-zero if it was altered
 
-An example lives in `examples/` (sheet digest `0xc3deb7f83f06017b33912dc365a0b1e9369dc7699a164f79b10c0c8eccf1d9b4`), scanned from the live mainnet escrow.
+An example lives in `examples/` (sheet digest `0x01b80630011c7f35fd21e1ebab6e54db22e9ee79fac50cd5eeb05b72168355f4`), scanned from the live mainnet escrow.
 
 ## Watch
 
