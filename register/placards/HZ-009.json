@@ -26,7 +26,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeSameBlock.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-009 --chain mainnet",
     "source": "reproductions/HZ-009/ArgusProbeSameBlock.t.sol",
     "expected": "both transactions in one block with timestamp and block number asserted unmoved: stranger first denies the buyer, buyer first pays in full, a late arbiter signature also loses, and at the boundary timestamp still the buyer wins",
     "match_test": "test_AB",

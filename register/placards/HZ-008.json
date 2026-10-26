@@ -23,7 +23,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeFuzz.t.sol --match-test test_P1",
+    "command": "python3 -m hazmat.confirm --placard HZ-008 --chain sepolia",
     "source": "reproductions/HZ-008/ArgusProbeFuzz.t.sol",
     "expected": "a sweep of 0x01 to 0x10 finds exactly two addresses that refuse a value-only call, 0x09 and 0x0a, with TransferFailed",
     "match_test": "test_P1",

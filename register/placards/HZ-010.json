@@ -26,7 +26,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A1",
+    "command": "python3 -m hazmat.confirm --placard HZ-010 --chain mainnet",
     "source": "reproductions/HZ-010/ArgusProbeAssessment.t.sol",
     "expected": "a cancel sent while nothing is pending still advances the generation and an already queued approval can no longer execute",
     "match_test": "test_A1",

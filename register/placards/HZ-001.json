@@ -21,7 +21,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeLiveEscrow.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-001 --chain mainnet",
     "source": "reproductions/HZ-001/ArgusProbeLiveEscrow.t.sol",
     "expected": "past the dispute window the attacker's timeout pays the worker 0 and the buyer's accept then reverts WrongState; with the reverse ordering the worker is paid in full"
   },

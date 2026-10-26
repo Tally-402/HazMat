@@ -24,7 +24,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeVaultShape.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-006 --chain sepolia",
     "source": "reproductions/HZ-006/ArgusProbeVaultShape.t.sol",
     "expected": "exactly 8192 admitted, 8193 refused, non-canonical header refused, shipped module admitted",
     "match_test": "test_H4",

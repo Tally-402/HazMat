@@ -28,7 +28,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeStrayFunds.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-005 --chain mainnet",
     "source": "reproductions/HZ-005/ArgusProbeStrayFunds.t.sol",
     "expected": "a bare native transfer reverts; forced native value and direct token transfers survive a full deal lifecycle with every total back at zero",
     "match_test": "test_H6",

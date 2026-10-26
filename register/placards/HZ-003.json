@@ -25,7 +25,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A3",
+    "command": "python3 -m hazmat.confirm --placard HZ-003 --chain mainnet",
     "source": "reproductions/HZ-003/ArgusProbeAssessment.t.sol",
     "expected": "an unexpired approval is refused while the proposal is pending and five days later; the zero-address cancel lifts the pending flag but the approval is still refused until it is re-signed at the new generation",
     "match_test": "test_A3",

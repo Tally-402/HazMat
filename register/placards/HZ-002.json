@@ -24,7 +24,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-002 --chain mainnet",
     "source": "reproductions/HZ-002/ArgusProbeGenAndGas.t.sol",
     "expected": "queue reverts on generation 3 while the live generation is 1; after schedule and cancel both queue and execute succeed and the target implementation changes; the signer was never rotated",
     "match_test": "test_AG003",

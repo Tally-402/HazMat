@@ -23,7 +23,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeWallet.t.sol",
+    "command": "python3 -m hazmat.confirm --placard HZ-007 --chain sepolia",
     "source": "reproductions/HZ-007/ArgusProbeWallet.t.sol",
     "expected": "the control shows the total is a hard stop; the renewal resets the window counter under the same id and refuses a payment signed under the old generation",
     "match_test": "test_W1",

@@ -9,7 +9,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | P0 format freeze | done |
 | P1 corpus | 10 of 10 placards, self-check green |
 | P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
-| P3 confirmation runner | working end to end for HZ-001; nine more probes to vendor |
+| P3 confirmation runner | done: all ten placards confirmed, rebuilt selectors identical to the deployed runtime |
 | P4 product surface | not started |
 | P5 watch service | not started |
 | P6 anchoring | not started |
@@ -75,6 +75,17 @@ Done when: a sheet's hash resolves on-chain against a corpus root.
 ## P7 - Solana engine, deferred
 
 Trigger: 25 published EVM classes, or a paying Solana-native customer. Then: `sbf-immediate-set` matcher over `lddw` immediates, an litesvm confirmation harness, and the classes that are richer there (stranded value, upgrade lifecycle).
+
+## Bugs found while building, and fixed on the spot
+
+- A 40-character hex blob is exactly as long as an address, so raw code silently went to the RPC. Fixed with `--as address|code`, plus a regression test.
+- `_sha256` was handed a hex string, not bytes, and crashed the supplement stage.
+- A verified record can carry a *partial* remapping list, so a contract that never imported forge-std had no remapping for it and the probe could not compile. Needed remappings are now appended, never substituted.
+- Cross-chain siblings: a probe on one chain may reference a contract verified on another. Extras now fall back to mainnet and record which chain each fetch used.
+- A target could be given as a label rather than an address; targets are now normalised and default to the placard's own.
+- Two probes referenced sibling source files the bundle cannot carry; supplements are declared per placard.
+- The runner ran only the first vendored probe and ignored the placard's test selection; it now runs every vendored file under the placard's `match_test`.
+- An unhandled `ConfirmError` in the compare stage lost the whole record; every stage now writes its own outcome.
 
 ## Explicitly not yet
 

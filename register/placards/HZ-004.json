@@ -23,7 +23,7 @@
   },
   "reproduction": {
     "kind": "forge",
-    "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol --match-test AG002",
+    "command": "python3 -m hazmat.confirm --placard HZ-004 --chain sepolia",
     "source": "reproductions/HZ-004/ArgusProbeGenAndGas.t.sol",
     "expected": "admitted at 0 through 3072 configuration bytes, denied at 3520 and above",
     "match_test": "test_AG002",
