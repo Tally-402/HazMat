@@ -82,6 +82,16 @@ A sheet, self-contained HTML with its own digest, plus the same content as JSON 
 
 An example lives in `examples/` (sheet digest `0xc3deb7f83f06017b33912dc365a0b1e9369dc7699a164f79b10c0c8eccf1d9b4`), scanned from the live mainnet escrow.
 
+## Watch
+
+    hazmat watch once --chain mainnet --sheet-dir sheets/     # one pass, cron-shaped
+    hazmat watch run  --chain mainnet --interval 300          # loop
+    hazmat watch status                                        # counters, cursor, recent alerts
+
+A pass polls the newest verified contracts, inspects each one, and alerts when a placard matches. `register/watchlist.json` names live deployments to re-inspect every pass, so a code change there raises an `upgrade` alert. State is sqlite, alerts are JSONL, and a webhook is posted to only if `--webhook` or `HAZMAT_WEBHOOK` is set. Read-only throughout.
+
+Expect a pass over the wider world to be quiet: the register is ten placards and they are shaped after one project, so breadth is what the register is now short of.
+
 ## Serve it
 
     hazmat serve --port 8712

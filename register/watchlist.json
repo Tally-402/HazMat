@@ -1,0 +1,25 @@
+{
+  "note": "live deployments watched for upgrades; a code-hash change raises an upgrade alert",
+  "addresses": [
+    {
+      "label": "ClausTokenDealEscrow mainnet",
+      "chain": "mainnet",
+      "address": "0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c"
+    },
+    {
+      "label": "ClausApprovalExecutor mainnet",
+      "chain": "mainnet",
+      "address": "0x892FA49D0c38E949DEb827Db66590fbaEAA34af8"
+    },
+    {
+      "label": "ClausNativeVault sepolia",
+      "chain": "sepolia",
+      "address": "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4"
+    },
+    {
+      "label": "ClausProjectWallet sepolia",
+      "chain": "sepolia",
+      "address": "0x182905eea41b06f63adef50cee6f104255474ecf"
+    }
+  ]
+}

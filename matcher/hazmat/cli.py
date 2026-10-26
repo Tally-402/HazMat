@@ -5,7 +5,7 @@ only routes. Flags belong to the command, so argv is handed over untouched.
 """
 import sys
 
-from . import batch, confirm, derive, match, selfcheck, serve, verify
+from . import batch, confirm, derive, match, selfcheck, serve, verify, watch
 
 COMMANDS = {
     'scan': (match, 'match one target (address, bytecode or file)'),
@@ -15,6 +15,7 @@ COMMANDS = {
     'verify': (verify, 're-derive a sheet digest, or re-check a record'),
     'selfcheck': (selfcheck, 'every placard fires on its target and stays quiet elsewhere'),
     'serve': (serve, 'serve the paste-a-target page, sheets and the JSON API'),
+    'watch': (watch, 'watch new verifications and upgrades, and alert'),
 }
 
 

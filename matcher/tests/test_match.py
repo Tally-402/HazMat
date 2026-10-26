@@ -13,7 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from hazmat import batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify  # noqa: E402
+from hazmat import batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify, watch  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -157,6 +157,78 @@ class Serve(unittest.TestCase):
                 self.assertEqual(json.loads(exc.read())['state'], 'blocked')
         finally:
             server.shutdown()
+
+
+class Watch(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.db = watch.connect(os.path.join(self.tmp.name, 'w.sqlite3'))
+        self.alerts = os.path.join(self.tmp.name, 'alerts.jsonl')
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def feed(self, *entries):
+        return lambda chain, limit: list(entries)
+
+    def inspector(self, matches_for=()):
+        def inspect_(address):
+            if address in matches_for:
+                return {'code_sha256': '0x' + 'aa' * 32, 'placards': ['HZ-001']}
+            return {'code_sha256': '0x' + 'bb' * 32, 'placards': []}
+        return inspect_
+
+    def test_one_alert_per_matching_address_and_a_second_pass_is_quiet(self):
+        entries = [{'address': '0xaaa', 'verifiedAt': '2026-01-01T00:00:00Z'},
+                   {'address': '0xbbb', 'verifiedAt': '2026-01-01T00:00:01Z'}]
+        first = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries),
+                               inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts)
+        self.assertEqual(first['candidates'], 2)
+        self.assertEqual(first['matched'], 1)
+        again = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries),
+                                inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts)
+        self.assertEqual(again['candidates'], 0)
+        self.assertEqual(watch.status(self.db)['alerts'], 1)
+
+    def test_an_unreachable_address_is_recorded_without_an_alert(self):
+        entries = [{'address': '0xdead', 'verifiedAt': '2026-02-01T00:00:00Z'}]
+        def inspector(_):
+            raise match.MatchError('no code')
+        got = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries), inspect_fn=inspector,
+                              sink=self.alerts)
+        self.assertEqual(got['errors'], ['0xdead: no code'])
+        self.assertEqual(watch.status(self.db)['alerts'], 0)
+        self.assertEqual(watch.status(self.db)['seen'], 1)
+
+    def test_a_watched_address_whose_code_changes_raises_an_upgrade_alert(self):
+        watchlist = os.path.join(self.tmp.name, 'watchlist.json')
+        Path(watchlist).write_text(json.dumps({'addresses': [{'chain': 'mainnet', 'address': '0xccc'}]}))
+        hashes = iter(['0x' + '11' * 32, '0x' + '22' * 32])
+        def inspector(address):
+            return {'code_sha256': next(hashes), 'placards': []}
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(), inspect_fn=inspector,
+                        sink=self.alerts, watchlist=watchlist)
+        second = watch.pass_once(self.db, 'mainnet', feed=self.feed(), inspect_fn=inspector,
+                                 sink=self.alerts, watchlist=watchlist)
+        self.assertEqual(second['upgrades'], 1)
+        rows = json.loads(Path(self.alerts).read_text().strip().splitlines()[-1])
+        self.assertEqual((rows['kind'], rows['address']), ('upgrade', '0xccc'))
+
+    def test_the_cursor_does_not_move_backwards(self):
+        watch.pass_once(self.db, 'mainnet', feed=self.feed({'address': '0x1', 'verifiedAt': '2026-05-01T00:00:00Z'}),
+                        inspect_fn=self.inspector(), sink=self.alerts)
+        older = [{'address': '0x2', 'verifiedAt': '2026-04-01T00:00:00Z'}]
+        got = watch.pass_once(self.db, 'mainnet', feed=self.feed(*older), inspect_fn=self.inspector(),
+                              sink=self.alerts)
+        self.assertEqual(got['candidates'], 0)
+        self.assertEqual(got['cursor'], '2026-04-01T00:00:00Z')
+
+    def test_status_counts_and_the_alert_file_is_jsonl(self):
+        watch.pass_once(self.db, 'mainnet', feed=self.feed({'address': '0xm', 'verifiedAt': '2026-06-01T00:00:00Z'}),
+                        inspect_fn=self.inspector({'0xm'}), sink=self.alerts)
+        state = watch.status(self.db)
+        self.assertEqual((state['seen'], state['alerts'], state['matched_ever']), (1, 1, 1))
+        self.assertEqual(json.loads(Path(self.alerts).read_text().strip())['placards'], ['HZ-001'])
 
 
 class Confirm(unittest.TestCase):

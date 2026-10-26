@@ -11,7 +11,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
 | P3 confirmation runner | done: all ten placards confirmed, rebuilt selectors identical to the deployed runtime |
 | P4 product surface | done: CLI, sheets, PDF without a PDF library, verify, local server |
-| P5 watch service | not started |
+| P5 watch service | done: feed poll, upgrade watchlist, sqlite state, JSONL alerts |
 | P6 anchoring | not started |
 | P7 Solana engine | deferred, trigger below |
 
@@ -64,7 +64,7 @@ Done when: a stranger can go address to shareable artifact without reading the r
 
 Poll new verifications and proxy upgrades, match, alert. SQLite for state, cron for cadence.
 
-Done when: a new deployment matching a placard produces an alert without human action.
+Done: a pass polls the newest verifications, inspects each, alerts on a match, and re-inspects the deployments in `register/watchlist.json` so a code change raises an `upgrade` alert. Verified live: a pass over a feed carrying the escrow alerted with HZ-001, HZ-005 and HZ-009 and wrote sheets; a real pass over 25 newly verified mainnet contracts ran clean and advanced the cursor. Still to do: give it a cadence (a scheduled pass) rather than running it by hand.
 
 ## P6 - anchoring
 
