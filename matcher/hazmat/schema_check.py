@@ -117,10 +117,11 @@ def main(argv=None):
     parser.add_argument('--register', default=None)
     parser.add_argument('--confirmations', default=None)
     args = parser.parse_args(argv)
-    errors = check(args.register, None, args.confirmations)
+    register = Path(args.register or ROOT / 'register' / 'placards')
+    errors = check(str(register), None, args.confirmations)
     for error in errors:
         print('  %s' % error)
-    placards = len(list(Path(args.register).glob('*.json')))
+    placards = len(list(register.glob('*.json')))
     print('%d placards, %d problem(s)' % (placards, len(errors)))
     return 1 if errors else 0
 
