@@ -132,15 +132,19 @@ class Verify(unittest.TestCase):
             self.assertTrue(any('fetch' in c['check'] and not c['ok'] for c in got['checks']))
 
     def test_a_sheet_verifies_against_the_epoch_it_names_even_after_a_new_one(self):
+        first = anchor.load_epoch(1)          # an epoch published before the register grew
         report = Pdf().report()
-        report['register_anchor'] = {'epoch': 1, 'root': anchor.load_epoch(2)['root'], 'file': 'epoch-x.json',
-                                     'register_digest': anchor.load_epoch(2)['register_digest']}
+        report['register_digest'] = first['register_digest']
+        report['register_anchor'] = {'epoch': 1, 'root': first['root'], 'file': 'epoch-1.json',
+                                     'register_digest': first['register_digest']}
         page, _ = sds.render(report)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp, 's.html')
-            path.write_text(page)                                  # names epoch 1
-            self.assertTrue(verify.verify_sheet(str(path))['ok'])  # and is checked against epoch 1
-            self.assertTrue(any(c.get('epoch') == 1 for c in verify.verify_sheet(str(path))['checks']))
+            path.write_text(page)                                       # names epoch 1
+            got = verify.verify_sheet(str(path))
+            self.assertTrue(got['ok'])                                  # still verifies after epoch 2 exists
+            self.assertTrue(any(c.get('epoch') == 1 for c in got['checks']))
+            self.assertFalse(any(c.get('epoch') == 2 for c in got['checks']))
 
     def test_the_register_digest_changes_when_a_placard_does(self):
         before = match.register_digest(REGISTER)
