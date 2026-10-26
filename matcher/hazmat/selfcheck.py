@@ -3,6 +3,7 @@
 Every listed address is also a negative control for every placard it does not
 expect, so a matcher that fires on everything fails here.
 """
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -28,8 +29,12 @@ def check(controls_path=CONTROLS, register=None):
     return failures
 
 
-def main():
-    failures = check()
+def main(argv=None):
+    parser = argparse.ArgumentParser(prog='hazmat selfcheck')
+    parser.add_argument('--register', default=None)
+    parser.add_argument('--controls', default=None)
+    args = parser.parse_args(argv)
+    failures = check(args.controls or CONTROLS, args.register)
     print('%d failures' % len(failures))
     return 1 if failures else 0
 
