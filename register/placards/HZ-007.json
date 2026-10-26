@@ -39,7 +39,7 @@
         "command": "python3 -m hazmat.confirm --placard HZ-007 --chain sepolia",
         "verdict": "confirmed",
         "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 25 of 25 identical to the deployed runtime, and the placard's own probe passed 3 test(s)",
-        "selector_agreement": "25/25, 222 body bytes differing (immutable windows), length delta 0",
+        "selector_agreement": "25/25, 222 body bytes differing, length delta 0",
         "probe_tests": [
           "test_W1_control_totalIsAHardStopWithoutRenewal()",
           "test_W1a_inPlaceRenewalResetsTheSpendCapUnderTheSameId()",

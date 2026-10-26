@@ -31,6 +31,8 @@ A match is never reported as safe. Every sheet lists what was **not** checked.
 
 ## The register
 
+Fifteen placards, eleven of them `confirmed` by a rebuild and a passing reproduction; the rest are `pattern` and say so.
+
 `register/placards/HZ-001.json` and onward, append-only, never renumbered, cited like a CVE. `HZ-001` is the first: *a still-valid action is destroyed by a permissionless trigger in the same block*, confirmed on a deployed mainnet escrow whose published source was verified byte-identical to the live runtime.
 
 Every placard carries an id, class, matcher, money bound, reproduction, fix, provenance and author. Confirmed placards must ship a runnable reproduction - CI enforces it.

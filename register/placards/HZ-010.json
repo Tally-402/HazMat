@@ -43,7 +43,7 @@
         "command": "python3 -m hazmat.confirm --placard HZ-010 --chain mainnet",
         "verdict": "confirmed",
         "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
-        "selector_agreement": "59/59, 227 body bytes differing (immutable windows), length delta 0",
+        "selector_agreement": "59/59, 227 body bytes differing, length delta 0",
         "probe_tests": [
           "test_A1_cancelWithNoPendingRecoveryKillsAQueuedApproval()"
         ],

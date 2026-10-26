@@ -1,0 +1,78 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 1852 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(HAZMAT SAFETY DATA SHEET) Tj T*
+() Tj T*
+(target 0xe1cE2345d25462996AE27F58E3e001245e043EA4 family evm) Tj T*
+(code sha256 0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1) Tj T*
+(register 15 placards body 522 bytes metadata 0 excluded 6 four-byte constants) Tj T*
+(assertion level: pattern match only; confirmation runs are separate) Tj T*
+() Tj T*
+(WHAT WAS READ) Tj T*
+(placards checked 15 classes 7 selectors in code 6 the register asks about 0 otherwise unaccounted 6) Tj T*
+(  0x06661abd unindexed) Tj T*
+(  0x35420fd9 unindexed) Tj T*
+(  0x4e487b71 unindexed) Tj T*
+(  0xb326e4a9 unindexed) Tj T*
+(  0xc34c08e5 unindexed) Tj T*
+(  0xd09de08a unindexed) Tj T*
+() Tj T*
+(SUBJECT) Tj T*
+() Tj T*
+(proxy 0xe1ce2345d25462996ae27f58e3e001245e043ea4) Tj T*
+(resolved via implementation\(\) getter) Tj T*
+(effective 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a) Tj T*
+(verified as ClausManagedProject \(exact_match\)) Tj T*
+(verified as CounterV2 \(match\)) Tj T*
+(ADDRESSES SCANNED) Tj T*
+(requested 0xe1ce2345d25462996ae27f58e3e001245e043ea4 12 selectors 1936 bytes) Tj T*
+(implementation 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a 6 selectors 522 bytes) Tj T*
+() Tj T*
+(ASSERTION) Tj T*
+(a match is a candidate, not a clearance. Nothing here claims the contract is safe.) Tj T*
+() Tj T*
+(PLACARDS) Tj T*
+(no placard matched. That is not the same as safe.) Tj T*
+() Tj T*
+(NOT CHECKED) Tj T*
+(  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
+(  - are labelled not followed) Tj T*
+(  - reachability) Tj T*
+(  - economic preconditions) Tj T*
+(  - state at any particular block) Tj T*
+(  - source-level reasoning) Tj T*
+(  - anything not covered by a placard) Tj T*
+() Tj T*
+(cite the placard id, the code sha256 and the register digest.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000002145 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
+startxref
+2242
+%%EOF

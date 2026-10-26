@@ -131,6 +131,17 @@ class Verify(unittest.TestCase):
             self.assertFalse(got['ok'])
             self.assertTrue(any('fetch' in c['check'] and not c['ok'] for c in got['checks']))
 
+    def test_a_sheet_verifies_against_the_epoch_it_names_even_after_a_new_one(self):
+        report = Pdf().report()
+        report['register_anchor'] = {'epoch': 1, 'root': anchor.load_epoch(2)['root'], 'file': 'epoch-x.json',
+                                     'register_digest': anchor.load_epoch(2)['register_digest']}
+        page, _ = sds.render(report)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp, 's.html')
+            path.write_text(page)                                  # names epoch 1
+            self.assertTrue(verify.verify_sheet(str(path))['ok'])  # and is checked against epoch 1
+            self.assertTrue(any(c.get('epoch') == 1 for c in verify.verify_sheet(str(path))['checks']))
+
     def test_the_register_digest_changes_when_a_placard_does(self):
         before = match.register_digest(REGISTER)
         self.assertEqual(before, match.register_digest(REGISTER))
@@ -331,7 +342,7 @@ class Coverage(unittest.TestCase):
         cov = report['coverage']
         self.assertEqual(cov['selectors_in_code'],
                          cov['selectors_the_register_asks_about'] + cov['selectors_otherwise_unaccounted'])
-        self.assertEqual(cov['placards_checked'], 10)
+        self.assertEqual(cov['placards_checked'], 15)
         self.assertTrue(cov['means'].startswith('a match means'))
         selectors = [u['selector'] for u in cov['unaccounted_sample']]
         self.assertIn('0xdeadbeef', selectors)
@@ -495,7 +506,7 @@ class NoPersonalPaths(unittest.TestCase):
         self.assertNotIn(str(Path.home()), blob)
         page, _ = sds.render(report)
         self.assertNotIn('/Users/', page)
-        self.assertIn('epoch-1.json', page)                       # named by file, not by path
+        self.assertIn('epoch-%d.json' % match.latest_anchor()['epoch'], page)   # named by file, not by path
 
     def test_a_displayed_path_prefers_relative_then_tilde(self):
         self.assertEqual(paths.display(Path(REGISTER, 'HZ-001.json')), 'register/placards/HZ-001.json')
@@ -526,10 +537,10 @@ class Api(unittest.TestCase):
 
     def test_the_register_endpoint_lists_every_placard_and_the_anchor(self):
         got = self.get('/api/register')
-        self.assertEqual(got['count'], 10)
-        self.assertEqual(len(got['placards']), 10)
+        self.assertEqual(got['count'], 15)
+        self.assertEqual(len(got['placards']), 15)
         self.assertTrue(got['digest'].startswith('0x'))
-        self.assertEqual(got['anchor']['epoch'], 1)
+        self.assertEqual(got['anchor']['epoch'], match.latest_anchor()['epoch'])
 
     def test_a_placard_endpoint_carries_its_confirmation(self):
         got = self.get('/api/placard/HZ-001')
@@ -540,7 +551,9 @@ class Api(unittest.TestCase):
     def test_the_proof_endpoint_verifies_against_the_published_root(self):
         got = self.get('/api/proof?placard=HZ-005')
         self.assertTrue(got['verified'])
-        self.assertEqual(anchor.load_epoch(1)['root'], got['root'])
+        latest = match.latest_anchor()
+        self.assertEqual(latest['epoch'], got['epoch'])          # proves into the newest epoch
+        self.assertEqual(anchor.load_epoch(got['epoch'])['root'], got['root'])
 
     def test_unknown_ids_are_a_404_with_a_reason(self):
         try:

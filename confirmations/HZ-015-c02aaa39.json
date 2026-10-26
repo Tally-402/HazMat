@@ -1,0 +1,112 @@
+{
+  "chain": "mainnet",
+  "chain_id": 1,
+  "forge": {
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
+    "version": "forge Version: 1.8.6"
+  },
+  "placard": "HZ-015",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
+  "stages": {
+    "build": {
+      "exit_code": 0,
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.4.19/solc-0.4.19\"\nevm_version = \"byzantium\"",
+      "log_tail": "Compiling 1 files with Solc 0.4.19\nSolc 0.4.19 finished in 11.82ms\nCompiler run successful!\nWarning: unable to lint. Solar only supports Solidity versions >=0.8.0\n",
+      "state": "ok"
+    },
+    "compare": {
+      "artifact": "WETH9.sol/WETH9.json",
+      "body_bytes_differing": 0,
+      "body_length_delta": 0,
+      "deployed_body_bytes": 3081,
+      "deployed_bytes": 3124,
+      "note": "immutables live in the deployed body, so byte differences here are expected; the selector set is the portable signal",
+      "rebuilt_body_bytes": 3081,
+      "rebuilt_bytes": 3124,
+      "selectors_deployed": 12,
+      "selectors_extra_in_rebuild": [],
+      "selectors_missing_from_rebuild": [],
+      "selectors_rebuilt": 12,
+      "state": "ok"
+    },
+    "fetch": {
+      "contract": "WETH9",
+      "fetches": [
+        {
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "compiler": "0.4.19+commit.c4cbbb05",
+          "contract": "WETH9",
+          "creation_match": "match",
+          "fetched_on_chain": 1,
+          "files": [
+            {
+              "bundle_key": "WETH9.sol",
+              "path": "src/WETH9.sol",
+              "sha256": "4a4205fff097f9364ebba3c8a32670a63fccffb39baddc0046a6da1ba398c767"
+            }
+          ],
+          "match": "match",
+          "runtime_match": "match",
+          "settings": {
+            "libraries": {},
+            "optimizer": {
+              "enabled": false,
+              "runs": 200
+            },
+            "remappings": []
+          },
+          "sources": 1,
+          "verified_at": "2024-08-08T13:28:37Z"
+        }
+      ],
+      "settings": {
+        "libraries": {},
+        "optimizer": {
+          "enabled": false,
+          "runs": 200
+        },
+        "remappings": []
+      },
+      "solc_local": "~/Library/Application Support/svm/0.4.19/solc-0.4.19",
+      "state": "ok",
+      "verified_at": "2024-08-08T13:28:37Z"
+    },
+    "libs": {
+      "files_added": 48,
+      "state": "ok",
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
+    },
+    "probe": {
+      "exit_codes": [
+        0
+      ],
+      "failed": [],
+      "log_tail": "== WethStipend.t.sol\nCompiling 2 files with Solc 0.4.19\nSolc 0.4.19 finished in 16.11ms\nCompiler run successful!\n\nRan 4 tests for test/WethStipend.t.sol:WethStipend\n[PASS] test_aContractWithNoPayableFallbackReverts() (gas: 289769)\n[PASS] test_aFallbackThatWritesStorageReverts() (gas: 272087)\n[PASS] test_anEmptyFallbackIsPaidWhichIsWhatProvesItIsTheStipend() (gas: 204635)\n[PASS] test_anEoaRecipientIsPaid() (gas: 103603)\nSuite result: ok. 4 passed; 0 failed; 0 skipped; finished in 591.00\u00b5s (1.51ms CPU time)\n\nRan 1 test suite in 3.27ms (591.00\u00b5s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)\nWarning: dynamic test linking disabled for 1 files: error: expected a state variable declaration\n",
+      "match_test": null,
+      "missing_lib_hint": null,
+      "passed": [
+        "test_aContractWithNoPayableFallbackReverts()",
+        "test_aFallbackThatWritesStorageReverts()",
+        "test_anEmptyFallbackIsPaidWhichIsWhatProvesItIsTheStipend()",
+        "test_anEoaRecipientIsPaid()"
+      ],
+      "sources": [
+        "WethStipend.t.sol"
+      ],
+      "state": "ok"
+    },
+    "supplement": {
+      "files": [],
+      "skipped": "a file the bundle already carries is never overwritten",
+      "state": "ok"
+    }
+  },
+  "target": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  "target_code_bytes": 3124,
+  "target_code_sha256": "0x5566bf50796faf93c9b6f6adacd3b32c70bfe16b48ffc59db6cd144cbdc89739",
+  "verdict": "confirmed",
+  "workdir": "work/HZ-015-c02aaa39"
+}

@@ -127,11 +127,14 @@ def fetch_source(chain_id, address, workdir, base=SOURCIFY, fallback_chains=(1,)
         raise ConfirmError('sourcify returned no sources for %s' % address)
     written = []
     for name, entry in sources.items():
-        path = Path(workdir) / name
+        # a flat bundle (one file at the root, as WETH9 is stored) would otherwise sit
+        # outside the configured source directory and forge would compile nothing
+        rel = name if '/' in name else 'src/' + name
+        path = Path(workdir) / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         content = entry['content'] if isinstance(entry, dict) else entry
         path.write_text(content)
-        written.append({'path': name, 'sha256': _sha256(content.encode())})
+        written.append({'path': rel, 'bundle_key': name, 'sha256': _sha256(content.encode())})
     return record, written
 
 
@@ -210,6 +213,13 @@ def write_foundry_toml(workdir, settings, solc_path=None, solc_version=None):
         lines.append('optimizer_runs = %d' % int(optimizer.get('runs', 200)))
     if settings.get('evmVersion'):
         lines.append('evm_version = "%s"' % settings['evmVersion'])
+    elif solc_version:
+        # a 0.4/0.5 record often omits evmVersion; forging the era keeps foundry from
+        # handing a 2017 compiler an evm version it has never heard of
+        era = {'0.4': 'byzantium', '0.5': 'istanbul', '0.6': 'istanbul', '0.7': 'london'}
+        chosen = era.get(solc_version[:3])
+        if chosen:
+            lines.append('evm_version = "%s"' % chosen)
     Path(workdir, 'foundry.toml').write_text('\n'.join(lines) + '\n')
     return '\n'.join(lines)
 
@@ -342,6 +352,10 @@ def run(placard_id, target, register=None, chain='mainnet', workdir='work',
     code, log = _run([forge, 'build'], str(root), timeout)
     record['stages']['build'].update({'state': 'ok' if code == 0 else 'blocked', 'exit_code': code,
                                       'log_tail': paths.shorten(log[-2500:])})
+    if 'Bad CPU type' in log:
+        record['stages']['build']['hint'] = ('the pinned solc is an x86_64 binary and this is arm64: '
+                                             'install Rosetta once with '
+                                             'softwareupdate --install-rosetta --agree-to-license')
     if code != 0:
         return _finish(record, root)
 

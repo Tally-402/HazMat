@@ -18,11 +18,11 @@ BT
 () Tj T*
 (target 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c family evm) Tj T*
 (code sha256 0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139) Tj T*
-(register 10 placards body 11566 bytes metadata 53 excluded 49 four-byte constants) Tj T*
+(register 15 placards body 11566 bytes metadata 53 excluded 49 four-byte constants) Tj T*
 (assertion level: pattern match only; confirmation runs are separate) Tj T*
 () Tj T*
 (WHAT WAS READ) Tj T*
-(placards checked 10 classes 6 selectors in code 49 the register asks about 8 otherwise unaccounted 41) Tj T*
+(placards checked 15 classes 7 selectors in code 49 the register asks about 9 otherwise unaccounted 40) Tj T*
 (  0x0256965f unindexed) Tj T*
 (  0x06fda65d unindexed) Tj T*
 (  0x0b135d3f unindexed) Tj T*

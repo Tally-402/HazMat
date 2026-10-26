@@ -1,0 +1,47 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "tier": "pattern",
+  "id": "HZ-012",
+  "placard_class": 5,
+  "placard_class_name": "encoding",
+  "title": "A transparent proxy answers admin selectors that collide with the implementation namespace",
+  "summary": "Admin functions live in the proxy runtime under names an implementation also tends to use. Which branch answers depends on the caller, so the same selector means different things to the admin and to everyone else, and the collision is invisible in the ABI of either contract alone.",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xf851a440",
+      "0x8f283970"
+    ],
+    "require_any": [
+      "0x5c60da1b"
+    ],
+    "notes": "admin() 0xf851a440, changeAdmin(address) 0x8f283970, implementation() 0x5c60da1b. selectors derived in-repo and verified present in the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "the admin branch bypasses the implementation for the caller that matches it"
+  },
+  "reproduction": {
+    "kind": "manual",
+    "command": "hazmat scan --code 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 --chain mainnet",
+    "expected": "admin() and changeAdmin(address) present in the proxy runtime alongside implementation()"
+  },
+  "confirmed_on": [
+    {
+      "target": "USDC proxy 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 chainId 1"
+    }
+  ],
+  "fix": "Document which selectors belong to the proxy, and keep the implementation from reusing them.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "USDC FiatToken proxy, mainnet",
+    "published_source": "proxy runtime selectors",
+    "deployed_verified": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 chainId 1",
+    "evidence": [
+      "admin(), changeAdmin() and implementation() all resolve inside a 2,186 byte runtime",
+      "the implementation contract at 0x43506849 does not carry upgradeTo at all, so the authority is proxy-only"
+    ]
+  }
+}

@@ -7,7 +7,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | phase | state |
 |---|---|
 | P0 format freeze | done |
-| P1 corpus | 10 of 10 placards, self-check green |
+| P1 corpus | 15 placards, 9 classes, self-check green against six controls |
 | P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
 | P3 confirmation runner | done: all ten placards confirmed, rebuilt selectors identical to the deployed runtime |
 | P4 product surface | done: CLI, sheets with coverage and subject resolution, PDF, verify, server, front end |
@@ -35,7 +35,7 @@ Done when: schema validates every placard, CI rejects a confirmed placard withou
 
 ## P1 - corpus
 
-Goal: ten confirmed placards. Below roughly ten, a register is a demo.
+Goal: ten confirmed placards. Below roughly ten, a register is a demo. Reached fifteen: eleven confirmed, four pattern-tier, across nine classes and three unrelated codebases (claus-network, USDC, WETH).
 
 1. `HZ-002`..`HZ-010` from the session findings and public post-mortems. Done.
 2. A self-check harness: each placard must fire on its own target codehash and stay quiet on controls.

@@ -1,0 +1,53 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "tier": "pattern",
+  "id": "HZ-011",
+  "placard_class": 8,
+  "placard_class_name": "upgrade-lifecycle",
+  "title": "A proxy keeps its whole upgrade authority in the runtime and nothing on-chain delays it",
+  "summary": "The admin surface lives in the proxy bytecode itself, so whoever holds it replaces the logic in one transaction. No delay, timelock or queued-implementation selector is present, so nothing on-chain gives holders time to exit before a swap.",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x3659cfe6",
+      "0x4f1ef286"
+    ],
+    "require_any": [
+      "0xf851a440",
+      "0x5c60da1b"
+    ],
+    "require_none_of": [
+      "0xd33219b4",
+      "0x6a42b8f8"
+    ],
+    "notes": "upgradeTo(address) 0x3659cfe6, upgradeToAndCall(address,bytes) 0x4f1ef286, admin() 0xf851a440, implementation() 0x5c60da1b; absence checked over getMinDelay() 0xd33219b4 and delay() 0x6a42b8f8 only, so a bespoke timelock under another name is not detected. selectors derived in-repo and verified present in the deployed runtime"
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "every balance the proxy holds, reachable by swapping the implementation"
+  },
+  "reproduction": {
+    "kind": "manual",
+    "command": "hazmat scan --code 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 --chain mainnet",
+    "expected": "the proxy runtime carries admin(), implementation(), upgradeTo and upgradeToAndCall and no delay getter"
+  },
+  "confirmed_on": [
+    {
+      "target": "USDC proxy 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 chainId 1 (6 selectors in 2,186 bytes)",
+      "equivalence": "selector set derived in-repo from the live runtime, not from source"
+    }
+  ],
+  "fix": "State the upgrade path and who holds it; a delay contract is the usual mitigation.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "USDC FiatToken proxy, mainnet",
+    "published_source": "proxy runtime selectors",
+    "deployed_verified": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 chainId 1",
+    "evidence": [
+      "the proxy is 2,186 bytes and carries 6 selectors, of which 5 are its admin surface",
+      "no getMinDelay() or delay() selector is present in the runtime"
+    ]
+  }
+}

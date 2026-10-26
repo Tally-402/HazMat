@@ -1,0 +1,68 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "tier": "confirmed",
+  "id": "HZ-015",
+  "placard_class": 6,
+  "placard_class_name": "asset-handling",
+  "title": "A wrapped-native payout forwards with a stipend, so a smart-contract recipient can block its own withdrawal",
+  "summary": "Withdrawal pays the caller with a bare value transfer carrying only the 2300-gas stipend. An externally-owned account is fine, an empty fallback is fine, and any contract whose fallback so much as writes storage runs out of gas, so the withdrawal reverts until the recipient is changed.",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xd0e30db0",
+      "0x2e1a7d4d"
+    ],
+    "require_any": [
+      "0x70a08231",
+      "0x18160ddd"
+    ],
+    "require_none_of": [
+      "0x01681a62",
+      "0x7a4e4ecf"
+    ],
+    "notes": "deposit() 0xd0e30db0, withdraw(uint256) 0x2e1a7d4d, balanceOf(address) 0x70a08231, totalSupply() 0x18160ddd; absence checked over sweep(address) and rescue(address,uint256) only. Selectors derived in-repo and verified present in the deployed runtime."
+  },
+  "money_bound": {
+    "kind": "per-event",
+    "expression": "the withdrawal amount, stuck until the recipient is changed or upgraded"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "python3 -m hazmat.confirm --placard HZ-015 --chain mainnet",
+    "source": "reproductions/HZ-015/WethStipend.t.sol (no forge-std, because the verified source is solc 0.4.19)",
+    "expected": "an EOA recipient is paid; a contract with no payable fallback reverts; a contract whose fallback writes storage reverts; a contract with an empty payable fallback is paid, which is what shows it is the stipend and not contracts in general"
+  },
+  "confirmed_on": [
+    {
+      "target": "WETH 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 chainId 1",
+      "equivalence": "verified source is a single file, WETH9.sol, solc 0.4.19",
+      "confirmation": {
+        "record": "confirmations/HZ-015-c02aaa39.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-015 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (match on runtime, verified 2024-08-08), rebuilt with the record's own compiler settings, rebuilt selector set 12 of 12 identical to the deployed runtime, and the placard's own probe passed 4 test(s)",
+        "selector_agreement": "12/12, 0 body bytes differing, length delta 0",
+        "probe_tests": [
+          "test_aContractWithNoPayableFallbackReverts()",
+          "test_aFallbackThatWritesStorageReverts()",
+          "test_anEmptyFallbackIsPaidWhichIsWhatProvesItIsTheStipend()",
+          "test_anEoaRecipientIsPaid()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
+    }
+  ],
+  "fix": "Forward with call and a gas allowance, or document that only EOAs and trivial fallbacks can withdraw.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "WETH, mainnet",
+    "published_source": "WETH9.sol (0.4.19)",
+    "deployed_verified": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 chainId 1",
+    "evidence": [
+      "withdraw() uses transfer(), so the recipient gets 2300 gas",
+      "no sweep or rescue selector, so stuck value needs a recipient change"
+    ]
+  }
+}

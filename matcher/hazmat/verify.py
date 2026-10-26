@@ -5,6 +5,7 @@ import re
 import sys
 from pathlib import Path
 
+from . import anchor as anchor_mod
 from . import chains, match, paths, sds
 
 
@@ -20,14 +21,25 @@ def verify_sheet(path, expect=None, anchor=None):
         {'check': 'the digest re-derives from the sheet bytes', 'ok': claimed == recomputed},
         {'check': 'the digest matches the one supplied', 'ok': expect is None or claimed == expect},
     ]
-    # if the sheet names a published epoch, its register digest must be that epoch's
+    # if the sheet names an epoch, that epoch's record must back it - not the newest one,
+    # or publishing a new epoch would invalidate every sheet already handed out
     named = re.search(r'register \d+ placards v(0x[0-9a-f]{16})', page)
-    record = anchor or match.latest_anchor()
+    claimed_epoch = re.search(r'anchor epoch (\d+) root (0x[0-9a-f]{64})', page)
+    record = anchor
+    if record is None and claimed_epoch:
+        try:
+            record = anchor_mod.load_epoch(int(claimed_epoch.group(1)))
+        except anchor_mod.AnchorError:
+            record = None
+    if record is None:
+        record = match.latest_anchor()
     if named and record:
-        checks.append({'check': 'the register digest the sheet names is the published epoch',
+        checks.append({'check': 'the register digest the sheet names is that epoch\'s',
                        'ok': named.group(1) == record.get('register_digest'),
-                       'sheet': named.group(1), 'epoch': record.get('epoch'),
-                       'root': record.get('root')})
+                       'sheet': named.group(1), 'epoch': record.get('epoch'), 'root': record.get('root')})
+    if claimed_epoch and record:
+        checks.append({'check': 'the epoch root the sheet names is that epoch\'s root',
+                       'ok': claimed_epoch.group(2) == record.get('root'), 'epoch': record.get('epoch')})
     return {'kind': 'sheet', 'file': paths.display(path), 'claimed': claimed, 'recomputed': recomputed,
             'expected': expect, 'ok': ok and all(c['ok'] for c in checks), 'checks': checks}
 

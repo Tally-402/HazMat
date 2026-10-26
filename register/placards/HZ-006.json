@@ -46,7 +46,7 @@
         "command": "python3 -m hazmat.confirm --placard HZ-006 --chain sepolia",
         "verdict": "confirmed",
         "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 6 test(s)",
-        "selector_agreement": "11/11, 60 body bytes differing (immutable windows), length delta 0",
+        "selector_agreement": "11/11, 60 body bytes differing, length delta 0",
         "probe_tests": [
           "test_H4a_projectAdmitsAPayloadOfExactly8192()",
           "test_H4b_onePayloadByteOverIsRejected()",
