@@ -1,0 +1,51 @@
+{
+  "id": "HZ-001",
+  "placard_class": 2,
+  "placard_class_name": "ordering",
+  "title": "A still-valid action is destroyed by a permissionless trigger in the same block",
+  "summary": "Two exits are legal in the same block and pay opposite amounts. The transaction that lands first decides, and the losing exit cannot be repaired because the other is already dead from its own clock.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xe4725ba1",
+      "0x7c7a9804",
+      "0x82cbf88b"
+    ],
+    "notes": "accept(bytes32) 0xe4725ba1, settleExpired(bytes32) 0x7c7a9804, dispute(bytes32,bytes32) 0x82cbf88b. A match is a candidate; reachability needs a confirmation run."
+  },
+  "money_bound": {
+    "kind": "per-deal",
+    "expression": "one deal amount, which is the worker's entire payment on the affected deal",
+    "live_parameter": "escrow.maximumDeal()"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeLiveEscrow.t.sol",
+    "source": "reproductions/HZ-001/ArgusProbeLiveEscrow.t.sol",
+    "expected": "past the dispute window the attacker's timeout pays the worker 0 and the buyer's accept then reverts WrongState; with the reverse ordering the worker is paid in full"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausTokenDealEscrow 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c (chainId 1)",
+      "source": "claus-network 8dbf692688da640a5dc275df58f1a58a405b508d",
+      "equivalence": "published source verified byte-identical to the deployed runtime (394 differing bytes, all inside 23 immutable windows)",
+      "attacker_gas": 100871,
+      "victim_loss": "one maximum-sized deal"
+    }
+  ],
+  "fix": "Bound the still-valid exit by the same clock as the permissionless trigger, or document which exit is authoritative after the window.",
+  "provenance": {
+    "first_observed": "2026-10-25",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d",
+    "published_source": "contracts/src/ClausTokenDealEscrow.sol:141-144 (accept), :175 (settleExpired)",
+    "deployed_verified": "0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c chainId 1",
+    "evidence": [
+      "attacker pays no capital and gains nothing; the loss falls on the worker",
+      "same-block both-orders case passes",
+      "arbiter resolution and worker refund both also pay zero, so no repair path remains"
+    ]
+  },
+  "author": "Argus",
+  "created": "2026-10-26"
+}

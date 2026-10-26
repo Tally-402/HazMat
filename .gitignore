@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+out/
+cache/
+.DS_Store
+sheet-*.html

@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HazMat placard",
+  "type": "object",
+  "required": [
+    "id",
+    "placard_class",
+    "title",
+    "summary",
+    "tier",
+    "matcher",
+    "money_bound",
+    "fix",
+    "provenance",
+    "author",
+    "created"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^HZ-[0-9]{3}$"
+    },
+    "placard_class": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9
+    },
+    "placard_class_name": {
+      "enum": [
+        "extraction",
+        "ordering",
+        "authority",
+        "availability",
+        "encoding",
+        "asset-handling",
+        "stranded-value",
+        "upgrade-lifecycle",
+        "lifecycle-state"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "summary": {
+      "type": "string"
+    },
+    "tier": {
+      "enum": [
+        "pattern",
+        "confirmed"
+      ],
+      "description": "pattern = selector/opcode match only; confirmed = a runnable reproduction exists and was executed"
+    },
+    "matcher": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "selector-set",
+            "opcode-sequence"
+          ]
+        },
+        "require_all": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "require_any": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "money_bound": {
+      "type": "object",
+      "required": [
+        "kind",
+        "expression"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "per-event",
+            "per-deal",
+            "capacity",
+            "capability"
+          ]
+        },
+        "expression": {
+          "type": "string"
+        },
+        "live_parameter": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reproduction": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "forge",
+            "script",
+            "manual"
+          ]
+        },
+        "command": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "expected": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "confirmed_on": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "fix": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "first_observed"
+      ],
+      "properties": {
+        "first_observed": {
+          "type": "string"
+        },
+        "specimen": {
+          "type": "string"
+        },
+        "published_source": {
+          "type": "string"
+        },
+        "deployed_verified": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "author": {
+      "type": "string"
+    },
+    "created": {
+      "type": "string"
+    }
+  }
+}

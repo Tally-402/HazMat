@@ -1,0 +1,29 @@
+name: validate
+on: [push, pull_request]
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install jsonschema
+      - name: placards validate, ids unique, filename matches id, confirmed ships a repro
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          from jsonschema import validate
+          schema = json.loads(pathlib.Path('register/schema/placard.schema.json').read_text())
+          ids = set()
+          for path in sorted(pathlib.Path('register/placards').glob('*.json')):
+              row = json.loads(path.read_text())
+              validate(row, schema)
+              assert row['id'] == path.stem, f"{path.name} does not match its id"
+              assert row['id'] not in ids, f"duplicate {row['id']}"
+              if row['tier'] == 'confirmed':
+                  assert row.get('reproduction'), f"{row['id']} confirmed without a reproduction"
+              ids.add(row['id'])
+          print(f"{len(ids)} placards valid")
+          PY
+      - name: matcher tests
+        run: cd matcher && python -m unittest discover -s tests -v
