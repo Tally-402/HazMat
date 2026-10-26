@@ -61,8 +61,17 @@ async function scanView(chain, address){
   const out=document.getElementById('out'); out.innerHTML='<p class="note">reading chain…</p>';
   let d; try{ d=await get(`/scan?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}`); }
   catch(e){ out.innerHTML=`<div class="card warn"><b class="err">blocked</b><div class="note">${esc(e.message)}</div></div>`; return }
-  const cov=d.coverage||{}, ms=d.matches||[];
-  out.innerHTML=`
+  const cov=d.coverage||{}, ms=d.matches||[], sub=d.subject||{};
+  const idents=Object.entries(sub.identity||{}).map(([a,v])=>`${esc(a.slice(0,10))} ${esc(v.name||v.state||'')}`).join(' · ');
+  const subjectCard = sub.kind? `<div class="card" style="border-color:#3a3f45">
+    <div class="row"><b>${esc(sub.kind)}</b><span class="sp">${esc(sub.requested)}</span></div>
+    ${sub.via?`<div class="sp">resolved via ${esc(sub.via)}</div>`:''}
+    ${sub.effective&&sub.effective!==sub.requested?`<div>logic at <code>${esc(sub.effective)}</code></div>`:''}
+    ${idents?`<div class="sp">${idents}</div>`:''}
+    ${(sub.evidence||[]).map(e=>`<div class="sp">${esc(e)}</div>`).join('')}
+    ${sub.kind==='possible-proxy'?`<div class="sp">the code delegatecalls but no pointer was found, so the logic may sit somewhere this resolver cannot see</div>`:''}
+   </div>` : '';
+  out.innerHTML=subjectCard+`
    <div class="card"><div class="row"><b>${ms.length} placard${ms.length===1?'':'s'} matched</b><span class="sp">${esc(d.family)} · ${cov.selectors_in_code} selectors read · ${cov.placards_checked} placards checked</span></div>
     <div class="note">${esc(cov.means||'')}</div>
     <div class="row" style="margin-top:.6rem">
@@ -74,7 +83,7 @@ async function scanView(chain, address){
       <div class="row"><a href="#/placard/${esc(m.id)}"><b>${esc(m.id)}</b></a>${chip(m.placard_class)}<span class="sp">${esc(m.tier)} placard · assertion: ${esc(m.assertion)}</span></div>
       <div>${esc(m.title)}</div>
       <div class="sp">money: ${esc((m.money_bound||{}).expression||'n/a')}</div>
-      <div class="sp">matched by <code>${esc((m.matched_selectors||[]).join(' '))}</code></div></div>`).join('') || '<div class="card"><b>no placard matched</b><div class="note">that is not the same as safe. The register has '+cov.placards_checked+' placards and they are shaped after a small number of projects, so a clean sheet mostly means unfamiliar, not sound.</div></div>'}
+      <div class="sp">matched by <code>${esc((m.matched_selectors||[]).join(' '))}</code>${m.role&&m.role!=='requested'?` on the ${esc(m.role)} <code>${esc((m.at||'').slice(0,10))}</code>`:''}</div></div>`).join('') || '<div class="card"><b>no placard matched</b><div class="note">that is not the same as safe. The register has '+cov.placards_checked+' placards and they are shaped after a small number of projects, so a clean sheet mostly means unfamiliar, not sound.</div></div>'}
    <h2>what was read</h2>
    <div class="grid">
      <div class="card"><div class="big">${cov.selectors_in_code}</div><div class="sp">selectors in code</div></div>

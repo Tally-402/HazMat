@@ -73,6 +73,19 @@ Keccak-256 is implemented in-repo, so the matcher and the deriver have no depend
 
 A 40-character hex string is ambiguous: exactly an address, and also a plausible 20-byte code blob. `--as address` or `--as code` settles it; the default prefers the address and says so loudly when the chain has nothing there.
 
+## What a scan resolves first
+
+Most addresses a user pastes are not the thing holding the logic. The scan resolves before it matches, and scans **both** addresses, labelling which one a match came from:
+
+| shape | resolved by |
+|---|---|
+| EIP-7702 delegated EOA (23-byte `0xef0100` designator) | following the designator to the delegate |
+| EIP-1167 minimal clone | the address embedded in the 45-byte code |
+| proxy | EIP-1967 implementation and beacon slots, EIP-1822, the OZ legacy slot, or the `implementation()` getter |
+| anything else that delegatecalls | labelled `possible-proxy`, not claimed |
+
+A beacon is followed one hop to its implementation. `proxy-dangling` means the pointer exists and has no code. Code reads are cached for 10 minutes (`HAZMAT_CACHE_TTL`, `--no-cache`), so an upgrade is invisible for up to that long.
+
 ## What every sheet says about coverage
 
 A clean sheet is the common case, so the sheet states what was *read*, not just what matched: bytes read, selectors extracted, how many the register asked about, how many nothing accounts for, plus a readable near-miss list and the register digest and anchor epoch. `register/selectors.json` is a convenience index of 132 selector-to-signature names so those misses read usefully — a name there is `keccak(signature)` and nothing more.

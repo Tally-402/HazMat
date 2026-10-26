@@ -12,7 +12,10 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from . import chains
+import os
+import time
+
+from . import chains, resolve
 
 DEFAULT_RPC = chains.CHAINS[chains.DEFAULT]['rpc']
 # anchored to the repo, not the current directory: the register, the anchors and the
@@ -60,7 +63,37 @@ def push4_constants(body):
     return found
 
 
-def load_code(source, rpc=None, as_='auto'):
+CACHE_DIR = ROOT / 'work' / 'cache'
+CACHE_TTL = int(os.environ.get('HAZMAT_CACHE_TTL', '600'))
+
+
+def cached_code(chain, address, rpc, ttl=None):
+    """Read code with a short on-disk cache.
+
+    A cached read means an upgrade is invisible for up to the ttl, which is the
+    honest trade: say so rather than pretend freshness.
+    """
+    ttl = CACHE_TTL if ttl is None else ttl
+    key = CACHE_DIR / ('code-%s-%s.json' % (chain, address.lower()))
+    if ttl and key.is_file():
+        try:
+            row = json.loads(key.read_text())
+            if time.time() - row['at'] < ttl:
+                return bytes.fromhex(row['code'][2:]), True
+        except (ValueError, KeyError, OSError):
+            pass
+    code = bytes.fromhex((resolve.code_hex(address, rpc) or '0x')[2:])
+    if ttl:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        try:
+            key.write_text(json.dumps({'at': time.time(), 'chain': chain, 'address': address.lower(),
+                                       'code': '0x' + code.hex()}))
+        except OSError:
+            pass
+    return code, False
+
+
+def load_code(source, rpc=None, as_='auto', chain='mainnet', use_cache=True):
     """Read code from an address, raw hex, or a file.
 
     A 40-character hex string is ambiguous: it is exactly an address and also a
@@ -70,22 +103,14 @@ def load_code(source, rpc=None, as_='auto'):
     if as_ not in ('auto', 'address', 'code'):
         raise MatchError('unknown as_: %s' % as_)
     if as_ == 'address' or (as_ == 'auto' and re.fullmatch(r'0x[0-9a-fA-F]{40}', source)):
-        payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'eth_getCode',
-                              'params': [source, 'latest']}).encode()
-        request = urllib.request.Request(rpc or DEFAULT_RPC, data=payload,
-                                         headers={'content-type': 'application/json',
-                                                  'user-agent': 'hazmat/0.1'})
         try:
-            with urllib.request.urlopen(request, timeout=45) as response:
-                body = json.loads(response.read())
-        except urllib.error.URLError as exc:
-            raise MatchError('rpc unreachable: %s' % exc)
-        if 'result' not in body:
-            raise MatchError('rpc error: %s' % body.get('error'))
-        raw = body['result']
-        if raw in ('0x', '0x0'):
+            code, _ = (cached_code(chain, source, rpc or DEFAULT_RPC) if use_cache
+                       else (bytes.fromhex((resolve.code_hex(source, rpc or DEFAULT_RPC) or '0x')[2:]), False))
+        except resolve.ResolveError as exc:
+            raise MatchError(str(exc))
+        if not code:
             raise MatchError('no code at %s (an address with nothing deployed; pass as_/--as code to read it as bytecode)' % source)
-        return bytes.fromhex(raw[2:])
+        return code
     path = Path(source)
     if path.exists():
         return bytes.fromhex(path.read_text().strip().replace('0x', ''))
@@ -206,18 +231,58 @@ def register_digest(register_dir):
     return '0x' + hashlib.sha256(blob).hexdigest()[:16]
 
 
-def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
-    code = load_code(source, rpc, as_)
-    placards = load_register(register_dir)
-    matches, stats = match_code(code, placards, family)
-    return {'target': source, 'family': family,
+def scan_target(address, placards, register_dir, rpc, family, chain, use_cache=True):
+    code = load_code(address, rpc, 'address', chain, use_cache)
+    found, stats = match_code(code, placards, family)
+    return {'at': address.lower(), 'stats': stats, 'matches': found,
             'coverage': coverage(code, placards, register_dir),
-            'register_anchor': latest_anchor(),
             'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
-            'register_size': len(placards), 'stats': stats, 'matches': matches,
+            'identity': resolve.identity(address, rpc, chains.chain_id(chain))}
+
+
+def scan(source, register_dir, rpc=None, family='evm', as_='auto', chain='mainnet', use_cache=True):
+    rpc = rpc or chains.endpoint(chain)
+    placards = load_register(register_dir)
+    is_address = bool(re.fullmatch(r'0x[0-9a-fA-F]{40}', source)) and as_ != 'code'
+    subject = None
+    scans = []
+    if is_address:
+        # what is this, and where does the logic live? scanning a wrapper and
+        # reporting no match would be confident and wrong
+        resolved = resolve.resolve(source, rpc, chain)
+        subject = {k: resolved[k] for k in ('requested', 'chain', 'kind', 'effective', 'via', 'evidence')}
+        subject['targets'] = [{'address': a, 'role': r} for a, r in resolved['targets']]
+        for address, role in resolved['targets']:
+            try:
+                row = scan_target(address, placards, register_dir, rpc, family, chain, use_cache)
+            except MatchError as exc:
+                scans.append({'at': address.lower(), 'role': role, 'state': 'blocked', 'error': str(exc),
+                              'matches': [], 'stats': {}, 'coverage': {}})
+                continue
+            row['role'] = role
+            scans.append(row)
+        subject['identity'] = {s['at']: s['identity'] for s in scans if s.get('identity')}
+    else:
+        code = load_code(source, rpc, as_, chain, use_cache)
+        found, stats = match_code(code, placards, family)
+        scans.append({'at': source, 'role': 'code', 'stats': stats, 'matches': found,
+                      'coverage': coverage(code, placards, register_dir),
+                      'code_sha256': '0x' + hashlib.sha256(code).hexdigest()})
+    headline = next((s for s in scans if s.get('role') in ('implementation', 'delegate', 'clone target')), scans[0])
+    merged = []
+    for row in scans:
+        for found in row['matches']:
+            merged.append(dict(found, at=row['at'], role=row['role']))
+    return {'target': source, 'family': family, 'subject': subject, 'scans': scans,
+            'coverage': headline.get('coverage', {}),
+            'register_anchor': latest_anchor(),
+            'code_sha256': headline.get('code_sha256'),
+            'register_size': len(placards), 'stats': headline.get('stats', {}), 'matches': merged,
             'assertion': 'pattern match only; confirmation runs are separate',
             'register_digest': register_digest(register_dir),
-    'not_checked': ['reachability', 'economic preconditions',
+    'not_checked': ['resolution is best effort: unknown proxy patterns, diamond facets and '
+                    'beacons pointing at beacons are labelled not followed',
+                    'reachability', 'economic preconditions',
                             'state at any particular block', 'source-level reasoning',
                             'anything not covered by a placard']}
 

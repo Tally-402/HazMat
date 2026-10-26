@@ -13,7 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from hazmat import anchor, batch, chains, confirm, derive, keccak, match, paths, pdf, sds, serve, verify, watch  # noqa: E402
+from hazmat import anchor, batch, chains, confirm, derive, keccak, match, paths, pdf, resolve, sds, serve, verify, watch  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -348,6 +348,143 @@ class Coverage(unittest.TestCase):
         self.assertIn('What was read', page)
         self.assertIn('otherwise unaccounted', page)
         self.assertEqual(report['matches'], [])
+
+
+class Resolve(unittest.TestCase):
+    """The shapes that used to scan a wrapper and confidently report nothing."""
+
+    IMPL = '0x' + 'cc' * 20
+    DELEGATE = '0x' + '22' * 20        # the 7702 delegate for 0xaa
+    CLONE_TARGET = '0x' + '22' * 20    # the clone at 0xbb embeds the same address
+
+    def setUp(self):
+        self.CODE = {'0xaa': '0xef0100' + '11' * 20, '0x11': '0x6080',
+                     '0xbb': '0x363d3d373d3d3d363d73' + '22' * 20 + '5af43d82803e903d91602b57fd5bf3',
+                     self.DELEGATE: '0x6080', '0xcc': '0x6000', '0xdd': '0x6000f4', '0xee': '0x',
+                     '0x99': '0x6000', '0x12': '0x6000f4'}
+        self.calls = []
+        self.real = resolve.rpc_call
+        resolve.rpc_call = self.stub
+
+    def tearDown(self):
+        resolve.rpc_call = self.real
+
+    def word(self, address):
+        return '0x' + '0' * 24 + address[2:]
+
+    def stub(self, rpc, method, params, timeout=45):
+        self.calls.append(method)
+        if method == 'eth_getCode':
+            return self.CODE.get(params[0], '0x')
+        if method == 'eth_getStorageAt':
+            return self.word(self.IMPL) if (params[0] == '0xcc' and params[1].startswith('0x3608')) else '0x' + '0' * 64
+        if method == 'eth_call':
+            return self.word(self.DELEGATE) if params[0]['to'] == '0xdd' else '0x'
+        return '0x'
+
+    def test_a_delegated_eoa_resolves_to_its_delegate(self):
+        self.CODE['0xaa'] = '0xef0100' + '11' * 20
+        got = resolve.resolve('0xaa', 'stub')
+        self.assertEqual(got['kind'], 'delegated-eoa')
+        self.assertEqual(got['effective'], '0x' + '11' * 20)
+        self.assertEqual(got['effective'], got['targets'][1][0])
+        self.assertEqual([r for _, r in got['targets']], ['requested', 'delegate'])
+
+    def test_a_minimal_clone_resolves_to_what_it_clones(self):
+        got = resolve.resolve('0xbb', 'stub')
+        self.assertEqual(got['kind'], 'minimal-clone')
+        self.assertEqual(got['effective'], self.DELEGATE)
+
+    def test_a_standard_slot_proxy_resolves_through_the_slot(self):
+        self.CODE[self.IMPL] = '0x6080'                    # the implementation has code
+        got = resolve.resolve('0xcc', 'stub')
+        self.assertEqual(got['kind'], 'proxy')
+        self.assertEqual(got['via'], 'eip1967 implementation')
+        self.assertEqual(got['effective'], self.IMPL)
+
+    def test_a_slot_pointing_at_nothing_is_dangling_not_proxy(self):
+        got = resolve.resolve('0xcc', 'stub')               # no code at the implementation
+        self.assertEqual(got['kind'], 'proxy-dangling')
+        self.assertIn('has no code', ' '.join(got['evidence']))
+
+    def test_a_bespoke_proxy_resolves_through_the_getter(self):
+        got = resolve.resolve('0xdd', 'stub')
+        self.assertEqual(got['kind'], 'proxy')
+        self.assertEqual(got['via'], 'implementation() getter')
+
+    def test_an_address_with_no_code_says_so(self):
+        got = resolve.resolve('0xee', 'stub')
+        self.assertEqual(got['kind'], 'no-code')
+        self.assertIsNone(got['effective'])
+
+    def test_a_plain_contract_is_left_alone(self):
+        got = resolve.resolve('0x99', 'stub')
+        self.assertEqual((got['kind'], got['effective']), ('contract', '0x99'))
+
+    def test_delegatecall_without_a_pointer_is_hedged_not_claimed(self):
+        got = resolve.resolve('0x12', 'stub')
+        self.assertEqual(got['kind'], 'possible-proxy')
+        self.assertIn('cannot see', ' '.join(got['evidence']))
+
+    def test_identity_failure_is_never_fatal(self):
+        real = resolve.identity
+        resolve.identity = lambda *a, **k: {'state': 'not-found'}
+        try:
+            self.assertEqual(resolve.identity('0x99', 'stub')['state'], 'not-found')
+        finally:
+            resolve.identity = real
+
+
+class Cache(unittest.TestCase):
+    def setUp(self):
+        self.real = resolve.rpc_call
+        self.reads = []
+        self.tmp = tempfile.TemporaryDirectory()
+        self.real_dir = match.CACHE_DIR
+        match.CACHE_DIR = Path(self.tmp.name)
+        resolve.rpc_call = self.stub
+
+    def tearDown(self):
+        resolve.rpc_call = self.real
+        match.CACHE_DIR = self.real_dir
+        self.tmp.cleanup()
+
+    def stub(self, rpc, method, params, timeout=45):
+        self.reads.append(params[0])
+        return '0x6080'
+
+    def test_the_second_read_comes_from_disk(self):
+        first, hit = match.cached_code('mainnet', '0xdead', 'stub')
+        self.assertFalse(hit)
+        second, hit = match.cached_code('mainnet', '0xdead', 'stub')
+        self.assertTrue(hit)
+        self.assertEqual(first, second)
+        self.assertEqual(len(self.reads), 1)                       # one rpc call, not two
+
+    def test_a_zero_ttl_always_reads_through(self):
+        match.cached_code('mainnet', '0xbeef', 'stub', ttl=0)
+        match.cached_code('mainnet', '0xbeef', 'stub', ttl=0)
+        self.assertEqual(len(self.reads), 2)
+
+
+class ScanSubject(unittest.TestCase):
+    def test_a_proxy_scan_reports_both_addresses_and_where_the_match_was(self):
+        real_resolve, real_identity, real_rpc = resolve.resolve, resolve.identity, resolve.rpc_call
+        resolve.rpc_call = lambda rpc, method, params, timeout=45: '0x63e4725ba1637c7a98046382cbf88b' if method == 'eth_getCode' else '0x'
+        resolve.resolve = lambda address, rpc, chain='mainnet': {
+            'requested': address, 'chain': chain, 'kind': 'proxy', 'effective': '0x' + 'ee' * 20,
+            'via': 'test slot', 'evidence': ['test'], 'targets': [(address, 'requested'), ('0x' + 'ee' * 20, 'implementation')]}
+        resolve.identity = lambda *a, **k: {'state': 'not-found'}
+        try:
+            report = match.scan('0x' + 'cc' * 20, REGISTER, use_cache=False)
+        finally:
+            resolve.resolve, resolve.identity, resolve.rpc_call = real_resolve, real_identity, real_rpc
+        self.assertEqual(report['subject']['kind'], 'proxy')
+        self.assertEqual([s['role'] for s in report['scans']], ['requested', 'implementation'])
+        self.assertEqual({m['role'] for m in report['matches']}, {'requested', 'implementation'})
+        self.assertIn('resolved via test slot', sds.subject_line(report))
+        page, _ = sds.render(report)
+        self.assertIn('Addresses scanned', page)
 
 
 class NoPersonalPaths(unittest.TestCase):

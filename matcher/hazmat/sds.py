@@ -24,6 +24,8 @@ PAGE = """<!doctype html><meta charset="utf-8">
 </style>
 <h1>HazMat Safety Data Sheet</h1>
 <div>target <code>{target}</code> &middot; family {family}</div>
+<div>subject {subject}</div>
+{scans}
 <div>code sha256 <code>{sha}</code></div>
 <div>register {register} placards v{register_digest} &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
 <div>anchor {anchor}</div>
@@ -66,6 +68,41 @@ def anchor_line(report):
     return 'epoch %s root %s (%s)' % (anchor.get('epoch'), anchor.get('root'), anchor.get('file'))
 
 
+def subject_line(report):
+    """What the target actually is, and where the logic lives."""
+    subject = report.get('subject')
+    if not subject:
+        return 'raw code, not an address, so nothing was resolved'
+    kind = subject.get('kind')
+    line = '%s <code>%s</code>' % (html.escape(kind), html.escape(subject.get('requested', '')))
+    if subject.get('via'):
+        line += ' resolved via %s' % html.escape(subject['via'])
+    if subject.get('effective') and subject['effective'] != subject.get('requested'):
+        line += ' &rarr; effective <code>%s</code>' % html.escape(subject['effective'])
+    names = [v.get('name') for v in (subject.get('identity') or {}).values() if v.get('name')]
+    if names:
+        line += ' &middot; verified as %s' % ', '.join(html.escape(n) for n in names)
+    if kind == 'possible-proxy':
+        line += ' &middot; the code delegatecalls but no pointer was found, so the logic may sit somewhere this resolver cannot see'
+    return line
+
+
+def scan_table(report):
+    rows = report.get('scans') or []
+    if len(rows) < 2:
+        return ''
+    body = []
+    for row in rows:
+        ident = (row.get('identity') or {}).get('name') or (row.get('identity') or {}).get('state') or ''
+        found = ' '.join(m['id'] for m in row.get('matches', [])) or '&ndash;'
+        body.append('<tr><td>%s</td><td>%s</td><td><code>%s</code></td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
+            html.escape(row.get('role', '')), html.escape(ident), html.escape(row.get('at', '')),
+            (row.get('coverage') or {}).get('selectors_in_code', '?'), (row.get('stats') or {}).get('code_bytes', '?'),
+            found))
+    return ('<h2>Addresses scanned</h2><table><tr><th>role</th><th>identity</th><th>address</th>'
+            '<th>selectors</th><th>bytes</th><th>matched</th></tr>%s</table>' % ''.join(body))
+
+
 def render(report):
     rows = []
     for m in report['matches']:
@@ -88,6 +125,7 @@ def render(report):
                        rows='\n'.join(rows),
                        notchecked=''.join('<li>%s</li>' % html.escape(x) for x in report['not_checked']),
                        anchor=html.escape(anchor_line(report)), sheet=PLACEHOLDER,
+                       subject=subject_line(report), scans=scan_table(report),
                        coverage=html.escape((report.get('coverage') or {}).get('means', '')),
                        checked=(report.get('coverage') or {}).get('placards_checked', 0),
                        classes=len((report.get('coverage') or {}).get('classes_checked', [])),

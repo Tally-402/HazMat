@@ -57,6 +57,25 @@ def lines_for(report):
                    cov.get('selectors_otherwise_unaccounted', 0)))
     for miss in (cov.get('unaccounted_sample') or [])[:12]:
         out += ['  ' + line for line in wrap('%s %s' % (miss['selector'], miss['signature'] or 'unindexed'), WRAP - 3)]
+    subject = report.get('subject')
+    out += ['', 'SUBJECT', '']
+    if not subject:
+        out += wrap('raw code, not an address, so nothing was resolved')
+    else:
+        out += wrap('%s %s' % (subject.get('kind'), subject.get('requested')))
+        if subject.get('via'):
+            out += wrap('resolved via %s' % subject['via'])
+        if subject.get('effective') and subject['effective'] != subject.get('requested'):
+            out += wrap('effective %s' % subject['effective'])
+        for value in (subject.get('identity') or {}).values():
+            if value.get('name'):
+                out += wrap('verified as %s (%s)' % (value['name'], value.get('match') or 'match state unknown'))
+    if len(report.get('scans') or []) > 1:
+        out.append('ADDRESSES SCANNED')
+        for row in report['scans']:
+            out += wrap('  %-16s %s  %s selectors  %s bytes' % (row.get('role'), row.get('at'),
+                       (row.get('coverage') or {}).get('selectors_in_code', '?'),
+                       (row.get('stats') or {}).get('code_bytes', '?')))
     out += ['', 'ASSERTION']
     out += wrap('a match is a candidate, not a clearance. Nothing here claims the contract is safe.')
     out += ['', 'PLACARDS']
