@@ -92,6 +92,10 @@ A pass polls the newest verified contracts, inspects each one, and alerts when a
 
 Expect a pass over the wider world to be quiet: the register is ten placards and they are shaped after one project, so breadth is what the register is now short of.
 
+## Scheduling it
+
+`scripts/watch-pass.py` is the scheduled form: one pass, printing only when something matched, changed or errored, so a quiet tick is silent. Hermes cron runs scripts from `~/.hermes/scripts/`, so a two-line wrapper named `hazmat-watch-pass.py` there calls it by path and keeps this file the single source of truth.
+
 ## Serve it
 
     hazmat serve --port 8712
