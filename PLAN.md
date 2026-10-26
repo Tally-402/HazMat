@@ -10,7 +10,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | P1 corpus | 10 of 10 placards, self-check green |
 | P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
 | P3 confirmation runner | done: all ten placards confirmed, rebuilt selectors identical to the deployed runtime |
-| P4 product surface | done: CLI, sheets, PDF without a PDF library, verify, local server |
+| P4 product surface | done: CLI, sheets with coverage, PDF without a PDF library, verify, server, single-page front end |
 | P5 watch service | done: feed poll, upgrade detection on feed and watchlist, sqlite state, alerts |
 | P6 anchoring | done offline: epoch roots, proofs, on-chain verifier cross-checked |
 | P7 Solana engine | deferred, trigger below |

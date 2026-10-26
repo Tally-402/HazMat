@@ -147,8 +147,9 @@ class Serve(unittest.TestCase):
         try:
             port = server.server_address[1]
             form = urllib.request.urlopen('http://127.0.0.1:%d/' % port, timeout=10).read().decode()
-            self.assertIn('Paste a contract address', form)
-            self.assertIn('<select name="chain">', form)
+            self.assertIn('HAZMAT', form)                      # the single-page front end
+            self.assertIn('scan a contract', form)
+            self.assertIn('#/register', form)
             try:
                 urllib.request.urlopen('http://127.0.0.1:%d/scan?target=0x1&chain=nope' % port, timeout=10)
                 self.fail('a bad chain should be a 400')
@@ -164,6 +165,9 @@ class Watch(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.db = watch.connect(os.path.join(self.tmp.name, 'w.sqlite3'))
         self.alerts = os.path.join(self.tmp.name, 'alerts.jsonl')
+        # nothing here unless a test asks: the real register/watchlist.json would
+        # otherwise add inspections of its own and shift the counters
+        self.no_watchlist = os.path.join(self.tmp.name, 'no-watchlist.json')
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -182,11 +186,13 @@ class Watch(unittest.TestCase):
         entries = [{'address': '0xaaa', 'verifiedAt': '2026-01-01T00:00:00Z'},
                    {'address': '0xbbb', 'verifiedAt': '2026-01-01T00:00:01Z'}]
         first = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries),
-                               inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts)
+                               inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts,
+                               watchlist=self.no_watchlist)
         self.assertEqual(first['candidates'], 2)
         self.assertEqual(first['matched'], 1)
         again = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries),
-                                inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts)
+                                inspect_fn=self.inspector({'0xaaa'}), sink=self.alerts,
+                                watchlist=self.no_watchlist)
         self.assertEqual(again['candidates'], 0)
         self.assertEqual(watch.status(self.db)['alerts'], 1)
 
@@ -195,7 +201,7 @@ class Watch(unittest.TestCase):
         def inspector(_):
             raise match.MatchError('no code')
         got = watch.pass_once(self.db, 'mainnet', feed=self.feed(*entries), inspect_fn=inspector,
-                              sink=self.alerts)
+                              sink=self.alerts, watchlist=self.no_watchlist)
         self.assertEqual(got['errors'], ['0xdead: no code'])
         self.assertEqual(watch.status(self.db)['alerts'], 0)
         self.assertEqual(watch.status(self.db)['seen'], 1)
@@ -239,23 +245,25 @@ class Watch(unittest.TestCase):
         # the second entry is a re-verification, which is how a feed shows an upgrade
         entry = [{'address': '0xmatch', 'verifiedAt': '2026-08-01T00:00:00Z'}]
         again = [{'address': '0xmatch', 'verifiedAt': '2026-08-02T00:00:00Z'}]
-        watch.pass_once(self.db, 'mainnet', feed=self.feed(*entry), inspect_fn=inspector, sink=self.alerts)
-        watch.pass_once(self.db, 'mainnet', feed=self.feed(*again), inspect_fn=inspector, sink=self.alerts)
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(*entry), inspect_fn=inspector, sink=self.alerts,
+                        watchlist=self.no_watchlist)
+        watch.pass_once(self.db, 'mainnet', feed=self.feed(*again), inspect_fn=inspector, sink=self.alerts,
+                        watchlist=self.no_watchlist)
         kinds = [json.loads(l)['kind'] for l in Path(self.alerts).read_text().strip().splitlines()]
         self.assertEqual(kinds, ['new', 'upgrade'])
 
     def test_the_cursor_does_not_move_backwards(self):
         watch.pass_once(self.db, 'mainnet', feed=self.feed({'address': '0x1', 'verifiedAt': '2026-05-01T00:00:00Z'}),
-                        inspect_fn=self.inspector(), sink=self.alerts)
+                        inspect_fn=self.inspector(), sink=self.alerts, watchlist=self.no_watchlist)
         older = [{'address': '0x2', 'verifiedAt': '2026-04-01T00:00:00Z'}]
         got = watch.pass_once(self.db, 'mainnet', feed=self.feed(*older), inspect_fn=self.inspector(),
-                              sink=self.alerts)
+                              sink=self.alerts, watchlist=self.no_watchlist)
         self.assertEqual(got['candidates'], 0)
         self.assertEqual(got['cursor'], '2026-04-01T00:00:00Z')
 
     def test_status_counts_and_the_alert_file_is_jsonl(self):
         watch.pass_once(self.db, 'mainnet', feed=self.feed({'address': '0xm', 'verifiedAt': '2026-06-01T00:00:00Z'}),
-                        inspect_fn=self.inspector({'0xm'}), sink=self.alerts)
+                        inspect_fn=self.inspector({'0xm'}), sink=self.alerts, watchlist=self.no_watchlist)
         state = watch.status(self.db)
         self.assertEqual((state['seen'], state['alerts'], state['matched_ever']), (1, 1, 1))
         self.assertEqual(json.loads(Path(self.alerts).read_text().strip())['placards'], ['HZ-001'])
@@ -314,6 +322,80 @@ class Anchor(unittest.TestCase):
         # and a proof for the duplicated leaf folds back to the same root
         proof = anchor.proof(REGISTER, 'HZ-001')               # separate walk, real register
         self.assertTrue(anchor.verify(proof['leaf'], proof['proof'], proof['root']))
+
+
+class Coverage(unittest.TestCase):
+    def test_coverage_accounts_for_every_selector_it_did_not_ask_about(self):
+        code = '0x' + '63e4725ba1' + '637c7a9804' + '63deadbeef' + '6300000001'
+        report = match.scan(code, REGISTER, as_='code')
+        cov = report['coverage']
+        self.assertEqual(cov['selectors_in_code'],
+                         cov['selectors_the_register_asks_about'] + cov['selectors_otherwise_unaccounted'])
+        self.assertEqual(cov['placards_checked'], 10)
+        self.assertTrue(cov['means'].startswith('a match means'))
+        selectors = [u['selector'] for u in cov['unaccounted_sample']]
+        self.assertIn('0xdeadbeef', selectors)
+
+    def test_the_name_index_reads_signatures_but_claims_nothing_more(self):
+        names = match.load_selector_names(REGISTER)
+        self.assertGreater(len(names), 100)
+        self.assertEqual(names.get(keccak.selector_hex('transfer(address,uint256)')), 'transfer(address,uint256)')
+        self.assertEqual(names.get(keccak.selector_hex('accept(bytes32)')), 'accept(bytes32)')
+
+    def test_a_clean_sheet_still_states_what_was_read(self):
+        report = match.scan('0x' + '6311111111', REGISTER, as_='code')
+        page, _ = sds.render(report)
+        self.assertIn('What was read', page)
+        self.assertIn('otherwise unaccounted', page)
+        self.assertEqual(report['matches'], [])
+
+
+class Api(unittest.TestCase):
+    def setUp(self):
+        import threading
+        import urllib.request
+        self.urllib = urllib.request
+        self.server = serve.make_server(0, '127.0.0.1')
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        self.base = 'http://127.0.0.1:%d' % self.server.server_address[1]
+
+    def tearDown(self):
+        self.server.shutdown()
+
+    def get(self, path):
+        return json.loads(self.urllib.urlopen(self.base + path, timeout=15).read())
+
+    def test_the_page_is_served_with_its_views(self):
+        page = self.urllib.urlopen(self.base + '/', timeout=15).read().decode()
+        self.assertIn('HAZMAT', page)
+        for view in ('registerView', 'placardView', 'anchorsView', 'aboutView'):
+            self.assertIn(view, page)
+
+    def test_the_register_endpoint_lists_every_placard_and_the_anchor(self):
+        got = self.get('/api/register')
+        self.assertEqual(got['count'], 10)
+        self.assertEqual(len(got['placards']), 10)
+        self.assertTrue(got['digest'].startswith('0x'))
+        self.assertEqual(got['anchor']['epoch'], 1)
+
+    def test_a_placard_endpoint_carries_its_confirmation(self):
+        got = self.get('/api/placard/HZ-001')
+        self.assertTrue(got['matcher']['require_all'])
+        self.assertEqual(got['confirmation']['verdict'], 'confirmed')
+        self.assertTrue(got['confirmation']['probe_tests'])
+
+    def test_the_proof_endpoint_verifies_against_the_published_root(self):
+        got = self.get('/api/proof?placard=HZ-005')
+        self.assertTrue(got['verified'])
+        self.assertEqual(anchor.load_epoch(1)['root'], got['root'])
+
+    def test_unknown_ids_are_a_404_with_a_reason(self):
+        try:
+            self.urllib.urlopen(self.base + '/api/placard/HZ-999', timeout=15)
+            self.fail('expected 404')
+        except self.urllib.HTTPError as exc:
+            self.assertEqual(exc.code, 404)
+            self.assertIn('no such placard', json.loads(exc.read())['error'])
 
 
 class Confirm(unittest.TestCase):

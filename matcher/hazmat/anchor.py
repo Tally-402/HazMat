@@ -21,7 +21,8 @@ from pathlib import Path
 
 from . import keccak, match
 
-DEFAULT_DIR = 'anchors'
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_DIR = str(ROOT / 'anchors')
 
 
 class AnchorError(Exception):
@@ -129,7 +130,7 @@ def load_epoch(path_or_epoch, out_dir=DEFAULT_DIR):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog='hazmat anchor')
     parser.add_argument('action', choices=['root', 'prove', 'verify', 'list'])
-    parser.add_argument('--register', default='register/placards')
+    parser.add_argument('--register', default=str(ROOT / 'register' / 'placards'))
     parser.add_argument('--dir', default=DEFAULT_DIR)
     parser.add_argument('--epoch', default=None)
     parser.add_argument('--placard', default=None)

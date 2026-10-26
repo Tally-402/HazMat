@@ -28,6 +28,14 @@ PAGE = """<!doctype html><meta charset="utf-8">
 <div>register {register} placards v{register_digest} &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
 <div>anchor {anchor}</div>
 <div class="banner"><b>Assertion level: {assertion}.</b> A match is a candidate, not a clearance. {note}</div>
+<h2>What was read</h2>
+<div class="banner">{coverage}</div>
+<table>
+<tr><th>placards checked</th><th>classes</th><th>selectors in code</th><th>the register asks about</th><th>otherwise unaccounted</th></tr>
+<tr><td>{checked}</td><td>{classes}</td><td>{in_code}</td><td>{asked}</td><td>{unaccounted}</td></tr>
+</table>
+<h2>Unaccounted selectors (nearest misses)</h2>
+<ul class="sel">{misses}</ul>
 <h2>Placards</h2>
 <table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
 {rows}</table>
@@ -79,7 +87,16 @@ def render(report):
                        note=html.escape(report['assertion'] + ' match only' if report['matches'] else 'nothing matched'),
                        rows='\n'.join(rows),
                        notchecked=''.join('<li>%s</li>' % html.escape(x) for x in report['not_checked']),
-                       anchor=html.escape(anchor_line(report)), sheet=PLACEHOLDER)
+                       anchor=html.escape(anchor_line(report)), sheet=PLACEHOLDER,
+                       coverage=html.escape((report.get('coverage') or {}).get('means', '')),
+                       checked=(report.get('coverage') or {}).get('placards_checked', 0),
+                       classes=len((report.get('coverage') or {}).get('classes_checked', [])),
+                       in_code=(report.get('coverage') or {}).get('selectors_in_code', 0),
+                       asked=(report.get('coverage') or {}).get('selectors_the_register_asks_about', 0),
+                       unaccounted=(report.get('coverage') or {}).get('selectors_otherwise_unaccounted', 0),
+                       misses=''.join('<li><code>%s</code> %s</li>' % (
+                           html.escape(m['selector']), html.escape(m['signature'] or 'unindexed'))
+                           for m in (report.get('coverage') or {}).get('unaccounted_sample', [])))
     digest = hashlib.sha256(page.encode()).hexdigest()
     return page.replace(PLACEHOLDER, digest), '0x' + digest
 

@@ -22,9 +22,10 @@ from pathlib import Path
 from . import chains, match, sds
 
 FEED = 'https://sourcify.dev/server/v2/contracts/%s?limit=%d'
-DEFAULT_DB = 'work/watch.sqlite3'
-DEFAULT_ALERTS = 'work/alerts.jsonl'
-WATCHLIST = 'register/watchlist.json'
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_DB = str(ROOT / 'work' / 'watch.sqlite3')
+DEFAULT_ALERTS = str(ROOT / 'work' / 'alerts.jsonl')
+WATCHLIST = str(ROOT / 'register' / 'watchlist.json')
 
 SCHEMA = """
 create table if not exists seen (

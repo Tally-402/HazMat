@@ -15,6 +15,14 @@ from pathlib import Path
 from . import chains
 
 DEFAULT_RPC = chains.CHAINS[chains.DEFAULT]['rpc']
+# anchored to the repo, not the current directory: the register, the anchors and the
+# name index all live beside the code and must resolve wherever a process starts
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def rooted(path):
+    path = Path(path)
+    return path if path.is_absolute() else ROOT / path
 MAX_METADATA = 0x1000
 
 
@@ -141,7 +149,8 @@ def match_code(code, placards, family='evm'):
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}
 
 
-def latest_anchor(anchor_dir='anchors'):
+def latest_anchor(anchor_dir=None):
+    anchor_dir = str(rooted(anchor_dir or 'anchors'))
     """The newest published epoch, so a sheet names the root it was matched against."""
     import json as _json
     paths = sorted(Path(anchor_dir).glob('epoch-*.json'), key=lambda p: int(p.stem.split('-')[1])) \
@@ -151,6 +160,43 @@ def latest_anchor(anchor_dir='anchors'):
     record = _json.loads(paths[-1].read_text())
     return {'epoch': record.get('epoch'), 'root': record.get('root'),
             'register_digest': record.get('register_digest'), 'file': str(paths[-1])}
+
+
+def load_selector_names(register_dir):
+    path = rooted(Path(register_dir).parent) / 'selectors.json'
+    if not path.is_file():
+        return {}
+    return json.loads(path.read_text()).get('selectors') or {}
+
+
+def coverage(code, placards, register_dir):
+    """What the register asked about, and what it did not.
+
+    A clean sheet is the common case, so the sheet has to say what was actually
+    read rather than only what matched.
+    """
+    body, _ = strip_metadata(code)
+    constants = push4_constants(body)
+    asked = set()
+    for placard in placards:
+        matcher = placard.get('matcher', {})
+        for key in ('require_all', 'require_any', 'require_none_of'):
+            asked |= set(_bare(matcher.get(key, [])))
+    names = load_selector_names(register_dir)
+    covered = sorted(c for c in constants if c in asked)
+    uncovered = sorted(c for c in constants if c not in asked)
+    return {
+        'method': 'bytecode fingerprint only; no source or ABI required',
+        'means': 'a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.',
+        'placards_checked': len(placards),
+        'classes_checked': sorted({p['placard_class'] for p in placards}),
+        'selectors_in_code': len(constants),
+        'selectors_the_register_asks_about': len(covered),
+        'selectors_otherwise_unaccounted': len(uncovered),
+        'covered': ['0x' + c for c in covered],
+        'unaccounted_sample': [{'selector': '0x' + c, 'signature': names.get(c)} for c in uncovered[:24]],
+        'named_index_size': len(names),
+    }
 
 
 def register_digest(register_dir):
@@ -165,6 +211,7 @@ def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
     placards = load_register(register_dir)
     matches, stats = match_code(code, placards, family)
     return {'target': source, 'family': family,
+            'coverage': coverage(code, placards, register_dir),
             'register_anchor': latest_anchor(),
             'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
             'register_size': len(placards), 'stats': stats, 'matches': matches,

@@ -49,7 +49,15 @@ def lines_for(report):
                 % (report['register_size'], report['stats']['body_bytes'],
                    report['stats']['metadata_bytes'], report['stats']['push4_constants']))
     out += wrap('assertion level: %s' % report['assertion']) + ['']
-    out.append('ASSERTION')
+    cov = report.get('coverage') or {}
+    out.append('WHAT WAS READ')
+    out += wrap('placards checked %s   classes %s   selectors in code %s   the register asks about %s   otherwise unaccounted %s'
+                % (cov.get('placards_checked', 0), len(cov.get('classes_checked', [])),
+                   cov.get('selectors_in_code', 0), cov.get('selectors_the_register_asks_about', 0),
+                   cov.get('selectors_otherwise_unaccounted', 0)))
+    for miss in (cov.get('unaccounted_sample') or [])[:12]:
+        out += ['  ' + line for line in wrap('%s %s' % (miss['selector'], miss['signature'] or 'unindexed'), WRAP - 3)]
+    out += ['', 'ASSERTION']
     out += wrap('a match is a candidate, not a clearance. Nothing here claims the contract is safe.')
     out += ['', 'PLACARDS']
     if not report['matches']:

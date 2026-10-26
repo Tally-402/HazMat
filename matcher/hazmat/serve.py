@@ -11,9 +11,20 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from . import chains, match, pdf, sds
+import json as _json
+from pathlib import Path
+
+from . import anchor, chains, match, pdf, sds
 
 DEFAULT_PORT = 8712
+# anchored to the repo, not the current directory: the server has to work wherever
+# it is launched from, which is how a scheduled or backgrounded process runs it.
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def rooted(path):
+    path = Path(path)
+    return path if path.is_absolute() else ROOT / path
 
 FORM = """<!doctype html><meta charset="utf-8"><title>HazMat</title>
 <style>
@@ -43,9 +54,50 @@ def _query(path):
     return parsed.path, {k: v[0] for k, v in parse_qs(parsed.query).items()}
 
 
+def register_payload(register=None):
+    register = register or Handler.register
+    placards = []
+    for path in sorted(Path(register).glob('*.json')):
+        row = _json.loads(path.read_text())
+        placards.append({'id': row['id'], 'placard_class': row['placard_class'],
+                         'placard_class_name': row.get('placard_class_name'), 'title': row['title'],
+                         'tier': row['tier'], 'money': (row.get('money_bound') or {}).get('expression', 'n/a')})
+    return {'count': len(placards), 'placards': placards, 'anchor': match.latest_anchor(),
+            'digest': match.register_digest(register)}
+
+
+def placard_payload(placard_id, register=None):
+    register = register or Handler.register
+    path = Path(register, placard_id + '.json')
+    if not path.is_file():
+        raise match.MatchError('no such placard: %s' % placard_id)
+    row = _json.loads(path.read_text())
+    records = sorted(rooted('confirmations').glob(placard_id + '-*.json'))
+    if records:
+        record = _json.loads(records[-1].read_text())
+        stages = record.get('stages', {})
+        row['confirmation'] = {
+            'verdict': record.get('verdict'), 'record': str(records[-1]),
+            'probe_tests': (stages.get('probe') or {}).get('passed', []),
+            'evidence': (row.get('confirmed_on') or [{}])[0].get('confirmation', {}).get('evidence'),
+            'selector_agreement': (row.get('confirmed_on') or [{}])[0].get('confirmation', {}).get('selector_agreement'),
+            'fetched_on': ((stages.get('fetch') or {}).get('fetches') or [{}])[0].get('verified_at')}
+    return row
+
+
+def proof_payload(placard_id, register=None, anchor_dir=None):
+    register = register or Handler.register
+    anchor_dir = anchor_dir or str(rooted('anchors'))
+    record = anchor.load_epoch(max(1, len(list(Path(anchor_dir).glob('epoch-*.json')))), anchor_dir)
+    got = anchor.proof(register, placard_id)
+    return {'epoch': record['epoch'], 'leaf': got['leaf'], 'proof': got['proof'], 'root': got['root'],
+            'verified': got['root'] == record['root'] and anchor.verify(got['leaf'], got['proof'], record['root'])}
+
+
 class Handler(BaseHTTPRequestHandler):
-    register = 'register/placards'
+    register = str(rooted('register/placards'))
     chain = 'mainnet'
+    web_dir = str(rooted('web'))
     server_version = 'hazmat'
 
     def _send(self, body, content_type='text/html; charset=utf-8', code=200):
@@ -60,13 +112,44 @@ class Handler(BaseHTTPRequestHandler):
     def _fail(self, message, code=502):
         self._send(json.dumps({'state': 'blocked', 'error': message}), 'application/json', code)
 
+    def _api(self, path, query):
+        """Read-only JSON for the page. No signing, no state."""
+        try:
+            if path == '/api/register':
+                return self._send(json.dumps(register_payload(self.register)), 'application/json')
+            if path == '/api/anchors':
+                epochs = []
+                for item in sorted(rooted('anchors').glob('epoch-*.json'), key=lambda p: int(p.stem.split('-')[1])):
+                    row = _json.loads(item.read_text())
+                    row.pop('leaves', None)
+                    epochs.append(row)
+                return self._send(json.dumps({'epochs': epochs}), 'application/json')
+            if path == '/api/proof':
+                placard_id = (query.get('placard') or '').upper()
+                if not placard_id:
+                    return self._fail('pass ?placard=HZ-001', 400)
+                return self._send(json.dumps(proof_payload(placard_id, self.register)), 'application/json')
+            if path.startswith('/api/placard/'):
+                placard_id = path.split('/')[-1].upper()
+                return self._send(json.dumps(placard_payload(placard_id, self.register)), 'application/json')
+        except (match.MatchError, anchor.AnchorError, ValueError) as exc:
+            return self._fail(str(exc), 404)
+        except OSError as exc:
+            return self._fail('read failed: %s' % exc)
+        return self._fail('unknown api route: %s' % path, 404)
+
     def do_GET(self):
         path, query = _query(self.path)
         chain = query.get('chain', self.chain)
-        if path == '/':
+        if path == '/' or path == '/index.html':
+            page = rooted(self.web_dir) / 'index.html'
+            if page.is_file():
+                return self._send(page.read_text())
             options = ''.join('<option%s>%s</option>' % (' selected' if c == chain else '', c)
                               for c in sorted(chains.CHAINS))
             return self._send(FORM % options)
+        if path.startswith('/api/'):
+            return self._api(path, query)
         target = query.get('target') or query.get('code')
         if not target:
             return self._fail('pass ?target=0x...', 400)
@@ -98,8 +181,10 @@ class Handler(BaseHTTPRequestHandler):
         sys.stderr.write('hazmat %s\n' % (fmt % args))
 
 
-def make_server(port=DEFAULT_PORT, host='127.0.0.1', register='register/placards', chain='mainnet'):
-    Handler.register = register
+def make_server(port=DEFAULT_PORT, host='127.0.0.1', register=None, chain='mainnet'):
+    # only override when asked: a relative default here would undo the anchoring
+    if register:
+        Handler.register = register
     Handler.chain = chain
     return ThreadingHTTPServer((host, port), Handler)
 
@@ -108,7 +193,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog='hazmat serve')
     parser.add_argument('--port', type=int, default=DEFAULT_PORT)
     parser.add_argument('--host', default='127.0.0.1')
-    parser.add_argument('--register', default='register/placards')
+    parser.add_argument('--register', default=None)
     parser.add_argument('--chain', default='mainnet', choices=sorted(chains.CHAINS))
     args = parser.parse_args(argv)
     server = make_server(args.port, args.host, args.register, args.chain)

@@ -73,6 +73,10 @@ Keccak-256 is implemented in-repo, so the matcher and the deriver have no depend
 
 A 40-character hex string is ambiguous: exactly an address, and also a plausible 20-byte code blob. `--as address` or `--as code` settles it; the default prefers the address and says so loudly when the chain has nothing there.
 
+## What every sheet says about coverage
+
+A clean sheet is the common case, so the sheet states what was *read*, not just what matched: bytes read, selectors extracted, how many the register asked about, how many nothing accounts for, plus a readable near-miss list and the register digest and anchor epoch. `register/selectors.json` is a convenience index of 132 selector-to-signature names so those misses read usefully — a name there is `keccak(signature)` and nothing more.
+
 ## What a scan returns
 
 A sheet, self-contained HTML with its own digest, plus the same content as JSON and as a PDF written by a dependency-free writer in this repo:
@@ -95,6 +99,12 @@ Expect a pass over the wider world to be quiet: the register is ten placards and
 ## Scheduling it
 
 `scripts/watch-pass.py` is the scheduled form: one pass, printing only when something matched, changed or errored, so a quiet tick is silent. Hermes cron runs scripts from `~/.hermes/scripts/`, so a two-line wrapper named `hazmat-watch-pass.py` there calls it by path and keeps this file the single source of truth.
+
+## The page
+
+    hazmat serve            # http://127.0.0.1:8712
+
+`web/index.html` is the whole front end: one file, no framework, no build step. It has a scan view, the register, per-placard pages, the anchors, and a plain-language "what this is not" view. It talks only to the local server, so a browser never needs an RPC or a wallet. Paths are anchored to the repo, so the server works from any directory.
 
 ## Serve it
 

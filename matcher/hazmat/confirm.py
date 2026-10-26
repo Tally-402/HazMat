@@ -27,7 +27,9 @@ from pathlib import Path
 from . import chains, match
 
 SOURCIFY = 'https://sourcify.dev/server/v2/contract/%s/%s?fields=sources,compilation'
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FORGE = os.path.expanduser('~/.foundry/bin/forge')
+DEFAULT_REGISTER = str(ROOT / 'register' / 'placards')
 # Libraries and upstream sources a probe may need, discovered rather than demanded.
 # An entry can be overridden with HAZMAT_LIBS="name=/path:name2=/path2" or --lib.
 LIB_CANDIDATES = {
@@ -403,7 +405,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog='hazmat confirm')
     parser.add_argument('--placard', required=True)
     parser.add_argument('--target', default=None, help='an address, or a label containing one; defaults to the placard confirmed_on target')
-    parser.add_argument('--register', default='register/placards')
+    parser.add_argument('--register', default=None)
     parser.add_argument('--chain', default='mainnet', choices=sorted(chains.CHAINS))
     parser.add_argument('--workdir', default='work')
     parser.add_argument('--forge', default=DEFAULT_FORGE)
@@ -424,7 +426,7 @@ def main(argv=None):
             parser.error('--lib wants NAME=PATH, got %s' % item)
         name, path = item.split('=', 1)
         libs[name] = path
-    placard = {p['id']: p for p in match.load_register(args.register)}[args.placard]
+    placard = {p['id']: p for p in match.load_register(args.register or DEFAULT_REGISTER)}[args.placard]
     extra = (placard.get('reproduction') or {}).get('sources') or []
     add = []
     for item in args.add_source:
