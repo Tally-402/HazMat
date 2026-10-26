@@ -1,0 +1,61 @@
+{
+  "algorithm": "keccak256/sorted-pair/duplicate-odd",
+  "epoch": 1,
+  "leaf_rule": "keccak256(canonical json, keys sorted, separators (\",\", \":\"))",
+  "leaves": [
+    {
+      "file": "HZ-005.json",
+      "id": "HZ-005",
+      "leaf": "196a388457487d35d469ea886e9f5a7e6dcb04798c34d2d16dc053a4c4736c5e"
+    },
+    {
+      "file": "HZ-008.json",
+      "id": "HZ-008",
+      "leaf": "3b15e78cb28a0b7a8e187475e7f221aca7f91f26c6cb54dd3736cbd96eff1ad5"
+    },
+    {
+      "file": "HZ-006.json",
+      "id": "HZ-006",
+      "leaf": "52ebd4ccc06e5abb4e8c0f8adb1f30ea4dc2b93defd381524db0a7bcb1f909a2"
+    },
+    {
+      "file": "HZ-010.json",
+      "id": "HZ-010",
+      "leaf": "5c0322586634ca94d56de33d052a0fdd43b384510c5dd8110cc8007299930a75"
+    },
+    {
+      "file": "HZ-007.json",
+      "id": "HZ-007",
+      "leaf": "5e8b0d66acd7118bff71d7dbf619c579b27dd666152e6bb3fc73148a8394d337"
+    },
+    {
+      "file": "HZ-003.json",
+      "id": "HZ-003",
+      "leaf": "6c5beabb5f5c5dc0cbc671d822cf95f259a45ee9c50d342e0475d72766133a94"
+    },
+    {
+      "file": "HZ-004.json",
+      "id": "HZ-004",
+      "leaf": "6cf5b24b2774b4151abe3019e9abc22c41371b4c1241a820fa8e04fb7199744c"
+    },
+    {
+      "file": "HZ-009.json",
+      "id": "HZ-009",
+      "leaf": "717793f898ee68ab12457e7d031fe0a50c90c0fc761a7fbe2974452aabec0b0f"
+    },
+    {
+      "file": "HZ-002.json",
+      "id": "HZ-002",
+      "leaf": "73c1a6f507fa11914796c2bdf92ad94058dd697ffc97cf5a3d7986d608f23019"
+    },
+    {
+      "file": "HZ-001.json",
+      "id": "HZ-001",
+      "leaf": "a3a5b588776771603186d9f24679811ff5323b0898cc839613e3a6f10d2a613b"
+    }
+  ],
+  "notes": null,
+  "placards": 10,
+  "register_digest": "0xca24680aad3570ef",
+  "root": "273ba6d01b66ac188ea3f44ef8bd9fa317410c88c3aaa45bff9709ffea822816"
+}

@@ -13,7 +13,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from hazmat import batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify, watch  # noqa: E402
+from hazmat import anchor, batch, chains, confirm, derive, keccak, match, pdf, sds, serve, verify, watch  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -259,6 +259,61 @@ class Watch(unittest.TestCase):
         state = watch.status(self.db)
         self.assertEqual((state['seen'], state['alerts'], state['matched_ever']), (1, 1, 1))
         self.assertEqual(json.loads(Path(self.alerts).read_text().strip())['placards'], ['HZ-001'])
+
+
+class Anchor(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_a_leaf_is_content_addressed_not_byte_addressed(self):
+        row = json.loads(Path(REGISTER, 'HZ-001.json').read_text())
+        reordered = {k: row[k] for k in reversed(list(row))}
+        self.assertEqual(anchor.leaf_of(row), anchor.leaf_of(reordered))
+        row['title'] = row['title'] + '!'
+        self.assertNotEqual(anchor.leaf_of(row), anchor.leaf_of(reordered))
+
+    def test_the_root_is_stable_and_every_placard_proves_against_it(self):
+        rows = anchor.leaves_of(REGISTER)
+        leaves = [r['leaf'] for r in rows]
+        _, root = anchor.build(leaves)
+        self.assertEqual(root, anchor.build(list(reversed(leaves)))[1])    # order-independent
+        for row in rows:
+            got = anchor.proof(REGISTER, row['id'])
+            self.assertEqual(got['root'], root)
+            self.assertTrue(anchor.verify(got['leaf'], got['proof'], root))
+
+    def test_a_stranger_leaf_and_an_empty_register(self):
+        rows = anchor.leaves_of(REGISTER)
+        _, root = anchor.build([r['leaf'] for r in rows])
+        self.assertFalse(anchor.verify('00' * 32, anchor.proof(REGISTER, 'HZ-001')['proof'], root))
+        self.assertIsNone(anchor.build([])[1])
+
+    def test_an_epoch_round_trips_and_names_the_register_it_covers(self):
+        record, path = anchor.write_epoch(REGISTER, self.tmp.name, epoch=3)
+        self.assertTrue(Path(path).is_file())
+        again = anchor.load_epoch(3, self.tmp.name)
+        self.assertEqual(again['root'], record['root'])
+        self.assertEqual(again['register_digest'], match.register_digest(REGISTER))
+        self.assertEqual(again['placards'], len(anchor.leaves_of(REGISTER)))
+
+    def test_a_proof_for_an_unknown_placard_is_loud(self):
+        with self.assertRaises(anchor.AnchorError):
+            anchor.proof(REGISTER, 'HZ-999')
+
+    def test_an_odd_level_duplicates_its_last_node_and_the_walk_agrees(self):
+        leaves = sorted('0' * 63 + str(i) for i in range(3))   # three leaves: levels are 3, 2, 1
+        levels, root = anchor.build(leaves)
+        self.assertEqual([len(level) for level in levels], [3, 2, 1])
+        parents = anchor.next_level(leaves)
+        self.assertEqual(sorted(parents),
+                         sorted([anchor.parent(leaves[0], leaves[1]), anchor.parent(leaves[2], leaves[2])]))
+        self.assertEqual(root, anchor.next_level(parents)[0])
+        # and a proof for the duplicated leaf folds back to the same root
+        proof = anchor.proof(REGISTER, 'HZ-001')               # separate walk, real register
+        self.assertTrue(anchor.verify(proof['leaf'], proof['proof'], proof['root']))
 
 
 class Confirm(unittest.TestCase):

@@ -1,6 +1,7 @@
 """Re-derive what a sheet and a record claim, without trusting their producer."""
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -11,16 +12,24 @@ class VerifyError(Exception):
     pass
 
 
-def verify_sheet(path, expect=None):
+def verify_sheet(path, expect=None, anchor=None):
     page = Path(path).read_text()
     claimed, recomputed, ok = sds.verify(page, expect)
+    checks = [
+        {'check': 'the sheet carries a digest', 'ok': bool(claimed)},
+        {'check': 'the digest re-derives from the sheet bytes', 'ok': claimed == recomputed},
+        {'check': 'the digest matches the one supplied', 'ok': expect is None or claimed == expect},
+    ]
+    # if the sheet names a published epoch, its register digest must be that epoch's
+    named = re.search(r'register \d+ placards v(0x[0-9a-f]{16})', page)
+    record = anchor or match.latest_anchor()
+    if named and record:
+        checks.append({'check': 'the register digest the sheet names is the published epoch',
+                       'ok': named.group(1) == record.get('register_digest'),
+                       'sheet': named.group(1), 'epoch': record.get('epoch'),
+                       'root': record.get('root')})
     return {'kind': 'sheet', 'file': str(path), 'claimed': claimed, 'recomputed': recomputed,
-            'expected': expect, 'ok': ok,
-            'checks': [
-                {'check': 'the sheet carries a digest', 'ok': bool(claimed)},
-                {'check': 'the digest re-derives from the sheet bytes', 'ok': claimed == recomputed},
-                {'check': 'the digest matches the one supplied', 'ok': expect is None or claimed == expect},
-            ]}
+            'expected': expect, 'ok': ok and all(c['ok'] for c in checks), 'checks': checks}
 
 
 def verify_record(path, rpc=None, chain='mainnet'):

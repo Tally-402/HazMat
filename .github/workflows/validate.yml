@@ -25,6 +25,10 @@ jobs:
               ids.add(row['id'])
           print(f"{len(ids)} placards valid")
           PY
+      - name: the on-chain anchor verifier agrees with the python prover
+        run: |
+          git clone --depth 1 https://github.com/foundry-rs/forge-std /tmp/forge-std
+          HAZMAT_FORGE_STD=/tmp/forge-std bash scripts/anchor-forge-test.sh
       - name: matcher tests
         run: cd matcher && python -m unittest discover -s tests -v
       - name: a sheet renders offline and its digest verifies (then fails once tampered with)

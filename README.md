@@ -102,6 +102,16 @@ Expect a pass over the wider world to be quiet: the register is ten placards and
 
 `/` is a paste-a-target form, `/scan` is JSON, `/sheet` is HTML, `/pdf` is a PDF. Standard library only, read-only, and every response carries the code digest.
 
+## Anchors
+
+The register is merkle-rooted per epoch, so a sheet names the root it was matched against and a single placard can be proved into it without republishing the corpus.
+
+    hazmat anchor root --epoch 1        # writes anchors/epoch-1.json
+    hazmat anchor prove --placard HZ-001  # leaf + siblings + root
+    hazmat anchor verify --proof proof.json
+
+Rules are frozen in `matcher/hazmat/anchor.py`: leaf is `keccak256` of the placard's canonical json, so reformatting a file does not move a root while changing a field does; every pair is sorted before hashing so a proof needs no side flags; an odd level sorts first and then duplicates its last node. `anchors/HazMatAnchor.sol` implements the same fold on-chain, and `scripts/anchor-forge-test.sh` checks the Solidity verifier against the Python prover over a generated vector, so the two cannot drift. Not deployed yet.
+
 ## Confirming a placard
 
 A `confirmed` placard can be re-confirmed from scratch: source is fetched from Sourcify, rebuilt with the settings from the verification record, compared selector-for-selector against the deployed runtime, then its vendored reproduction is run against the rebuild.

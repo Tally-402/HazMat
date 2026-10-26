@@ -141,6 +141,18 @@ def match_code(code, placards, family='evm'):
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}
 
 
+def latest_anchor(anchor_dir='anchors'):
+    """The newest published epoch, so a sheet names the root it was matched against."""
+    import json as _json
+    paths = sorted(Path(anchor_dir).glob('epoch-*.json'), key=lambda p: int(p.stem.split('-')[1])) \
+        if Path(anchor_dir).is_dir() else []
+    if not paths:
+        return None
+    record = _json.loads(paths[-1].read_text())
+    return {'epoch': record.get('epoch'), 'root': record.get('root'),
+            'register_digest': record.get('register_digest'), 'file': str(paths[-1])}
+
+
 def register_digest(register_dir):
     """One digest over the whole register, so a sheet names the revision it used."""
     rows = sorted(Path(register_dir).glob('*.json'))
@@ -152,7 +164,9 @@ def scan(source, register_dir, rpc=None, family='evm', as_='auto'):
     code = load_code(source, rpc, as_)
     placards = load_register(register_dir)
     matches, stats = match_code(code, placards, family)
-    return {'target': source, 'family': family, 'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
+    return {'target': source, 'family': family,
+            'register_anchor': latest_anchor(),
+            'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
             'register_size': len(placards), 'stats': stats, 'matches': matches,
             'assertion': 'pattern match only; confirmation runs are separate',
             'register_digest': register_digest(register_dir),

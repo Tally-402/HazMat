@@ -26,6 +26,7 @@ PAGE = """<!doctype html><meta charset="utf-8">
 <div>target <code>{target}</code> &middot; family {family}</div>
 <div>code sha256 <code>{sha}</code></div>
 <div>register {register} placards v{register_digest} &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
+<div>anchor {anchor}</div>
 <div class="banner"><b>Assertion level: {assertion}.</b> A match is a candidate, not a clearance. {note}</div>
 <h2>Placards</h2>
 <table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
@@ -50,6 +51,13 @@ def claimed_digest(page):
     return '0x' + found.group(1) if found else None
 
 
+def anchor_line(report):
+    anchor = report.get('register_anchor')
+    if not anchor:
+        return 'no epoch published yet'
+    return 'epoch %s root %s (%s)' % (anchor.get('epoch'), anchor.get('root'), anchor.get('file'))
+
+
 def render(report):
     rows = []
     for m in report['matches']:
@@ -71,7 +79,7 @@ def render(report):
                        note=html.escape(report['assertion'] + ' match only' if report['matches'] else 'nothing matched'),
                        rows='\n'.join(rows),
                        notchecked=''.join('<li>%s</li>' % html.escape(x) for x in report['not_checked']),
-                       sheet=PLACEHOLDER)
+                       anchor=html.escape(anchor_line(report)), sheet=PLACEHOLDER)
     digest = hashlib.sha256(page.encode()).hexdigest()
     return page.replace(PLACEHOLDER, digest), '0x' + digest
 

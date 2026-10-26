@@ -12,7 +12,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 | P3 confirmation runner | done: all ten placards confirmed, rebuilt selectors identical to the deployed runtime |
 | P4 product surface | done: CLI, sheets, PDF without a PDF library, verify, local server |
 | P5 watch service | done: feed poll, upgrade detection on feed and watchlist, sqlite state, alerts |
-| P6 anchoring | not started |
+| P6 anchoring | done offline: epoch roots, proofs, on-chain verifier cross-checked |
 | P7 Solana engine | deferred, trigger below |
 
 ## Standing decisions
@@ -70,7 +70,7 @@ Done: a pass polls the newest verifications, inspects each, alerts on a match, a
 
 Merkle-root the corpus per epoch; per-match attestation on demand, so a sheet is citable and third-party verifiable.
 
-Done when: a sheet's hash resolves on-chain against a corpus root.
+Offline half done: epochs are merkle-rooted, a placard proves into one, a sheet names the root, and the Solidity verifier reproduces the Python prover over a generated vector (5 forge tests). Remaining: deploy `HazMatAnchor.sol` somewhere and point `hazmat verify` at it, which needs one broadcast.
 
 ## P7 - Solana engine, deferred
 
@@ -86,6 +86,7 @@ Trigger: 25 published EVM classes, or a paying Solana-native customer. Then: `sb
 - Two probes referenced sibling source files the bundle cannot carry; supplements are declared per placard.
 - The runner ran only the first vendored probe and ignored the placard's test selection; it now runs every vendored file under the placard's `match_test`.
 - An unhandled `ConfirmError` in the compare stage lost the whole record; every stage now writes its own outcome.
+- `build()` paired an unsorted level while the proof walk paired sorted ones, so proofs landed on a root the published epoch did not have. Both now share one `next_level()`, and the cross-check is a proof landing on the *published* root, not on itself. A set comprehension in the walk also deduped identical parents and halved a level twice.
 - The watch feed de-duplicated against its own `seen` table, so a contract verified *again* after an upgrade was never re-inspected and the upgrade was swallowed. Candidates are now filtered by cursor only, and one `observe` path classifies each sighting as `new` or `upgrade` so neither the feed nor the watchlist can hide a change.
 
 ## Explicitly not yet
