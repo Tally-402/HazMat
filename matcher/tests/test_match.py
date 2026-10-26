@@ -8,7 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ROOT = Path(__file__).resolve().parents[2]
 REGISTER = str(ROOT / 'register' / 'placards')
 
-from hazmat import derive, match, sds  # noqa: E402
+import os
+
+from hazmat import batch, chains, derive, keccak, match, sds  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -71,6 +73,45 @@ class Sheet(unittest.TestCase):
         page, _ = sds.render(report)
         self.assertEqual(report['matches'], [])
         self.assertIn('not the same as safe', page)
+
+
+class Keccak(unittest.TestCase):
+    def test_known_vectors(self):
+        self.assertEqual(keccak.keccak256(b'').hex(),
+                         'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470')
+        self.assertEqual(keccak.keccak256(b'abc').hex(),
+                         '4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45')
+
+    def test_selectors_match_the_known_values(self):
+        self.assertEqual(keccak.selector('accept(bytes32)'), '0xe4725ba1')
+        self.assertEqual(keccak.selector('transfer(address,uint256)'), '0xa9059cbb')
+        self.assertEqual(keccak.selector('settleExpired(bytes32)'), '0x7c7a9804')
+
+
+class Chains(unittest.TestCase):
+    def test_every_entry_resolves_and_has_a_chain_id(self):
+        for name in chains.CHAINS:
+            self.assertTrue(chains.endpoint(name).startswith('http'))
+            self.assertIsInstance(chains.chain_id(name), int)
+
+    def test_unknown_chain_is_loud(self):
+        with self.assertRaises(KeyError):
+            chains.endpoint('polygon')
+
+
+class Batch(unittest.TestCase):
+    def test_one_report_per_line_and_a_sheet_only_when_something_matches(self):
+        import tempfile
+        code = '0x' + ('63e4725ba1637c7a98046382cbf88b' + '63' + '82cbf88b')
+        plain = '0x' + '6311111111'
+        path = tempfile.mktemp(suffix='.txt')
+        open(path, 'w').write('# a comment\n%s\n\n%s\n' % (code, plain))
+        with tempfile.TemporaryDirectory() as sheets:
+            reports = batch.run(path, REGISTER, sheet_dir=sheets, quiet=True)
+            self.assertEqual(len(reports), 2)
+            self.assertEqual([m['id'] for m in reports[0]['matches']], ['HZ-001'])
+            self.assertEqual(reports[1]['matches'], [])
+            self.assertEqual(len(os.listdir(sheets)), 1)
 
 
 class Derive(unittest.TestCase):

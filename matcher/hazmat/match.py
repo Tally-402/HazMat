@@ -12,7 +12,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DEFAULT_RPC = 'https://ethereum-rpc.publicnode.com'
+from . import chains
+
+DEFAULT_RPC = chains.CHAINS[chains.DEFAULT]['rpc']
 MAX_METADATA = 0x1000
 
 
@@ -148,8 +150,11 @@ def main(argv=None):
     parser.add_argument('--register', default='register/placards')
     parser.add_argument('--code', required=True, help='0x-hex, a file, or a contract address')
     parser.add_argument('--rpc', default=None)
+    parser.add_argument('--chain', default=None, choices=sorted(chains.CHAINS))
     parser.add_argument('--family', default='evm', choices=list(FAMILIES))
     args = parser.parse_args(argv)
+    if args.chain:
+        args.rpc = chains.endpoint(args.chain)
     try:
         print(json.dumps(scan(args.code, args.register, args.rpc, args.family), indent=2, sort_keys=True))
         return 0

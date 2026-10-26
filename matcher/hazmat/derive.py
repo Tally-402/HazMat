@@ -8,13 +8,10 @@ deployed address. Only a selector that is present belongs in `require_all`.
 import argparse
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
-from . import match
-
-CAST = 'cast'
+from . import keccak, match
 EXTERNAL = re.compile(r'function\s+(\w+)\s*\(([^)]*)\)\s*([^{;]*)')
 STRUCT = re.compile(r'struct\s+(\w+)\s*\{([^}]*)\}')
 NOISE = ('calldata', 'memory', 'storage', 'indexed', 'payable')
@@ -65,10 +62,8 @@ def signatures(paths):
 
 
 def selector(signature):
-    result = subprocess.run([CAST, 'sig', signature], capture_output=True, text=True)
-    if result.returncode != 0:
-        return None
-    return result.stdout.strip()
+    """Four-byte selector from the in-repo keccak, so cast is optional."""
+    return keccak.selector(signature)
 
 
 def run(paths, address=None, rpc=None):

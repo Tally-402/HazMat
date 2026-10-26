@@ -63,6 +63,14 @@ Every placard must fire on its own target and stay quiet on the others. Each lis
 
     python3 -m hazmat.selfcheck
 
+## Batch and chains
+
+    python3 -m hazmat.batch --file targets.txt --chain mainnet --sheet-dir sheets/
+
+One line per target: an address, raw code, or a path. Chains are named (`mainnet`, `base`, `arbitrum`, `optimism`, `sepolia`); `--rpc` overrides.
+
+Keccak-256 is implemented in-repo, so the matcher and the deriver have no dependencies at all and no `cast` binary is needed.
+
 ## Contributing a placard
 
 1. Reproduce the hazard and keep the repro runnable.

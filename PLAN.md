@@ -8,7 +8,7 @@ Ordered by dependency. Each phase has a definition of done. Nothing ships a clai
 |---|---|
 | P0 format freeze | done |
 | P1 corpus | 10 of 10 placards, self-check green |
-| P2 engine hardening | partially done: derive.py, require_none_of, family gate |
+| P2 engine hardening | done: require_any/require_none_of, derive.py, in-repo keccak, chain registry, batch |
 | P3 confirmation runner | not started |
 | P4 product surface | not started |
 | P5 watch service | not started |
@@ -44,10 +44,7 @@ Done when: `matcher --self-check` passes for all placards, and each confirmed pl
 
 ## P2 - engine hardening
 
-1. `require_none_of` and `require_any` in the matcher.
-2. In-repo keccak so selectors are derived, not hardcoded.
-3. Chain registry (mainnet, base) with endpoint fallback.
-4. `hazmat scan`, `hazmat batch --file`, stable sorted JSON.
+All four done: matcher combinators, in-repo keccak (vectors checked against known digests), chain registry, batch mode writing sheets. Stable sorted JSON throughout.
 
 Done when: the matcher has no dependencies, runs offline against supplied code, and the CLI is scriptable.
 
