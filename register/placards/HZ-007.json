@@ -24,12 +24,29 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeWallet.t.sol",
-    "source": "claus-network/contracts/test/ArgusProbeWallet.t.sol::test_W1a, test_W1b, control test_W1_control",
-    "expected": "the control shows the total is a hard stop; the renewal resets the window counter under the same id and refuses a payment signed under the old generation"
+    "source": "reproductions/HZ-007/ArgusProbeWallet.t.sol",
+    "expected": "the control shows the total is a hard stop; the renewal resets the window counter under the same id and refuses a payment signed under the old generation",
+    "match_test": "test_W1",
+    "sources": [
+      "0x182905eea41b06f63adef50cee6f104255474ecf"
+    ]
   },
   "confirmed_on": [
     {
-      "target": "ClausProjectWallet 0x182905eea41b06f63adef50cee6f104255474ecf chainId 11155111, all six ABI functions present in the runtime"
+      "target": "ClausProjectWallet 0x182905eea41b06f63adef50cee6f104255474ecf chainId 11155111, all six ABI functions present in the runtime",
+      "confirmation": {
+        "record": "confirmations/HZ-007-182905ee.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-007 --chain sepolia",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 25 of 25 identical to the deployed runtime, and the placard's own probe passed 3 test(s)",
+        "selector_agreement": "25/25, 222 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_W1_control_totalIsAHardStopWithoutRenewal()",
+          "test_W1a_inPlaceRenewalResetsTheSpendCapUnderTheSameId()",
+          "test_W1b_renewalKillsPaymentsSignedUnderTheOldGeneration()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "State that renewal is an allowance reset, or carry the window across renewals.",

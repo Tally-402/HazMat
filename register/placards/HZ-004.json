@@ -24,14 +24,30 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol --match-test AG002",
-    "source": "claus-network/contracts/test/ArgusProbeGenAndGas.t.sol::ArgusProbeVaultConfigGas",
-    "expected": "admitted at 0 through 3072 configuration bytes, denied at 3520 and above"
+    "source": "reproductions/HZ-004/ArgusProbeGenAndGas.t.sol",
+    "expected": "admitted at 0 through 3072 configuration bytes, denied at 3520 and above",
+    "match_test": "test_AG002",
+    "add_sources": [
+      "src/ClausReadonlyProject.sol",
+      "src/ClausApprovalExecutor.sol"
+    ]
   },
   "confirmed_on": [
     {
       "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
       "threshold_measured": "3072 admitted / 3520 denied",
-      "revision_drift": "the deployed runtime is an earlier revision than the published source: withdraw(uint256,address) is in the current ABI and absent from the deployed code, and four deployed selectors match nothing in the current source, so the measured threshold describes the current build rather than provably this deployment"
+      "revision_drift": "the deployed runtime is an earlier revision than the published source: withdraw(uint256,address) is in the current ABI and absent from the deployed code, and four deployed selectors match nothing in the current source, so the measured threshold describes the current build rather than provably this deployment",
+      "confirmation": {
+        "record": "confirmations/HZ-004-66fa2f84.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-004 --chain sepolia",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "11/11, 60 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Document the real ceiling for a vault policy, or size the envelope from the configuration length.",

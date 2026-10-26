@@ -52,7 +52,7 @@ Done when: the matcher has no dependencies, runs offline against supplied code, 
 
 Promote `pattern` to `confirmed` mechanically: locate verified source, build with a pinned toolchain, generate a probe from a per-class template, run it in an isolated dir, record command and observed output into the placard.
 
-Done for `HZ-001`: source fetched from Sourcify, rebuilt with the recorded settings, selector set identical to the deployed runtime, vendored probe green. The remaining work is one probe per placard, since probes are per hazard and cannot be generated from a matcher alone.
+Done for all ten: each fetched from Sourcify, rebuilt with the record's own settings, rebuilt selector set identical to the deployed runtime (49/49, 59/59, 25/25, 11/11 depending on the contract), and its own probe green. Probes are per hazard and cannot be generated from a matcher alone, so each new placard ships one.
 
 ## P4 - product surface
 

@@ -29,14 +29,34 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeStrayFunds.t.sol",
-    "source": "claus-network/contracts/test/ArgusProbeStrayFunds.t.sol",
-    "expected": "a bare native transfer reverts; forced native value and direct token transfers survive a full deal lifecycle with every total back at zero"
+    "source": "reproductions/HZ-005/ArgusProbeStrayFunds.t.sol",
+    "expected": "a bare native transfer reverts; forced native value and direct token transfers survive a full deal lifecycle with every total back at zero",
+    "match_test": "test_H6",
+    "sources": [
+      "0xc2292af8B51109a27A4B4E28E9cF9f3AeDE4190C"
+    ],
+    "add_sources": [
+      "src/ClausDealEscrow.sol"
+    ]
   },
   "confirmed_on": [
     {
       "target": "ClausTokenDealEscrow 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c chainId 1",
       "equivalence": "published source reproduces the deployed runtime: 18 of 19 derived selectors present, the absent one being the native-value withdraw form",
-      "derivation": "matcher/hazmat/derive.py over contracts/src against the live address"
+      "derivation": "matcher/hazmat/derive.py over contracts/src against the live address",
+      "confirmation": {
+        "record": "confirmations/HZ-005-c2292af8.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-005 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-14), rebuilt with the record's own compiler settings, rebuilt selector set 49 of 49 identical to the deployed runtime, and the placard's own probe passed 3 test(s)",
+        "selector_agreement": "49/49, 394 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_H6a_bareEthTransferIsRejected()",
+          "test_H6b_forcedEthIsUnaccountedAndStranded()",
+          "test_H6c_directTokenTransferIsUnaccountedAndStranded()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Add a sweep for stray value, or document that it is donated.",

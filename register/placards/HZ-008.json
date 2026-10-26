@@ -24,12 +24,34 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeFuzz.t.sol --match-test test_P1",
-    "source": "claus-network/contracts/test/ArgusProbeFuzz.t.sol::ArgusProbeFuzzVault::test_P1_precompileRecipientsAreNotInert",
-    "expected": "a sweep of 0x01 to 0x10 finds exactly two addresses that refuse a value-only call, 0x09 and 0x0a, with TransferFailed"
+    "source": "reproductions/HZ-008/ArgusProbeFuzz.t.sol",
+    "expected": "a sweep of 0x01 to 0x10 finds exactly two addresses that refuse a value-only call, 0x09 and 0x0a, with TransferFailed",
+    "match_test": "test_P1",
+    "sources": [
+      "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4",
+      "0x182905eea41b06f63adef50cee6f104255474ecf",
+      "0x892FA49D0c38E949DEb827Db66590fbaEAA34af8"
+    ],
+    "add_sources": [
+      "src/ClausProjectWallet.sol",
+      "src/ClausReadonlyProject.sol",
+      "src/ClausApprovalExecutor.sol"
+    ]
   },
   "confirmed_on": [
     {
-      "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111"
+      "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
+      "confirmation": {
+        "record": "confirmations/HZ-008-66fa2f84.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-008 --chain sepolia",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "11/11, 60 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_P1_precompileRecipientsAreNotInert()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Fall back to a push that tolerates refusal, or document which recipient addresses are inert.",

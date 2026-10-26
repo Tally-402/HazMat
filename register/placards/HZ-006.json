@@ -25,14 +25,38 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeVaultShape.t.sol",
-    "source": "claus-network/contracts/test/ArgusProbeVaultShape.t.sol::test_H4a, test_H4b, test_H4c",
-    "expected": "exactly 8192 admitted, 8193 refused, non-canonical header refused, shipped module admitted"
+    "source": "reproductions/HZ-006/ArgusProbeVaultShape.t.sol",
+    "expected": "exactly 8192 admitted, 8193 refused, non-canonical header refused, shipped module admitted",
+    "match_test": "test_H4",
+    "sources": [
+      "0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4"
+    ],
+    "add_sources": [
+      "src/ClausReadonlyProject.sol",
+      "src/ClausVaultAdmission.sol"
+    ]
   },
   "confirmed_on": [
     {
       "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111 (recorded in the projects own deployments.json, verified through Sourcify and Etherscan as exact_match)",
       "revision_drift": "the deployed runtime carries 11 four-byte constants; 5 match the current ABI, 1 is the Solidity Panic selector, and 4 match no function in the current source or artifacts. withdraw(uint256,address) is in the current ABI but absent from the deployed code, so the deployment is an earlier revision than the published source",
-      "attacker_cost": "zero, the refusal is passive"
+      "attacker_cost": "zero, the refusal is passive",
+      "confirmation": {
+        "record": "confirmations/HZ-006-66fa2f84.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-006 --chain sepolia",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 6 test(s)",
+        "selector_agreement": "11/11, 60 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_H4a_projectAdmitsAPayloadOfExactly8192()",
+          "test_H4b_onePayloadByteOverIsRejected()",
+          "test_H4c_nonCanonicalAbiHeaderIsRejected()",
+          "test_H4d_shippedAdmissionModuleIsAViablePolicy()",
+          "test_H4e_largeOutputModuleIsDeniedByTheShippedShapeRule()",
+          "test_H4f_gasEnvelopeForACorrectShapePolicy()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Make the enforced shape and the advertised bound the same number, and say which headers are canonical.",

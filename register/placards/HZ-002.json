@@ -25,14 +25,31 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol",
-    "source": "claus-network/contracts/test/ArgusProbeGenAndGas.t.sol::ArgusProbeRecoveryGeneration",
-    "expected": "queue reverts on generation 3 while the live generation is 1; after schedule and cancel both queue and execute succeed and the target implementation changes; the signer was never rotated"
+    "source": "reproductions/HZ-002/ArgusProbeGenAndGas.t.sol",
+    "expected": "queue reverts on generation 3 while the live generation is 1; after schedule and cancel both queue and execute succeed and the target implementation changes; the signer was never rotated",
+    "match_test": "test_AG003",
+    "add_sources": [
+      "src/ClausReadonlyProject.sol",
+      "src/ClausNativeVault.sol"
+    ]
   },
   "confirmed_on": [
     {
       "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1",
       "equivalence": "published source at claus-network-contracts 0acc594a43 reproduces the deployed runtime, body identical, residual is the CBOR metadata trailer only",
-      "attacker_cost": "one queue plus one execute"
+      "attacker_cost": "one queue plus one execute",
+      "confirmation": {
+        "record": "confirmations/HZ-002-892fa49d.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-002 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 2 test(s)",
+        "selector_agreement": "59/59, 227 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_AG003_control_scheduleAloneLeavesTheSignatureInvalid()",
+          "test_AG003_preSignedFutureGenerationSurvivesAScheduleAndCancel()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Make the generation increment unpredictable, or require a fresh signer on cancellation.",

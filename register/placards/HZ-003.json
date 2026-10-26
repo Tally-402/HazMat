@@ -26,12 +26,28 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A3",
-    "source": "claus-network/contracts/test/ArgusProbeAssessment.t.sol::test_A3_pendingOwnerProposalSuspendsUpgradesIndefinitely",
-    "expected": "an unexpired approval is refused while the proposal is pending and five days later; the zero-address cancel lifts the pending flag but the approval is still refused until it is re-signed at the new generation"
+    "source": "reproductions/HZ-003/ArgusProbeAssessment.t.sol",
+    "expected": "an unexpired approval is refused while the proposal is pending and five days later; the zero-address cancel lifts the pending flag but the approval is still refused until it is re-signed at the new generation",
+    "match_test": "test_A3",
+    "add_sources": [
+      "src/ClausReadonlyProject.sol",
+      "src/ClausNativeVault.sol"
+    ]
   },
   "confirmed_on": [
     {
-      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1"
+      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1",
+      "confirmation": {
+        "record": "confirmations/HZ-003-892fa49d.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-003 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "59/59, 227 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_A3_pendingOwnerProposalSuspendsUpgradesIndefinitely()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Have the cancel path restore the previous generation, or state that a cancellation requires re-signing.",

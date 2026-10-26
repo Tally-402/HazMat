@@ -80,7 +80,9 @@ A `confirmed` placard can be re-confirmed from scratch: source is fetched from S
     python3 -m hazmat.confirm --placard HZ-001 --target 0xc2292af8B51109a27A4B4e28E9cF9f3AeDE4190C --chain mainnet \
         --forge-std path/to/forge-std --lib openzeppelin-contracts=path/to/openzeppelin-contracts
 
-The record lands in `confirmations/`, one per placard and target, with every stage's own outcome. Verdicts: `confirmed`, `confirmed_with_selector_drift`, `refuted`, `blocked`. A probe that runs and fails is `refuted`, and an earlier stage failing is `blocked` - never silently confirmed.
+No flags are required: forge, solc, forge-std, OpenZeppelin and the upstream source tree are discovered, and every path used is written into the record. Override with `--forge`, `--forge-std`, `--lib NAME=PATH`, `--source-root` or `HazMat`'s `HAZMAT_LIBS="name=/path:..."`.
+
+The record lands in `confirmations/`, one per placard and target, with every stage's own outcome. Verdicts: `confirmed`, `confirmed_with_selector_drift`, `refuted`, `blocked`. A probe that runs and fails is `refuted`, and an earlier stage failing is `blocked` - never silently confirmed. A file the verified bundle already carries is never overwritten by a supplement or a library: the bundle stays authoritative.
 
 ## Contributing a placard
 

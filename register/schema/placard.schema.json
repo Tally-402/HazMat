@@ -134,6 +134,17 @@
         },
         "expected": {
           "type": "string"
+        },
+        "match_test": {
+          "type": "string",
+          "description": "regex selecting exactly the tests that confirm this hazard"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "every verified source the probe needs, target included"
         }
       },
       "additionalProperties": false

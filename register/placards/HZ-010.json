@@ -27,12 +27,28 @@
   "reproduction": {
     "kind": "forge",
     "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A1",
-    "source": "claus-network/contracts/test/ArgusProbeAssessment.t.sol::test_A1_cancelWithNoPendingRecoveryKillsAQueuedApproval",
-    "expected": "a cancel sent while nothing is pending still advances the generation and an already queued approval can no longer execute"
+    "source": "reproductions/HZ-010/ArgusProbeAssessment.t.sol",
+    "expected": "a cancel sent while nothing is pending still advances the generation and an already queued approval can no longer execute",
+    "match_test": "test_A1",
+    "add_sources": [
+      "src/ClausReadonlyProject.sol",
+      "src/ClausNativeVault.sol"
+    ]
   },
   "confirmed_on": [
     {
-      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1, all 15 derived selectors present"
+      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1, all 15 derived selectors present",
+      "confirmation": {
+        "record": "confirmations/HZ-010-892fa49d.json",
+        "command": "python3 -m hazmat.confirm --placard HZ-010 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "59/59, 227 body bytes differing (immutable windows), length delta 0",
+        "probe_tests": [
+          "test_A1_cancelWithNoPendingRecoveryKillsAQueuedApproval()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
     }
   ],
   "fix": "Scope the generation bump to the approval named, or document that a cancel clears the project queue.",

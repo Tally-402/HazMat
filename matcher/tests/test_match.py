@@ -102,6 +102,40 @@ class Confirm(unittest.TestCase):
             self.assertEqual(got['selectors_extra_in_rebuild'], [])
             self.assertEqual(got['selectors_deployed'], 2)
 
+    def test_a_partial_remapping_set_still_reaches_forge_std(self):
+        with tempfile.TemporaryDirectory() as work:
+            toml = confirm.write_foundry_toml(work, {'remappings': ['@openzeppelin/contracts/=lib/oz/']}, None, '0.8.27')
+            self.assertIn('@openzeppelin/contracts/=lib/oz/', toml)      # the record's own entry wins
+            self.assertIn('forge-std/=lib/forge-std/src/', toml)          # the needed one is appended
+            self.assertIn('solc_version = "0.8.27"', toml)                # no local binary: pin the version
+            self.assertNotIn('solc = ', toml)
+
+    def test_a_target_label_is_reduced_to_its_address(self):
+        placard = {'id': 'HZ-900', 'confirmed_on': [{'target': 'Thing 0xAbCd000000000000000000000000000000001234 chainId 1'}]}
+        self.assertEqual(confirm.normalise_target(None, placard), '0xAbCd000000000000000000000000000000001234')
+        self.assertEqual(confirm.normalise_target('see 0x' + '11' * 20 + ' now', placard), '0x' + '11' * 20)
+        with self.assertRaises(confirm.ConfirmError):
+            confirm.normalise_target('no address here', placard)
+
+    def test_add_sources_never_overwrites_and_records_a_digest(self):
+        with tempfile.TemporaryDirectory() as work, tempfile.TemporaryDirectory() as up:
+            Path(work, 'src').mkdir()
+            Path(work, 'src', 'kept.sol').write_text('from the bundle')
+            Path(up, 'kept.sol').write_text('from upstream')
+            Path(up, 'added.sol').write_text('from upstream too')
+            added = confirm.add_sources(work, [('src/kept.sol', up + '/kept.sol'), ('src/added.sol', up + '/added.sol')])
+            self.assertEqual(Path(work, 'src', 'kept.sol').read_text(), 'from the bundle')
+            self.assertEqual(Path(work, 'src', 'added.sol').read_text(), 'from upstream too')
+            self.assertEqual([a['path'] for a in added], ['src/added.sol'])
+            self.assertEqual(len(added[0]['sha256']), 64)
+
+    def test_discover_libs_finds_what_exists_and_records_it(self):
+        found = confirm.discover_libs()
+        self.assertIn('forge-std', found)
+        self.assertTrue(os.path.isdir(found['forge-std']))
+        explicit = confirm.discover_libs({'forge-std': '/tmp'})
+        self.assertEqual(explicit['forge-std'], '/tmp')
+
     def test_find_solc_returns_a_path_or_none(self):
         got = confirm.find_solc('0.8.27')
         self.assertTrue(got is None or os.path.isfile(got))

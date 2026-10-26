@@ -6,7 +6,6 @@ optionally reports which selectors are actually present in the runtime code of a
 deployed address. Only a selector that is present belongs in `require_all`.
 """
 import argparse
-import json
 import re
 import sys
 from pathlib import Path
