@@ -1,0 +1,45 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-004",
+  "placard_class": 4,
+  "placard_class_name": "availability",
+  "title": "A configuration size the project accepts exceeds the gas envelope that evaluates it",
+  "summary": "Two layers enforce different limits and never reconcile them. The project admits a configuration up to its own bound, while the caller evaluates it inside a fixed gas envelope that the storage-to-calldata copy exhausts well before that size, so a correct policy silently cannot admit deposits.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xd0e30db0",
+      "0x20e684b6",
+      "0x2ce0f9d6"
+    ],
+    "notes": "deposit() 0xd0e30db0, admissionPolicy() 0x20e684b6, principal(address) 0x2ce0f9d6 Selectors derived from source and verified present in the deployed runtime."
+  },
+  "money_bound": {
+    "kind": "capacity",
+    "expression": "deposits are denied to a correct policy, so capacity is unreachable; withdrawals are unaffected"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol --match-test AG002",
+    "source": "claus-network/contracts/test/ArgusProbeGenAndGas.t.sol::ArgusProbeVaultConfigGas",
+    "expected": "admitted at 0 through 3072 configuration bytes, denied at 3520 and above"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
+      "threshold_measured": "3072 admitted / 3520 denied"
+    }
+  ],
+  "fix": "Document the real ceiling for a vault policy, or size the envelope from the configuration length.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692",
+    "published_source": "contracts/src/ClausNativeVault.sol:15, :56-78",
+    "evidence": [
+      "the 3072 to 3520 flip reproduces the project claim of 3520"
+    ]
+  }
+}

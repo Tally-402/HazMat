@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ROOT = Path(__file__).resolve().parents[2]
 REGISTER = str(ROOT / 'register' / 'placards')
 
-from hazmat import match, sds  # noqa: E402
+from hazmat import derive, match, sds  # noqa: E402
 
 TRAILER = bytes.fromhex('a264697066735822' + '11' * 34 + '64736f6c634300081b0033')
 PLACARD = [{'id': 'HZ-001', 'title': 't', 'placard_class': 2, 'placard_class_name': 'ordering',
@@ -50,8 +50,12 @@ class Matching(unittest.TestCase):
 
     def test_register_loads_and_the_shipped_placard_validates(self):
         rows = match.load_register(REGISTER)
-        self.assertEqual([r['id'] for r in rows], ['HZ-001'])
+        ids = [r['id'] for r in rows]
+        self.assertIn('HZ-001', ids)
         self.assertEqual(len(rows[0]['matcher']['require_all']), 3)
+        for row in rows:
+            self.assertTrue(row['matcher'].get('require_all') or row['matcher'].get('require_any'),
+                            '%s has an empty matcher' % row['id'])
 
 
 class Sheet(unittest.TestCase):
@@ -67,6 +71,29 @@ class Sheet(unittest.TestCase):
         page, _ = sds.render(report)
         self.assertEqual(report['matches'], [])
         self.assertIn('not the same as safe', page)
+
+
+class Derive(unittest.TestCase):
+    def test_struct_parameters_expand_to_their_tuple_form(self):
+        table = {'Approval': ['bytes32', 'uint256', 'address']}
+        self.assertEqual(derive.expand('Approval', table), '(bytes32,uint256,address)')
+        self.assertEqual(derive.expand('Approval[]', table), 'Approval[]')
+        self.assertEqual(derive.expand('bytes', table), 'bytes')
+
+    def test_signature_extraction_skips_internal_and_keeps_external(self):
+        tmp = Path(__file__).resolve().parent / '_sig_probe.sol'
+        tmp.write_text('contract C { function a(uint256 x) external {} function b() internal {} }')
+        try:
+            sigs = derive.signatures([str(tmp)])
+            self.assertIn('a(uint256)', sigs)
+            self.assertNotIn('b()', sigs)
+        finally:
+            tmp.unlink()
+
+    def test_empty_matcher_is_caught(self):
+        rows = match.load_register(REGISTER)
+        for row in rows:
+            self.assertTrue(row['matcher'].get('require_all') or row['matcher'].get('require_any'))
 
 
 if __name__ == '__main__':

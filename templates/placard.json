@@ -1,0 +1,35 @@
+{
+  "id": "HZ-000",
+  "chain_family": "evm",
+  "placard_class": 2,
+  "placard_class_name": "ordering",
+  "title": "",
+  "summary": "",
+  "tier": "pattern",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [],
+    "require_any": [],
+    "require_none_of": [],
+    "notes": "a match is a candidate; reachability needs a confirmation run"
+  },
+  "money_bound": {
+    "kind": "none",
+    "expression": ""
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "",
+    "source": "",
+    "expected": ""
+  },
+  "confirmed_on": [],
+  "fix": "",
+  "provenance": {
+    "first_observed": "",
+    "specimen": "",
+    "evidence": []
+  },
+  "author": "",
+  "created": ""
+}

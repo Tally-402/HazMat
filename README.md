@@ -49,6 +49,20 @@ Every placard carries an id, class, matcher, money bound, reproduction, fix, pro
 
 Input is raw code, a file, or an address. Metadata is excluded by its length field; four-byte constants are extracted with correct push-data stepping. Output is JSON, and the sheet is the artifact you hand to someone.
 
+## Deriving selectors
+
+Hand-writing selectors is guessing. Derive them from source, then check membership against the runtime code:
+
+    python3 -m hazmat.derive path/to/src --address 0x... --rpc https://...
+
+Only a selector reported `PRESENT` belongs in `require_all`. Struct parameters are expanded to their tuple form, which is also how two ABIs of the same family are told apart in bytecode.
+
+## Self-check
+
+Every placard must fire on its own target and stay quiet on the others. Each listed address is a negative control for every placard it does not expect:
+
+    python3 -m hazmat.selfcheck
+
 ## Contributing a placard
 
 1. Reproduce the hazard and keep the repro runnable.
@@ -61,4 +75,4 @@ Code MIT. Placards CC-BY-4.0: cite the id, the target code hash and the register
 
 ## Status
 
-Early. One placard, a working matcher, no anchoring yet.
+Early. Five placards, a working matcher, selector derivation, a self-check with negative controls. No anchoring yet.

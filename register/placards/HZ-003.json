@@ -1,0 +1,46 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-003",
+  "placard_class": 3,
+  "placard_class_name": "authority",
+  "title": "Cancelling an owner-transfer proposal bumps the generation again, so pre-signed approvals stay dead",
+  "summary": "A pending owner proposal suspends upgrades with no expiry. The documented cancel path uses a zero address, which increments the generation a second time, so an approval signed before the proposal is not restored by cancelling it.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0xcee8ff26",
+      "0x70da8cca"
+    ],
+    "require_any": [
+      "0xc1052b76"
+    ],
+    "notes": "proposeProjectOwner(bytes32,address) 0xcee8ff26, acceptProjectOwner(bytes32) 0x70da8cca, pendingProjectOwners(bytes32) 0xc1052b76 Selectors derived from source and verified present in the deployed runtime."
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "no money moves; upgrades stay suspended and approvals need re-signing"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeAssessment.t.sol --match-test test_A3",
+    "source": "claus-network/contracts/test/ArgusProbeAssessment.t.sol::test_A3_pendingOwnerProposalSuspendsUpgradesIndefinitely",
+    "expected": "an unexpired approval is refused while the proposal is pending and five days later; the zero-address cancel lifts the pending flag but the approval is still refused until it is re-signed at the new generation"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1"
+    }
+  ],
+  "fix": "Have the cancel path restore the previous generation, or state that a cancellation requires re-signing.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692",
+    "published_source": "contracts/src/ClausApprovalExecutor.sol:184-203",
+    "evidence": [
+      "a re-signed approval at generation 3 executes, so the lift works and only the pre-signed material is lost"
+    ]
+  }
+}

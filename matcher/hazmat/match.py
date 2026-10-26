@@ -83,34 +83,59 @@ def load_register(directory):
     return rows
 
 
-def match_code(code, placards):
+FAMILIES = ('evm', 'solana', 'any')
+
+
+def _bare(items):
+    return [s.lower().replace('0x', '') for s in items]
+
+
+def match_code(code, placards, family='evm'):
+    """Match code against placards for one instruction set.
+
+    A placard marked `any` is checked for every family. The assertion level is
+    always `pattern`: a bytecode match is a candidate, never a confirmation.
+    `require_none_of` is an absence check over the listed signatures only.
+    """
+    if family not in FAMILIES:
+        raise MatchError('unknown family: %s' % family)
     body, trailer = strip_metadata(code)
     constants = push4_constants(body)
     results = []
     for placard in placards:
+        if placard.get('chain_family', 'any') not in (family, 'any'):
+            continue
         matcher = placard.get('matcher', {})
         if matcher.get('kind') != 'selector-set':
             continue
-        required = [s.lower().replace('0x', '') for s in matcher.get('require_all', [])]
-        if not required:
+        required = _bare(matcher.get('require_all', []))
+        any_of = _bare(matcher.get('require_any', []))
+        none_of = _bare(matcher.get('require_none_of', []))
+        if not (required or any_of):
             continue
-        if all(item in constants for item in required):
-            results.append({'id': placard['id'], 'title': placard['title'],
-                            'placard_class': placard['placard_class'],
-                            'placard_class_name': placard.get('placard_class_name'),
-                            'tier': placard['tier'], 'assertion': 'pattern',
-                            'matched_selectors': ['0x' + item for item in required],
-                            'money_bound': placard.get('money_bound', {}),
-                            'confirmed_on': placard.get('confirmed_on', [])})
+        if not all(item in constants for item in required):
+            continue
+        if any_of and not any(item in constants for item in any_of):
+            continue
+        if none_of and any(item in constants for item in none_of):
+            continue
+        results.append({'id': placard['id'], 'title': placard['title'],
+                        'placard_class': placard['placard_class'],
+                        'placard_class_name': placard.get('placard_class_name'),
+                        'tier': placard['tier'], 'assertion': 'pattern',
+                        'matched_selectors': ['0x' + item for item in required + any_of],
+                        'absent_checked': len(none_of),
+                        'money_bound': placard.get('money_bound', {}),
+                        'confirmed_on': placard.get('confirmed_on', [])})
     return results, {'code_bytes': len(code), 'body_bytes': len(body),
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}
 
 
-def scan(source, register_dir, rpc=None):
+def scan(source, register_dir, rpc=None, family='evm'):
     code = load_code(source, rpc)
     placards = load_register(register_dir)
-    matches, stats = match_code(code, placards)
-    return {'target': source, 'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
+    matches, stats = match_code(code, placards, family)
+    return {'target': source, 'family': family, 'code_sha256': '0x' + hashlib.sha256(code).hexdigest(),
             'register_size': len(placards), 'stats': stats, 'matches': matches,
             'assertion': 'pattern match only; confirmation runs are separate',
             'not_checked': ['reachability', 'economic preconditions',
@@ -123,9 +148,10 @@ def main(argv=None):
     parser.add_argument('--register', default='register/placards')
     parser.add_argument('--code', required=True, help='0x-hex, a file, or a contract address')
     parser.add_argument('--rpc', default=None)
+    parser.add_argument('--family', default='evm', choices=list(FAMILIES))
     args = parser.parse_args(argv)
     try:
-        print(json.dumps(scan(args.code, args.register, args.rpc), indent=2, sort_keys=True))
+        print(json.dumps(scan(args.code, args.register, args.rpc, args.family), indent=2, sort_keys=True))
         return 0
     except MatchError as exc:
         print(json.dumps({'state': 'blocked', 'error': str(exc)}))

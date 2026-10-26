@@ -1,0 +1,53 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-005",
+  "placard_class": 7,
+  "placard_class_name": "stranded-value",
+  "title": "Value arriving outside the accounting has no sweep",
+  "summary": "A contract that pays out only from internal credits accepts forced native value or direct token transfers, counts them in no total, and offers no function to recover them. Accounting stays correct, so nothing breaks and nothing notices.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x70b6fbec",
+      "0xb12ae89c",
+      "0x9b40b785"
+    ],
+    "require_none_of": [
+      "0x01681a62",
+      "0x7a4e4ecf",
+      "0x9e281a98"
+    ],
+    "notes": "dealId(address,bytes32) 0x70b6fbec, planId(address,bytes32) 0xb12ae89c, cancelUnclaimed(bytes32) 0x9b40b785, all derived from source and verified present in the deployed runtime. Absence is checked only over sweep(address), rescue(address,uint256), withdrawToken(address,uint256): a recovery function under another name is not detected."
+  },
+  "money_bound": {
+    "kind": "per-event",
+    "expression": "the stranded amount itself, unbounded by any ceiling"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeStrayFunds.t.sol",
+    "source": "claus-network/contracts/test/ArgusProbeStrayFunds.t.sol",
+    "expected": "a bare native transfer reverts; forced native value and direct token transfers survive a full deal lifecycle with every total back at zero"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausTokenDealEscrow 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c chainId 1",
+      "equivalence": "published source reproduces the deployed runtime: 18 of 19 derived selectors present, the absent one being the native-value withdraw form",
+      "derivation": "matcher/hazmat/derive.py over contracts/src against the live address"
+    }
+  ],
+  "fix": "Add a sweep for stray value, or document that it is donated.",
+  "provenance": {
+    "first_observed": "2026-10-25",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692",
+    "published_source": "contracts/src/ClausTokenDealEscrow.sol (no sweep, rescue or withdrawToken anywhere in contracts/src)",
+    "evidence": [
+      "no sweep, rescue or withdrawToken selector exists anywhere in contracts/src, so nothing recovers a stray balance",
+      "forced native value and a direct token transfer both survive a complete deal with every total back at zero",
+      "the token and native escrows are distinguishable in bytecode by createDeal arity: (...,address,uint256,uint64) 0xe67326f8 present here, the uint64-value form absent"
+    ]
+  }
+}

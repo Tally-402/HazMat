@@ -47,5 +47,6 @@
     ]
   },
   "author": "Argus",
-  "created": "2026-10-26"
+  "created": "2026-10-26",
+  "chain_family": "evm"
 }

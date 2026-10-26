@@ -1,0 +1,49 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "id": "HZ-002",
+  "placard_class": 3,
+  "placard_class_name": "authority",
+  "title": "Cancelling a signer recovery re-validates approvals pre-signed for a predictable generation",
+  "summary": "Scheduling a recovery and then cancelling it advances the signer generation twice while keeping the same signer. A generation sequence that can be predicted lets material signed in advance for a future generation become valid again, which contradicts the claim that cancellation invalidates signatures made during the pause.",
+  "tier": "confirmed",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x81d1c867",
+      "0xd8d59645",
+      "0x424c706a",
+      "0x3758ca7a"
+    ],
+    "notes": "scheduleSignerRecovery(address) 0x81d1c867, cancelSignerRecovery() 0xd8d59645, finishSignerRecovery() 0x424c706a, recoveryDelay() 0x3758ca7a. Matching is a candidate: reachability needs a confirmation run. Selectors derived from source and verified present in the deployed runtime."
+  },
+  "money_bound": {
+    "kind": "capability",
+    "expression": "no money moves; the gain is control of a live read-only module that consumers trust"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "forge test --match-path test/ArgusProbeGenAndGas.t.sol",
+    "source": "claus-network/contracts/test/ArgusProbeGenAndGas.t.sol::ArgusProbeRecoveryGeneration",
+    "expected": "queue reverts on generation 3 while the live generation is 1; after schedule and cancel both queue and execute succeed and the target implementation changes; the signer was never rotated"
+  },
+  "confirmed_on": [
+    {
+      "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1",
+      "equivalence": "published source at claus-network-contracts 0acc594a43 reproduces the deployed runtime, body identical, residual is the CBOR metadata trailer only",
+      "attacker_cost": "one queue plus one execute"
+    }
+  ],
+  "fix": "Make the generation increment unpredictable, or require a fresh signer on cancellation.",
+  "provenance": {
+    "first_observed": "2026-10-25",
+    "specimen": "github.com/contractclaus/claus-network@8dbf692",
+    "published_source": "contracts/src/ClausApprovalExecutor.sol:216-238",
+    "deployed_verified": "0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1",
+    "evidence": [
+      "any 1 to 8 pause-cancel cycles land exactly on the signed generation (fuzz)",
+      "the same signature is refused when only the schedule happens, so the effect is the predictability"
+    ]
+  }
+}

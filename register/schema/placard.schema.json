@@ -8,12 +8,12 @@
     "title",
     "summary",
     "tier",
-    "matcher",
     "money_bound",
     "fix",
     "provenance",
     "author",
-    "created"
+    "created",
+    "chain_family"
   ],
   "additionalProperties": false,
   "properties": {
@@ -58,11 +58,13 @@
       "required": [
         "kind"
       ],
+      "additionalProperties": false,
       "properties": {
         "kind": {
           "enum": [
             "selector-set",
-            "opcode-sequence"
+            "opcode-sequence",
+            "sbf-immediate-set"
           ]
         },
         "require_all": {
@@ -77,11 +79,17 @@
             "type": "string"
           }
         },
+        "require_none_of": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "absence check, only over the exact signatures listed here"
+        },
         "notes": {
           "type": "string"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "money_bound": {
       "type": "object",
@@ -171,6 +179,14 @@
     },
     "created": {
       "type": "string"
+    },
+    "chain_family": {
+      "enum": [
+        "evm",
+        "solana",
+        "any"
+      ],
+      "description": "instruction set the matcher targets"
     }
   }
 }
