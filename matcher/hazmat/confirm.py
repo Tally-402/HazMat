@@ -31,14 +31,14 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_FORGE = os.path.expanduser('~/.foundry/bin/forge')
 DEFAULT_REGISTER = str(ROOT / 'register' / 'placards')
 # Libraries and upstream sources a probe may need, discovered rather than demanded.
-# An entry can be overridden with HAZMAT_LIBS="name=/path:name2=/path2" or --lib.
+# repo-local first, then the specimen kept beside this repo, so a fresh clone resolves
+# what this machine resolves. Neither is mandatory: HAZMAT_LIBS or --lib wins.
+SIBLING = os.path.join(os.path.dirname(str(ROOT)), 'claus-network-specimen', 'contracts')
 LIB_CANDIDATES = {
-    'forge-std': [os.path.expanduser('~/code/claus-network-specimen/contracts/lib/forge-std'),
-                  'lib/forge-std'],
-    'openzeppelin-contracts': [os.path.expanduser('~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts'),
-                               'lib/openzeppelin-contracts'],
+    'forge-std': ['lib/forge-std', os.path.join(SIBLING, 'lib', 'forge-std')],
+    'openzeppelin-contracts': ['lib/openzeppelin-contracts', os.path.join(SIBLING, 'lib', 'openzeppelin-contracts')],
 }
-SOURCE_ROOT_CANDIDATES = [os.path.expanduser('~/code/claus-network-specimen/contracts/src')]
+SOURCE_ROOT_CANDIDATES = ['src', os.path.join(SIBLING, 'src')]
 
 
 def discover_libs(explicit=None):

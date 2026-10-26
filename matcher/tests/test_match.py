@@ -641,11 +641,23 @@ class Confirm(unittest.TestCase):
             self.assertEqual(len(added[0]['sha256']), 64)
 
     def test_discover_libs_finds_what_exists_and_records_it(self):
-        found = confirm.discover_libs()
-        self.assertIn('forge-std', found)
-        self.assertTrue(os.path.isdir(found['forge-std']))
-        explicit = confirm.discover_libs({'forge-std': '/tmp'})
-        self.assertEqual(explicit['forge-std'], '/tmp')
+        # on its own, with no sibling checkout and no env: prove it finds a repo-local lib
+        here = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, 'lib', 'forge-std', 'src'))
+            os.makedirs(os.path.join(tmp, 'src'))
+            try:
+                os.chdir(tmp)
+                found = confirm.discover_libs()
+                self.assertEqual(found.get('forge-std'), 'lib/forge-std')
+                self.assertTrue(os.path.isdir(found['forge-std']))
+                self.assertEqual(confirm.discover_source_root(), 'src')
+                self.assertEqual(confirm.discover_libs({'forge-std': '/tmp'})['forge-std'], '/tmp')
+                os.environ['HAZMAT_LIBS'] = 'forge-std=/elsewhere'
+                self.assertEqual(confirm.discover_libs()['forge-std'], '/elsewhere')
+            finally:
+                os.environ.pop('HAZMAT_LIBS', None)
+                os.chdir(here)
 
     def test_find_solc_returns_a_path_or_none(self):
         got = confirm.find_solc('0.8.27')
