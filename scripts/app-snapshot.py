@@ -62,6 +62,9 @@ if (!location.hash) history.replaceState(null, '', '#/scan/%s/%s');
     sheet_html, _ = _sds.render(report)
     shim += ('<script>window.SHEET_HREF = "data:text/html;base64,%s";</script>\n'
              % base64.b64encode(sheet_html.encode()).decode())
+    # a file:// page cannot resolve /logo.png either
+    page = page.replace('src="/logo.png"', 'src="%s"' % _sds.mark_data_uri())
+    page = page.replace('<link rel="icon" href="/logo.png">', '')
     page = page.replace('<script>\nconst CLASSES=', shim + '<script>\nconst CLASSES=')
     Path(args.out).write_text(page)
     print('wrote %s (%d bytes)' % (args.out, len(page)))
