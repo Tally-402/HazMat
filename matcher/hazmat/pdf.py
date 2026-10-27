@@ -4,7 +4,9 @@ Text-only by design: the sheet is a document. Layout is deterministic, so the
 same report always produces the same bytes, which is what makes it citable.
 """
 import re
-from . import sds
+import zlib
+
+from . import logo, sds
 
 
 def clean(value):
@@ -146,29 +148,55 @@ def paginate(lines, size=MAX_LINES):
     return [lines[i:i + size] for i in range(0, len(lines), size)] or [[]]
 
 
-def render_pdf(report):
+def render_pdf(report, with_mark=True):
+    """Lay the document out and write it. Deterministic: same report, same bytes.
+
+    The mark rides on page one as an image object, composited onto white so no soft mask is
+    needed. If the asset is missing the document still renders, without it.
+    """
     pages = paginate(lines_for(report))
+    mark = None
+    if with_mark:
+        try:
+            mark = logo.pixels()
+        except (OSError, ValueError):
+            mark = None
     objects = []
     contents = []
-    for page in pages:
-        body = ['BT', '/F1 %g Tf %g TL' % (SIZE, LEADING), '%g %g Td' % (MARGIN, A4[1] - MARGIN)]
+    mark_height = 26 if mark else 0
+    for index, page in enumerate(pages):
+        top = A4[1] - MARGIN - (mark_height if index == 0 else 0)
+        body = []
+        if mark and index == 0:
+            size = 40
+            body.append('q %g 0 0 %g %g %g cm /Im0 Do Q'
+                        % (size, size, A4[0] - MARGIN - size, A4[1] - MARGIN - size + 4))
+        body += ['BT', '/F1 %g Tf %g TL' % (SIZE, LEADING), '%g %g Td' % (MARGIN, top)]
         for line in page:
             body.append('(%s) Tj T*' % escape(line))
         body.append('ET')
         contents.append('\n'.join(body).encode())
     count = len(pages)
-    # 1 catalog, 2 pages, then one page + one content object per page, then the font
+    # 1 catalog, 2 pages, then one page + one content object per page, then the font, then the mark
     font_obj = 3 + 2 * count
+    mark_obj = font_obj + 1
     kids = ' '.join('%d 0 R' % (3 + 2 * i) for i in range(count))
     objects.append(b'<< /Type /Catalog /Pages 2 0 R >>')
     objects.append(('<< /Type /Pages /Count %d /Kids [%s] >>' % (count, kids)).encode())
     for i in range(count):
+        xobject = ' /XObject << /Im0 %d 0 R >>' % mark_obj if (mark and i == 0) else ''
         objects.append(('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %d %d] '
-                        '/Resources << /Font << /F1 %d 0 R >> >> /Contents %d 0 R >>'
-                        % (A4[0], A4[1], font_obj, 4 + 2 * i)).encode())
+                        '/Resources << /Font << /F1 %d 0 R >>%s >> /Contents %d 0 R >>'
+                        % (A4[0], A4[1], font_obj, xobject, 4 + 2 * i)).encode())
         stream = contents[i]
         objects.append(b'<< /Length %d >>\nstream\n' % len(stream) + stream + b'\nendstream')
     objects.append(b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>')
+    if mark:
+        width, height, rgb = mark
+        packed = zlib.compress(rgb, 9)
+        objects.append(('<< /Type /XObject /Subtype /Image /Width %d /Height %d /ColorSpace /DeviceRGB '
+                        '/BitsPerComponent 8 /Filter /FlateDecode /Length %d >>' % (width, height, len(packed))).encode()
+                       + b'\nstream\n' + packed + b'\nendstream')
 
     out = bytearray(b'%PDF-1.4\n')
     offsets = []

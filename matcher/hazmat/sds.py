@@ -13,6 +13,7 @@ import html
 import json
 import re
 import sys
+from pathlib import Path
 
 PLACEHOLDER = '{SHEET}'
 DIGEST_LINE = re.compile(r'sheet sha256 <code>([0-9a-f]{64})</code>')
@@ -49,6 +50,7 @@ th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);pad
 th{font-weight:600;color:var(--dim);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 code{font:0.88em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--panel);padding:0 .25rem;border-radius:3px}
+img.mark{float:right;width:64px;height:64px;image-rendering:pixelated;margin:.2rem 0 .6rem 1rem;opacity:.9}
 ul.sel{columns:2;font-size:.85rem;color:var(--dim);list-style:none;padding-left:0}
 ul.sel li{margin:.15rem 0}
 details{margin:.6rem 0}
@@ -57,12 +59,22 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);font-si
 @media print{body{font-size:11pt}main{padding:0}.hazard{break-inside:avoid}h2{break-after:avoid}}
 """
 
+MARK = Path(__file__).resolve().parents[2] / 'web' / 'logo.png'
+
+
+def mark_data_uri():
+    """The mark inlined, so a sheet never depends on a network or a sibling file."""
+    import base64
+    return 'data:image/png;base64,%s' % base64.b64encode(MARK.read_bytes()).decode()
+
+
 PAGE = """<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HazMat Safety Data Sheet {target}</title>
 <style>{style}</style>
 <main>
 <header class="lede">
+  <img class="mark" src="{mark}" alt="HazMat" width="64" height="64">
   <div class="kicker">HazMat &middot; safety data sheet</div>
   <h1>{headline}</h1>
   <p class="standfirst">{standfirst}</p>
@@ -381,7 +393,8 @@ def render(report):
     standfirst = prose['standfirst']
     badges = prose['badges']
     page = PAGE.format(
-        style=STYLE, target=html.escape(report['target']), headline=headline, standfirst=standfirst,
+        style=STYLE, mark=mark_data_uri(), target=html.escape(report['target']),
+        headline=headline, standfirst=standfirst,
         badges=''.join('<span class="badge">%s</span>' % html.escape(str(b)) for b in badges),
         subject=subject_line(report), assertion=html.escape(report['assertion']),
         summary=''.join('<li><b>%s</b>%s %s</li>' % (html.escape(b['label']), ':' if b['label'] else '', b['text'])

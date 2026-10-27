@@ -518,6 +518,39 @@ class ScanSubject(unittest.TestCase):
         self.assertIn('Addresses scanned', page)
 
 
+class Mark(unittest.TestCase):
+    def test_the_mark_decodes_to_flat_rgb(self):
+        from hazmat import logo
+        width, height, rgb = logo.pixels()
+        self.assertEqual((width, height), (64, 64))
+        self.assertEqual(len(rgb), width * height * 3)          # no alpha survives the flatten
+
+    def test_the_sheet_inlines_the_mark_and_stays_self_contained(self):
+        report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
+        page, _ = sds.render(report)
+        self.assertEqual(page.count('data:image/png;base64,'), 1)
+        self.assertNotIn('src="/', page)                        # nothing fetched from a sibling
+
+    def test_the_pdf_carries_the_mark_on_the_first_page_only(self):
+        from hazmat import pdf
+        report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
+        body = pdf.render_pdf(report)
+        self.assertIn(b'/Subtype /Image', body)
+        self.assertEqual(body.count(b'/XObject'), 1)            # page one, and nowhere else
+        self.assertEqual(pdf.render_pdf(report), body)          # still deterministic
+
+    def test_without_the_asset_the_document_still_renders(self):
+        from hazmat import logo, pdf
+        original = logo.MARK
+        try:
+            logo.MARK = Path('/nonexistent/logo.png')
+            report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
+            body = pdf.render_pdf(report)
+            self.assertNotIn(b'/Subtype /Image', body)
+        finally:
+            logo.MARK = original
+
+
 class Schema(unittest.TestCase):
     def test_the_validator_catches_what_ci_would_catch(self):
         import sys as _sys
@@ -575,6 +608,12 @@ class Api(unittest.TestCase):
         self.assertIn('HAZMAT', page)
         for view in ('registerView', 'placardView', 'anchorsView', 'aboutView'):
             self.assertIn(view, page)
+
+    def test_the_mark_is_served_and_typed(self):
+        got = self.urllib.urlopen('%s/logo.png' % self.base, timeout=15)
+        self.assertEqual(got.status, 200)
+        self.assertEqual(got.headers.get('content-type'), 'image/png')
+        self.assertTrue(got.read().startswith(b'\x89PNG'))
 
     def test_the_api_carries_the_same_sentences_as_the_sheet(self):
         """The app renders generated prose from the API; if the two ever diverge, one of them lies."""

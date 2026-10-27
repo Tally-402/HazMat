@@ -152,6 +152,16 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(FORM % options)
         if path.startswith('/api/'):
             return self._api(path, query)
+        asset = rooted(self.web_dir) / path.lstrip('/')
+        if path != '/' and '/' not in path.lstrip('/') and asset.is_file():
+            body = asset.read_bytes()
+            self.send_response(200)
+            self.send_header('content-type', {'png': 'image/png', 'svg': 'image/svg+xml',
+                                              'css': 'text/css', 'js': 'text/javascript'}
+                             .get(asset.suffix.lstrip('.'), 'application/octet-stream'))
+            self.send_header('content-length', str(len(body)))
+            self.end_headers()
+            return self.wfile.write(body)
         target = query.get('target') or query.get('code')
         if not target:
             return self._fail('pass ?target=0x...', 400)
