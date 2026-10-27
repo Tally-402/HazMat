@@ -3,25 +3,67 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+<< /Type /Pages /Count 2 /Kids [3 0 R 5 0 R] >>
 endobj
 3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2214 >>
+<< /Length 4458 >>
 stream
 BT
 /F1 9 Tf 11.5 TL
 48 794 Td
 (HAZMAT SAFETY DATA SHEET) Tj T*
 () Tj T*
-(target 0x3212b29E33587A00FB1C83346f5dBFA69A458923 family evm) Tj T*
-(code sha256 0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603) Tj T*
-(register 16 placards body 22174 bytes metadata 43 excluded 42 four-byte constants) Tj T*
-(assertion level: pattern match only; confirmation runs are separate) Tj T*
+(0x3212b29E33587A00FB1C83346f5dBFA69A458923 \(verified as IMBTC\)) Tj T*
+() Tj T*
+(Read 22,174 bytes of deployed bytecode and checked it against 16 registered hazards. 1 hazard is) Tj T*
+(present, reproduced against this very contract.) Tj T*
+() Tj T*
+(  What this is: It is a plain contract on mainnet, read from its bytecode.) Tj T*
+(  What matched: 1 of the 16 registered hazards is present: HZ-016 \(asset-handling\).) Tj T*
+(  How sure: HZ-016 was reproduced against this exact contract, not a lookalike.) Tj T*
+(  The sharpest one: HZ-016: A token that calls the recipient back mid-transfer drains a counterparty) Tj T*
+(                    that settles after paying) Tj T*
+(  What is at stake: up to the credited balance a naive counterparty is holding; about 25M USD in one) Tj T*
+(                    event against imBTC in 2020.) Tj T*
+(  Precedent: Lendf.Me, 2020-04-19, roughly 25M USD, re-entrancy through imBTC's ERC777 callback.) Tj T*
+(  What to do about it: Not a token bug: any contract that accepts this token must clear its credit) Tj T*
+(                       before paying out, or re-enter-proof its payout path. Where the counterparty) Tj T*
+(                       cannot be changed, deposit through a wrapper that uses transfer\(\) and keeps the) Tj T*
+(                       callback off the hot path.) Tj T*
+() Tj T*
+(ASSERTION LEVEL: PATTERN MATCH ONLY; CONFIRMATION RUNS ARE SEPARATE) Tj T*
+(A match is a candidate, not a clearance: this sheet fingerprints a contract against registered hazard) Tj T*
+(shapes, it does not audit it. A clean sheet is not the same as safe.) Tj T*
+() Tj T*
+(HAZARDS FOUND) Tj T*
+() Tj T*
+(HZ-016 A token that calls the recipient back mid-transfer drains a counterparty that settles after) Tj T*
+(paying) Tj T*
+(  class 6 asset-handling   CONFIRMED ON THIS TARGET) Tj T*
+(  This token is an ERC777: transferring to a contract calls that contract back before the transfer) Tj T*
+(  returns, resolved through the ERC1820 registry, and the ERC777 send\(\) additionally requires a contract) Tj T*
+(  recipient to have registered an implementer. A counterparty that credits on deposit and only clears) Tj T*
+(  the credit after paying out can therefore be re-entered by the recipient, paid twice out of one) Tj T*
+(  balance, and left unable to pay the next honest depositor. The token is not at fault and is behaving) Tj T*
+(  to spec. imBTC was the token in the Lendf.Me drain of 2020-04-19, roughly 25 million dollars in one) Tj T*
+(  re-entrancy against exactly this shape, which is why a token whose selector set says ERC777 is worth) Tj T*
+(  knowing about before it is accepted, not after.) Tj T*
+(  What is at stake: up to the credited balance a naive counterparty is holding; about 25M USD in one) Tj T*
+(                    event against imBTC in 2020.) Tj T*
+(  What to do: Not a token bug: any contract that accepts this token must clear its credit before paying) Tj T*
+(              out, or re-enter-proof its payout path. Where the counterparty cannot be changed, deposit) Tj T*
+(              through a wrapper that uses transfer\(\) and keeps the callback off the hot path.) Tj T*
+(  Reproduced here: confirmations/HZ-016-3212b29e.json - a rebuild of the verified source and the probes) Tj T*
+(                   in it passed. Confirming behaviour, not intent.) Tj T*
+(  Lendf.Me, 2020-04-19, roughly 25M USD, re-entrancy through imBTC's ERC777 callback.) Tj T*
+(  matched by selectors: 0x9bd9bbc6 0x62ad1b83 0x06e48538 0x556f0dc7 0x959b8c3f 0xd95b6371) Tj T*
 () Tj T*
 (WHAT WAS READ) Tj T*
+(a match means the selectors a placard asks about are present. It does not mean reachable, and a clean) Tj T*
+(sheet is not a clearance.) Tj T*
 (placards checked 16 classes 7 selectors in code 42 the register asks about 12 otherwise unaccounted 30) Tj T*
 (  0x06fdde03 name\(\)) Tj T*
 (  0x095ea7b3 approve\(address,uint256\)) Tj T*
@@ -35,24 +77,29 @@ BT
 (  0x5c975abb paused\(\)) Tj T*
 (  0x75ab9782 tokensToSend\(address,address,address,uint256,bytes,bytes\)) Tj T*
 (  0x8f32d59b isOwner\(\)) Tj T*
+(  0x92ff0d31 transferable\(\)) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 1624 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(  0x95d89b41 symbol\(\)) Tj T*
+(  0x983b2d56 addMinter\(address\)) Tj T*
+(  0xa9059cbb transfer\(address,uint256\)) Tj T*
+(  0xaa271e1a isMinter\(address\)) Tj T*
+(  0xaabbb8ca getInterfaceImplementer\(address,bytes32\)) Tj T*
+(  0xb187984f disableTransfer\(\)) Tj T*
+(  0xb410908d revenueAddress\(\)) Tj T*
+(  ... and 4 more) Tj T*
 () Tj T*
-(SUBJECT) Tj T*
-() Tj T*
-(contract 0x3212b29e33587a00fb1c83346f5dbfa69a458923) Tj T*
-(verified as IMBTC \(match\)) Tj T*
-() Tj T*
-(ASSERTION) Tj T*
-(a match is a candidate, not a clearance. Nothing here claims the contract is safe.) Tj T*
-() Tj T*
-(PLACARDS) Tj T*
-() Tj T*
-(HZ-016  class 6 asset-handling  tier confirmed on this target  [scan is pattern]) Tj T*
-(  A token that calls the recipient back mid-transfer drains a counterparty that settles after paying) Tj T*
-(  money: up to the credited balance a naive counterparty is holding; about 25M USD in one event against) Tj T*
-(  money: imBTC in 2020) Tj T*
-(  matched: 0x9bd9bbc6 0x62ad1b83 0x06e48538 0x556f0dc7 0x959b8c3f 0xd95b6371) Tj T*
-() Tj T*
-(NOT CHECKED) Tj T*
+(NOT CHECKED AT ALL) Tj T*
 (  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
 (  - are labelled not followed) Tj T*
 (  - reachability) Tj T*
@@ -61,23 +108,38 @@ BT
 (  - source-level reasoning) Tj T*
 (  - anything not covered by a placard) Tj T*
 () Tj T*
-(cite the placard id, the code sha256 and the register digest.) Tj T*
+(THE TECHNICAL PART) Tj T*
+(target 0x3212b29E33587A00FB1C83346f5dBFA69A458923) Tj T*
+(family evm) Tj T*
+(code sha256 0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603) Tj T*
+(body bytes read 22174) Tj T*
+(metadata excluded 43 bytes \(CBOR trailer, appended after compilation\)) Tj T*
+(four-byte constants 42) Tj T*
+(register 16 placards v0xd7dea67cdf60b0bc) Tj T*
+(anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c \(epoch-3.json\)) Tj T*
+(register digest 0xd7dea67cdf60b0bc) Tj T*
+(anchor root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c) Tj T*
+(selector index 783 names, a convenience reading and not verification) Tj T*
+() Tj T*
+(Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact that carries its own digest; this PDF is the same report set for paper.) Tj T*
 ET
 endstream
 endobj
-5 0 obj
+7 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
 endobj
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000115 00000 n 
-0000000241 00000 n 
-0000002507 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000004757 00000 n 
+0000004883 00000 n 
+0000006559 00000 n 
 trailer
-<< /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
+<< /Size 8 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-2604
+6656
 %%EOF

@@ -1,32 +1,96 @@
-<!doctype html><meta charset="utf-8">
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HazMat Safety Data Sheet 0x3212b29E33587A00FB1C83346f5dBFA69A458923</title>
 <style>
- body{font:15px/1.5 ui-monospace,Menlo,monospace;margin:0;padding:2rem;background:#111;color:#e8e8e8}
- h1{font-size:1.2rem;margin:0 0 .2rem} h2{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;color:#8a8a8a;margin:2rem 0 .4rem}
- table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #2a2a2a;padding:.5rem .4rem;text-align:left;vertical-align:top}
- .id{color:#ffb020;white-space:nowrap} code{color:#7fd1ff;word-break:break-all} ul{padding-left:1.2rem;color:#bdbdbd}
- .banner{border:1px solid #444;padding:.6rem .8rem;margin:1rem 0;background:#181818}
- .sel{color:#9b9b9b;font-size:.85em}
+:root{--ink:#16181c;--dim:#5c636e;--line:#dfe3e8;--bg:#fff;--panel:#f6f7f9;--acc:#8a5a00;--warn:#8a1f1f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:46rem;margin:0 auto;padding:3rem 1.4rem 5rem}
+h1{font-size:1.9rem;line-height:1.2;margin:.2rem 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.15rem;margin:2.6rem 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+h3{font-size:1rem;margin:1.6rem 0 .3rem}
+p{margin:.6rem 0}
+ul{margin:.4rem 0 .9rem;padding-left:1.15rem}
+li{margin:.3rem 0}
+small,.dim{color:var(--dim)}
+.kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.lede{border-bottom:3px solid var(--ink);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.standfirst{font-size:1.08rem;margin:.7rem 0 0}
+.facts{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;margin:.9rem 0 0;font-size:.82rem}
+.badge{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:.05rem .55rem;
+  font-size:.75rem;color:var(--dim);white-space:nowrap}
+.badge.good{border-color:#1f6f43;color:#1f6f43}
+.badge.bad{border-color:var(--warn);color:var(--warn)}
+.banner{background:var(--panel);border-left:3px solid var(--acc);padding:.7rem .9rem;margin:1.2rem 0;font-size:.92rem}
+.hazard{border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;margin:1.1rem 0}
+.hazard h3{margin-top:0}
+.hazard .id{font-weight:600;color:var(--acc)}
+.hazard .why{border-left:2px solid var(--line);padding-left:.7rem;margin:.6rem 0;color:var(--dim);font-size:.94rem}
+.evidence{font-size:.82rem;color:var(--dim);margin-top:.7rem}
+table{border-collapse:collapse;width:100%;margin:.7rem 0;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:.45rem .5rem}
+th{font-weight:600;color:var(--dim);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+code{font:0.88em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--panel);padding:0 .25rem;border-radius:3px}
+ul.sel{columns:2;font-size:.85rem;color:var(--dim);list-style:none;padding-left:0}
+ul.sel li{margin:.15rem 0}
+details{margin:.6rem 0}
+summary{cursor:pointer;color:var(--dim);font-size:.9rem}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.85rem;color:var(--dim)}
+@media print{body{font-size:11pt}main{padding:0}.hazard{break-inside:avoid}h2{break-after:avoid}}
 </style>
-<h1>HazMat Safety Data Sheet</h1>
-<div>target <code>0x3212b29E33587A00FB1C83346f5dBFA69A458923</code> &middot; family evm</div>
-<div>subject contract <code>0x3212b29e33587a00fb1c83346f5dbfa69a458923</code> &middot; verified as IMBTC</div>
+<main>
+<header class="lede">
+  <div class="kicker">HazMat &middot; safety data sheet</div>
+  <h1>0x3212b29E33587A00FB1C83346f5dBFA69A458923 <span class="badge">verified as IMBTC</span></h1>
+  <p class="standfirst">Read 22,174 bytes of deployed bytecode and checked it against 16 registered hazards. 1 hazard is present, reproduced against this very contract.</p>
+  <div class="facts"><span class="badge">contract on mainnet</span><span class="badge">22174 bytes of code</span><span class="badge">1 of 16 hazards</span><span class="badge">epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</span></div>
+  <p class="dim" style="font-size:.82rem">contract <code>0x3212b29e33587a00fb1c83346f5dbfa69a458923</code> &middot; verified as IMBTC</p>
+</header>
 
-<div>code sha256 <code>0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603</code></div>
-<div>register 16 placards v0xd7dea67cdf60b0bc &middot; body 22174B &middot; metadata 43B excluded &middot; 42 four-byte constants</div>
-<div>anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</div>
-<div class="banner"><b>Assertion level: pattern match only; confirmation runs are separate.</b> A match is a candidate, not a clearance. 1 placard(s) matched
-A placard's own tier is in its row and says whether it was ever reproduced against a live target.</div>
+<div class="banner"><b>Assertion level: pattern match only; confirmation runs are separate.</b> A match is a candidate, not a clearance:
+this sheet fingerprints a contract against registered hazard shapes, it does not audit it.
+A clean sheet is not the same as safe.</div>
+
+<section>
+<h2>Summary</h2>
+<ul><li><b>What this is</b>: It is a plain contract on mainnet, read from its bytecode.</li><li><b>What matched</b>: 1 of the 16 registered hazards is present: HZ-016 (asset-handling).</li><li><b>How sure</b>: HZ-016 was reproduced against this exact contract, not a lookalike.</li><li><b>The sharpest one</b>: HZ-016: A token that calls the recipient back mid-transfer drains a counterparty that settles after paying</li><li><b>What is at stake</b>: up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020.</li><li><b>Precedent</b>: Lendf.Me, 2020-04-19, roughly 25M USD, re-entrancy through imBTC's ERC777 callback.</li><li><b>What to do about it</b>: Not a token bug: any contract that accepts this token must clear its credit before paying out, or re-enter-proof its payout path. Where the counterparty cannot be changed, deposit through a wrapper that uses transfer() and keeps the callback off the hot path.</li></ul>
+</section>
+
+<section>
+<h2>Hazards found</h2>
+<article class="hazard" id="HZ-016"><h3><span class="id">HZ-016</span> &middot; A token that calls the recipient back mid-transfer drains a counterparty that settles after paying</h3><div><span class="badge">class 6 asset-handling</span> <span class="badge good">confirmed on this target</span></div><p>This token is an ERC777: transferring to a contract calls that contract back before the transfer returns, resolved through the ERC1820 registry, and the ERC777 send() additionally requires a contract recipient to have registered an implementer. A counterparty that credits on deposit and only clears the credit after paying out can therefore be re-entered by the recipient, paid twice out of one balance, and left unable to pay the next honest depositor. The token is not at fault and is behaving to spec. imBTC was the token in the Lendf.Me drain of 2020-04-19, roughly 25 million dollars in one re-entrancy against exactly this shape, which is why a token whose selector set says ERC777 is worth knowing about before it is accepted, not after.</p><p><b>What is at stake:</b> up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020.</p><p><b>What to do:</b> Not a token bug: any contract that accepts this token must clear its credit before paying out, or re-enter-proof its payout path. Where the counterparty cannot be changed, deposit through a wrapper that uses transfer() and keeps the callback off the hot path.</p><p class="evidence">Reproduced here: <code>confirmations/HZ-016-3212b29e.json</code> &mdash; a rebuild of the verified source and the probes in it passed. Confirming behaviour, not intent.</p><p class="why">Lendf.Me, 2020-04-19, roughly 25M USD, re-entrancy through imBTC&#x27;s ERC777 callback.</p><div class="evidence">matched by selectors <code>0x9bd9bbc6 0x62ad1b83 0x06e48538 0x556f0dc7 0x959b8c3f 0xd95b6371</code> &middot; first observed on imBTC, mainnet</div></article>
+</section>
+
+<section>
 <h2>What was read</h2>
-<div class="banner">a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.</div>
+<p>a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.</p>
 <table>
 <tr><th>placards checked</th><th>classes</th><th>selectors in code</th><th>the register asks about</th><th>otherwise unaccounted</th></tr>
-<tr><td>16</td><td>7</td><td>42</td><td>12</td><td>30</td></tr>
+<tr><td class="num">16</td><td class="num">7</td><td class="num">42</td><td class="num">12</td><td class="num">30</td></tr>
 </table>
-<h2>Unaccounted selectors (nearest misses)</h2>
-<ul class="sel"><li><code>0x06fdde03</code> name()</li><li><code>0x095ea7b3</code> approve(address,uint256)</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2d07953a</code> distributeRevenue()</li><li><code>0x3092afd5</code> removeMinter(address)</li><li><code>0x313ce567</code> decimals()</li><li><code>0x3ba0b9a9</code> exchangeRate()</li><li><code>0x3e9491a2</code> revenue()</li><li><code>0x45338d63</code> setRevenueAddress(address)</li><li><code>0x5c975abb</code> paused()</li><li><code>0x75ab9782</code> tokensToSend(address,address,address,uint256,bytes,bytes)</li><li><code>0x8f32d59b</code> isOwner()</li><li><code>0x92ff0d31</code> transferable()</li><li><code>0x95d89b41</code> symbol()</li><li><code>0x983b2d56</code> addMinter(address)</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa271e1a</code> isMinter(address)</li><li><code>0xaabbb8ca</code> getInterfaceImplementer(address,bytes32)</li><li><code>0xb187984f</code> disableTransfer()</li><li><code>0xb410908d</code> revenueAddress()</li><li><code>0xd4ee1d90</code> newOwner()</li><li><code>0xd6644ff7</code> accuracyBalanceOf(address)</li><li><code>0xdcdc7dd0</code> mint(address,uint256,bytes,bytes)</li><li><code>0xdd62ed3e</code> allowance(address,address)</li></ul>
-<h2>Placards</h2>
-<table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
-<tr><td class="id">HZ-016</td><td>6 asset-handling</td><td>A token that calls the recipient back mid-transfer drains a counterparty that settles after paying</td><td>confirmed <b>on this target</b> <code>confirmations/HZ-016-3212b29e.json</code></td><td>up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020</td><td class="sel">0x9bd9bbc6 0x62ad1b83 0x06e48538 0x556f0dc7 0x959b8c3f 0xd95b6371</td></tr></table>
-<h2>Not checked</h2><ul><li>resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed</li><li>reachability</li><li>economic preconditions</li><li>state at any particular block</li><li>source-level reasoning</li><li>anything not covered by a placard</li></ul>
-<footer><p>sheet sha256 <code>0b1de8ae52a973cdad13bbffef378e4a86e7336725cd7450b5cfcea5e94f55c6</code> &middot; re-derive with <code>hazmat verify</code>; cite the id, the code sha256 and the register digest.</p></footer>
+<p class="dim">12 of the 42 selectors in this contract are asked about by some placard; the other 30 are listed below so you can see what was skipped.</p>
+<details><summary>Unaccounted selectors &mdash; the nearest misses (24). These are in the code and no registered hazard asks about them.</summary>
+<ul class="sel"><li><code>0x06fdde03</code> name()</li><li><code>0x095ea7b3</code> approve(address,uint256)</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2d07953a</code> distributeRevenue()</li><li><code>0x3092afd5</code> removeMinter(address)</li><li><code>0x313ce567</code> decimals()</li><li><code>0x3ba0b9a9</code> exchangeRate()</li><li><code>0x3e9491a2</code> revenue()</li><li><code>0x45338d63</code> setRevenueAddress(address)</li><li><code>0x5c975abb</code> paused()</li><li><code>0x75ab9782</code> tokensToSend(address,address,address,uint256,bytes,bytes)</li><li><code>0x8f32d59b</code> isOwner()</li><li><code>0x92ff0d31</code> transferable()</li><li><code>0x95d89b41</code> symbol()</li><li><code>0x983b2d56</code> addMinter(address)</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa271e1a</code> isMinter(address)</li><li><code>0xaabbb8ca</code> getInterfaceImplementer(address,bytes32)</li><li><code>0xb187984f</code> disableTransfer()</li><li><code>0xb410908d</code> revenueAddress()</li><li><code>0xd4ee1d90</code> newOwner()</li><li><code>0xd6644ff7</code> accuracyBalanceOf(address)</li><li><code>0xdcdc7dd0</code> mint(address,uint256,bytes,bytes)</li><li><code>0xdd62ed3e</code> allowance(address,address)</li></ul></details>
+</section>
+
+<section>
+<h2>Not checked at all</h2>
+<ul><li>resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed</li><li>reachability</li><li>economic preconditions</li><li>state at any particular block</li><li>source-level reasoning</li><li>anything not covered by a placard</li></ul>
+</section>
+
+<section>
+<h2>The technical part</h2>
+<p class="dim" id="pins">register 16 placards v0xd7dea67cdf60b0bc &middot; anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json) &middot; body 22174B read, 43B of metadata excluded, 42 four-byte constants. These are the strings to quote when citing this sheet.</p>
+<table><tr><td>target</td><td><code>0x3212b29E33587A00FB1C83346f5dBFA69A458923</code></td></tr><tr><td>family</td><td><code>evm</code></td></tr><tr><td>code sha256</td><td><code>0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603</code></td></tr><tr><td>body bytes read</td><td><code>22174</code></td></tr><tr><td>metadata excluded</td><td><code>43 bytes (CBOR trailer, appended after compilation)</code></td></tr><tr><td>four-byte constants</td><td><code>42</code></td></tr><tr><td>register</td><td><code>16 placards v0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor</td><td><code>epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</code></td></tr><tr><td>register digest</td><td><code>0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor root</td><td><code>0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c</code></td></tr><tr><td>selector index</td><td><code>783 names, a convenience reading and not verification</code></td></tr></table>
+
+</section>
+
+<footer>
+<p>sheet sha256 <code>e7355c264fda7797fc95b3f7355e445c7ae57671fa3df01b4345a685366ebba6</code></p>
+<p>Re-derive it with <code>hazmat verify --sheet &lt;this file&gt;</code> &mdash; the digest is over these bytes, so any edit shows up.
+To cite this in writing, quote the placard id, the code sha256 and the register digest, all above.</p>
+</footer>
+</main>
+</html>

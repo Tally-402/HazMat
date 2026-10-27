@@ -1,0 +1,90 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3086 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(HAZMAT SAFETY DATA SHEET) Tj T*
+() Tj T*
+(0x27182842E098f60e3D576794A5bFFb0777E025d3 \(verified as Euler\)) Tj T*
+() Tj T*
+(Read 854 bytes of deployed bytecode and checked it against 16 registered hazards. Nothing matched, which) Tj T*
+(is not the same as safe.) Tj T*
+() Tj T*
+(  What this is: It is a contract that delegatecalls, but the pointer to its logic was not found, so) Tj T*
+(                anything below may describe only part of what runs.) Tj T*
+(  What matched: Nothing. None of the 16 registered hazards are present in this bytecode.) Tj T*
+(  What that means: Unfamiliar rather than sound. The register is shaped after a small number of) Tj T*
+(                   projects, so a contract can be perfectly normal and still match nothing. A famous) Tj T*
+(                   example on this register: The DAO, EtherDelta and Fomo3D all match nothing.) Tj T*
+() Tj T*
+(ASSERTION LEVEL: PATTERN MATCH ONLY; CONFIRMATION RUNS ARE SEPARATE) Tj T*
+(A match is a candidate, not a clearance: this sheet fingerprints a contract against registered hazard) Tj T*
+(shapes, it does not audit it. A clean sheet is not the same as safe.) Tj T*
+() Tj T*
+(HAZARDS FOUND) Tj T*
+(None of the registered hazards are present. That is not the same as safe: the register is shaped after) Tj T*
+(a handful of projects, so this contract may simply be unfamiliar to it.) Tj T*
+() Tj T*
+(WHAT WAS READ) Tj T*
+(a match means the selectors a placard asks about are present. It does not mean reachable, and a clean) Tj T*
+(sheet is not a clearance.) Tj T*
+(placards checked 16 classes 7 selectors in code 5 the register asks about 0 otherwise unaccounted 5) Tj T*
+(  0x06fdde03 name\(\)) Tj T*
+(  0x734c938f unnamed) Tj T*
+(  0xcab65f01 unnamed) Tj T*
+(  0xe9c4a3ac unnamed) Tj T*
+(  0xffffffff unnamed) Tj T*
+() Tj T*
+(NOT CHECKED AT ALL) Tj T*
+(  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
+(  - are labelled not followed) Tj T*
+(  - reachability) Tj T*
+(  - economic preconditions) Tj T*
+(  - state at any particular block) Tj T*
+(  - source-level reasoning) Tj T*
+(  - anything not covered by a placard) Tj T*
+() Tj T*
+(THE TECHNICAL PART) Tj T*
+(target 0x27182842E098f60e3D576794A5bFFb0777E025d3) Tj T*
+(family evm) Tj T*
+(code sha256 0xf0492f376493cf80fcb38de4ffeaab80dc246d94b493b0367672d6cab251bb37) Tj T*
+(body bytes read 854) Tj T*
+(metadata excluded 53 bytes \(CBOR trailer, appended after compilation\)) Tj T*
+(four-byte constants 5) Tj T*
+(register 16 placards v0xd7dea67cdf60b0bc) Tj T*
+(anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c \(epoch-3.json\)) Tj T*
+(register digest 0xd7dea67cdf60b0bc) Tj T*
+(anchor root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c) Tj T*
+(selector index 783 names, a convenience reading and not verification) Tj T*
+() Tj T*
+(Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact that carries its own digest; this PDF is the same report set for paper.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000003379 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
+startxref
+3476
+%%EOF

@@ -169,6 +169,9 @@ def match_code(code, placards, family='evm'):
                         'matched_selectors': ['0x' + item for item in required + any_of],
                         'absent_checked': len(none_of),
                         'money_bound': placard.get('money_bound', {}),
+                        'summary': placard.get('summary', ''),       # the prose a reader needs
+                        'fix': placard.get('fix', ''),
+                        'provenance': placard.get('provenance', {}),
                         'confirmed_on': placard.get('confirmed_on', [])})
     return results, {'code_bytes': len(code), 'body_bytes': len(body),
                      'metadata_bytes': len(trailer), 'push4_constants': len(constants)}

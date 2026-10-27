@@ -1,0 +1,119 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [3 0 R 5 0 R] >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2979 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(HAZMAT SAFETY DATA SHEET) Tj T*
+() Tj T*
+(0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413) Tj T*
+() Tj T*
+(Read 10,838 bytes of deployed bytecode and checked it against 16 registered hazards. Nothing matched,) Tj T*
+(which is not the same as safe.) Tj T*
+() Tj T*
+(  What this is: It is a plain contract on mainnet, read from its bytecode.) Tj T*
+(  What matched: Nothing. None of the 16 registered hazards are present in this bytecode.) Tj T*
+(  What that means: Unfamiliar rather than sound. The register is shaped after a small number of) Tj T*
+(                   projects, so a contract can be perfectly normal and still match nothing. A famous) Tj T*
+(                   example on this register: The DAO, EtherDelta and Fomo3D all match nothing.) Tj T*
+() Tj T*
+(ASSERTION LEVEL: PATTERN MATCH ONLY; CONFIRMATION RUNS ARE SEPARATE) Tj T*
+(A match is a candidate, not a clearance: this sheet fingerprints a contract against registered hazard) Tj T*
+(shapes, it does not audit it. A clean sheet is not the same as safe.) Tj T*
+() Tj T*
+(HAZARDS FOUND) Tj T*
+(None of the registered hazards are present. That is not the same as safe: the register is shaped after) Tj T*
+(a handful of projects, so this contract may simply be unfamiliar to it.) Tj T*
+() Tj T*
+(WHAT WAS READ) Tj T*
+(a match means the selectors a placard asks about are present. It does not mean reachable, and a clean) Tj T*
+(sheet is not a clearance.) Tj T*
+(placards checked 16 classes 7 selectors in code 50 the register asks about 2 otherwise unaccounted 48) Tj T*
+(  0x011081c5 unnamed) Tj T*
+(  0x013cf08b unnamed) Tj T*
+(  0x0221038a unnamed) Tj T*
+(  0x095ea7b3 approve\(address,uint256\)) Tj T*
+(  0x0c3b7b96 unnamed) Tj T*
+(  0x0e708203 unnamed) Tj T*
+(  0x149acf9a unnamed) Tj T*
+(  0x1f2dc5ef unnamed) Tj T*
+(  0x21b5b8dd unnamed) Tj T*
+(  0x237e9492 unnamed) Tj T*
+(  0x23b872dd transferFrom\(address,address,uint256\)) Tj T*
+(  0x2632bf20 unnamed) Tj T*
+(  0x34145808 unnamed) Tj T*
+(  0x39d1f908 unnamed) Tj T*
+(  0x4b6753bc unnamed) Tj T*
+(  0x4df6d6cc unnamed) Tj T*
+(  0x4e10c3ee unnamed) Tj T*
+(  0x590e1ae3 unnamed) Tj T*
+(  0x612e45a3 unnamed) Tj T*
+(  0x643f7cdd unnamed) Tj T*
+(  ... and 4 more) Tj T*
+() Tj T*
+(NOT CHECKED AT ALL) Tj T*
+(  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
+(  - are labelled not followed) Tj T*
+(  - reachability) Tj T*
+(  - economic preconditions) Tj T*
+(  - state at any particular block) Tj T*
+(  - source-level reasoning) Tj T*
+(  - anything not covered by a placard) Tj T*
+() Tj T*
+(THE TECHNICAL PART) Tj T*
+(target 0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413) Tj T*
+(family evm) Tj T*
+(code sha256 0xc436411bc184e2fd575a021b25d8600ec94b1ddccf24f198cf66f17e2273cd44) Tj T*
+(body bytes read 10838) Tj T*
+(metadata excluded 0 bytes \(CBOR trailer, appended after compilation\)) Tj T*
+(four-byte constants 50) Tj T*
+(register 16 placards v0xd7dea67cdf60b0bc) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 533 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c \(epoch-3.json\)) Tj T*
+(register digest 0xd7dea67cdf60b0bc) Tj T*
+(anchor root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c) Tj T*
+(selector index 783 names, a convenience reading and not verification) Tj T*
+() Tj T*
+(Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact that carries its own digest; this PDF is the same report set for paper.) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000003278 00000 n 
+0000003404 00000 n 
+0000003988 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R /Info << /Producer (HazMat) >> >>
+startxref
+4085
+%%EOF

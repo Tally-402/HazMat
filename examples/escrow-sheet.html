@@ -1,34 +1,96 @@
-<!doctype html><meta charset="utf-8">
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HazMat Safety Data Sheet 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c</title>
 <style>
- body{font:15px/1.5 ui-monospace,Menlo,monospace;margin:0;padding:2rem;background:#111;color:#e8e8e8}
- h1{font-size:1.2rem;margin:0 0 .2rem} h2{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;color:#8a8a8a;margin:2rem 0 .4rem}
- table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #2a2a2a;padding:.5rem .4rem;text-align:left;vertical-align:top}
- .id{color:#ffb020;white-space:nowrap} code{color:#7fd1ff;word-break:break-all} ul{padding-left:1.2rem;color:#bdbdbd}
- .banner{border:1px solid #444;padding:.6rem .8rem;margin:1rem 0;background:#181818}
- .sel{color:#9b9b9b;font-size:.85em}
+:root{--ink:#16181c;--dim:#5c636e;--line:#dfe3e8;--bg:#fff;--panel:#f6f7f9;--acc:#8a5a00;--warn:#8a1f1f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:46rem;margin:0 auto;padding:3rem 1.4rem 5rem}
+h1{font-size:1.9rem;line-height:1.2;margin:.2rem 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.15rem;margin:2.6rem 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+h3{font-size:1rem;margin:1.6rem 0 .3rem}
+p{margin:.6rem 0}
+ul{margin:.4rem 0 .9rem;padding-left:1.15rem}
+li{margin:.3rem 0}
+small,.dim{color:var(--dim)}
+.kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.lede{border-bottom:3px solid var(--ink);padding-bottom:1.1rem;margin-bottom:1.6rem}
+.standfirst{font-size:1.08rem;margin:.7rem 0 0}
+.facts{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem;margin:.9rem 0 0;font-size:.82rem}
+.badge{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:.05rem .55rem;
+  font-size:.75rem;color:var(--dim);white-space:nowrap}
+.badge.good{border-color:#1f6f43;color:#1f6f43}
+.badge.bad{border-color:var(--warn);color:var(--warn)}
+.banner{background:var(--panel);border-left:3px solid var(--acc);padding:.7rem .9rem;margin:1.2rem 0;font-size:.92rem}
+.hazard{border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;margin:1.1rem 0}
+.hazard h3{margin-top:0}
+.hazard .id{font-weight:600;color:var(--acc)}
+.hazard .why{border-left:2px solid var(--line);padding-left:.7rem;margin:.6rem 0;color:var(--dim);font-size:.94rem}
+.evidence{font-size:.82rem;color:var(--dim);margin-top:.7rem}
+table{border-collapse:collapse;width:100%;margin:.7rem 0;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:.45rem .5rem}
+th{font-weight:600;color:var(--dim);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+code{font:0.88em ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--panel);padding:0 .25rem;border-radius:3px}
+ul.sel{columns:2;font-size:.85rem;color:var(--dim);list-style:none;padding-left:0}
+ul.sel li{margin:.15rem 0}
+details{margin:.6rem 0}
+summary{cursor:pointer;color:var(--dim);font-size:.9rem}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.85rem;color:var(--dim)}
+@media print{body{font-size:11pt}main{padding:0}.hazard{break-inside:avoid}h2{break-after:avoid}}
 </style>
-<h1>HazMat Safety Data Sheet</h1>
-<div>target <code>0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c</code> &middot; family evm</div>
-<div>subject contract <code>0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c</code> &middot; verified as ClausTokenDealEscrow</div>
+<main>
+<header class="lede">
+  <div class="kicker">HazMat &middot; safety data sheet</div>
+  <h1>0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c <span class="badge">verified as ClausTokenDealEscrow</span></h1>
+  <p class="standfirst">Read 11,566 bytes of deployed bytecode and checked it against 16 registered hazards. 3 hazards are present, reproduced against this very contract.</p>
+  <div class="facts"><span class="badge">contract on mainnet</span><span class="badge">11566 bytes of code</span><span class="badge">3 of 16 hazards</span><span class="badge">epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</span></div>
+  <p class="dim" style="font-size:.82rem">contract <code>0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c</code> &middot; verified as ClausTokenDealEscrow</p>
+</header>
 
-<div>code sha256 <code>0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139</code></div>
-<div>register 16 placards v0xd7dea67cdf60b0bc &middot; body 11566B &middot; metadata 53B excluded &middot; 49 four-byte constants</div>
-<div>anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</div>
-<div class="banner"><b>Assertion level: pattern match only; confirmation runs are separate.</b> A match is a candidate, not a clearance. 3 placard(s) matched
-A placard's own tier is in its row and says whether it was ever reproduced against a live target.</div>
+<div class="banner"><b>Assertion level: pattern match only; confirmation runs are separate.</b> A match is a candidate, not a clearance:
+this sheet fingerprints a contract against registered hazard shapes, it does not audit it.
+A clean sheet is not the same as safe.</div>
+
+<section>
+<h2>Summary</h2>
+<ul><li><b>What this is</b>: It is a plain contract on mainnet, read from its bytecode.</li><li><b>What matched</b>: 3 of the 16 registered hazards are present: HZ-001 (ordering), HZ-009 (ordering), HZ-005 (stranded-value).</li><li><b>How sure</b>: HZ-001, HZ-009, HZ-005 were reproduced against this exact contract, not a lookalike.</li><li><b>The sharpest one</b>: HZ-001: A still-valid action is destroyed by a permissionless trigger in the same block</li><li><b>What is at stake</b>: one deal amount, which is the worker's entire payment on the affected deal.</li><li><b>What to do about it</b>: Bound the still-valid exit by the same clock as the permissionless trigger, or document which exit is authoritative after the window.</li><li><b>Also</b>: Define the authoritative exit for the overlap, or bound both paths by the same clock.</li><li><b>Also</b>: Add a sweep for stray value, or document that it is donated.</li></ul>
+</section>
+
+<section>
+<h2>Hazards found</h2>
+<article class="hazard" id="HZ-001"><h3><span class="id">HZ-001</span> &middot; A still-valid action is destroyed by a permissionless trigger in the same block</h3><div><span class="badge">class 2 ordering</span> <span class="badge good">confirmed on this target</span></div><p>Two exits are legal in the same block and pay opposite amounts. The transaction that lands first decides, and the losing exit cannot be repaired because the other is already dead from its own clock.</p><p><b>What is at stake:</b> one deal amount, which is the worker&#x27;s entire payment on the affected deal.</p><p><b>What to do:</b> Bound the still-valid exit by the same clock as the permissionless trigger, or document which exit is authoritative after the window.</p><p class="evidence">Reproduced here: <code>confirmations/HZ-001-c2292af8.json</code> &mdash; a rebuild of the verified source and the probes in it passed. Confirming behaviour, not intent.</p><div class="evidence">matched by selectors <code>0xe4725ba1 0x7c7a9804 0x82cbf88b</code> &middot; first observed on github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d</div></article><article class="hazard" id="HZ-009"><h3><span class="id">HZ-009</span> &middot; Two permissionless exits are both legal in one block and pay opposite amounts</h3><div><span class="badge">class 2 ordering</span> <span class="badge good">confirmed on this target</span></div><p>Inside one block a stranger trigger and the buyer exit are both valid and settle the deal differently. Block ordering alone decides who is paid, and the loser cannot repair afterwards because the other path is already closed by its own clock.</p><p><b>What is at stake:</b> one deal: full price on one ordering, zero on the other.</p><p><b>What to do:</b> Define the authoritative exit for the overlap, or bound both paths by the same clock.</p><p class="evidence">Reproduced here: <code>confirmations/HZ-009-c2292af8.json</code> &mdash; a rebuild of the verified source and the probes in it passed. Confirming behaviour, not intent.</p><div class="evidence">matched by selectors <code>0xc9566ca9 0x7249fbb6 0xe4725ba1 0x7c7a9804</code> &middot; first observed on github.com/contractclaus/claus-network@8dbf692688da640a5dc275df58f1a58a405b508d</div></article><article class="hazard" id="HZ-005"><h3><span class="id">HZ-005</span> &middot; Value arriving outside the accounting has no sweep</h3><div><span class="badge">class 7 stranded-value</span> <span class="badge good">confirmed on this target</span> <span class="badge">3 absence checks</span></div><p>A contract that pays out only from internal credits accepts forced native value or direct token transfers, counts them in no total, and offers no function to recover them. Accounting stays correct, so nothing breaks and nothing notices.</p><p><b>What is at stake:</b> the stranded amount itself, unbounded by any ceiling.</p><p><b>What to do:</b> Add a sweep for stray value, or document that it is donated.</p><p class="evidence">Reproduced here: <code>confirmations/HZ-005-c2292af8.json</code> &mdash; a rebuild of the verified source and the probes in it passed. Confirming behaviour, not intent.</p><div class="evidence">matched by selectors <code>0x70b6fbec 0xb12ae89c 0x9b40b785</code> &middot; first observed on github.com/contractclaus/claus-network@8dbf692</div></article>
+</section>
+
+<section>
 <h2>What was read</h2>
-<div class="banner">a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.</div>
+<p>a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.</p>
 <table>
 <tr><th>placards checked</th><th>classes</th><th>selectors in code</th><th>the register asks about</th><th>otherwise unaccounted</th></tr>
-<tr><td>16</td><td>7</td><td>49</td><td>9</td><td>40</td></tr>
+<tr><td class="num">16</td><td class="num">7</td><td class="num">49</td><td class="num">9</td><td class="num">40</td></tr>
 </table>
-<h2>Unaccounted selectors (nearest misses)</h2>
-<ul class="sel"><li><code>0x0256965f</code> unindexed</li><li><code>0x06fda65d</code> unindexed</li><li><code>0x0b135d3f</code> unindexed</li><li><code>0x12171d83</code> unindexed</li><li><code>0x1919585b</code> unindexed</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2cd44ac3</code> unindexed</li><li><code>0x383630b7</code> unindexed</li><li><code>0x390d83ad</code> resolve(bytes32,uint256,bytes32,uint64,bytes)</li><li><code>0x4584712b</code> unindexed</li><li><code>0x48b44a76</code> runPlan(bytes32,uint32)</li><li><code>0x4d342432</code> unindexed</li><li><code>0x4e487b71</code> Panic(uint256)</li><li><code>0x51a6fad5</code> getDeal(bytes32)</li><li><code>0x5274afe7</code> unindexed</li><li><code>0x56891412</code> unindexed</li><li><code>0x6f20b45d</code> unindexed</li><li><code>0x81cd872a</code> unindexed</li><li><code>0x84b0196e</code> eip712Domain()</li><li><code>0x9f040b00</code> unindexed</li><li><code>0xa0f73826</code> getPlan(bytes32)</li><li><code>0xa7873c1b</code> unindexed</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa4f2653</code> unindexed</li></ul>
-<h2>Placards</h2>
-<table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
-<tr><td class="id">HZ-001</td><td>2 ordering</td><td>A still-valid action is destroyed by a permissionless trigger in the same block</td><td>confirmed <b>on this target</b> <code>confirmations/HZ-001-c2292af8.json</code></td><td>one deal amount, which is the worker&#x27;s entire payment on the affected deal</td><td class="sel">0xe4725ba1 0x7c7a9804 0x82cbf88b</td></tr>
-<tr><td class="id">HZ-005</td><td>7 stranded-value</td><td>Value arriving outside the accounting has no sweep</td><td>confirmed <b>on this target</b> <code>confirmations/HZ-005-c2292af8.json</code></td><td>the stranded amount itself, unbounded by any ceiling</td><td class="sel">0x70b6fbec 0xb12ae89c 0x9b40b785 &middot; 3 absence checks</td></tr>
-<tr><td class="id">HZ-009</td><td>2 ordering</td><td>Two permissionless exits are both legal in one block and pay opposite amounts</td><td>confirmed <b>on this target</b> <code>confirmations/HZ-009-c2292af8.json</code></td><td>one deal: full price on one ordering, zero on the other</td><td class="sel">0xc9566ca9 0x7249fbb6 0xe4725ba1 0x7c7a9804</td></tr></table>
-<h2>Not checked</h2><ul><li>resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed</li><li>reachability</li><li>economic preconditions</li><li>state at any particular block</li><li>source-level reasoning</li><li>anything not covered by a placard</li></ul>
-<footer><p>sheet sha256 <code>a52e2ff3de6d10b7dfdc9e8e75b3ae76a9d99ac80caf40d59015ffa856e3602a</code> &middot; re-derive with <code>hazmat verify</code>; cite the id, the code sha256 and the register digest.</p></footer>
+<p class="dim">9 of the 49 selectors in this contract are asked about by some placard; the other 40 are listed below so you can see what was skipped.</p>
+<details><summary>Unaccounted selectors &mdash; the nearest misses (24). These are in the code and no registered hazard asks about them.</summary>
+<ul class="sel"><li><code>0x0256965f</code> unnamed</li><li><code>0x06fda65d</code> unnamed</li><li><code>0x0b135d3f</code> unnamed</li><li><code>0x12171d83</code> unnamed</li><li><code>0x1919585b</code> unnamed</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2cd44ac3</code> unnamed</li><li><code>0x383630b7</code> unnamed</li><li><code>0x390d83ad</code> resolve(bytes32,uint256,bytes32,uint64,bytes)</li><li><code>0x4584712b</code> unnamed</li><li><code>0x48b44a76</code> runPlan(bytes32,uint32)</li><li><code>0x4d342432</code> unnamed</li><li><code>0x4e487b71</code> Panic(uint256)</li><li><code>0x51a6fad5</code> getDeal(bytes32)</li><li><code>0x5274afe7</code> unnamed</li><li><code>0x56891412</code> unnamed</li><li><code>0x6f20b45d</code> unnamed</li><li><code>0x81cd872a</code> unnamed</li><li><code>0x84b0196e</code> eip712Domain()</li><li><code>0x9f040b00</code> unnamed</li><li><code>0xa0f73826</code> getPlan(bytes32)</li><li><code>0xa7873c1b</code> unnamed</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa4f2653</code> unnamed</li></ul></details>
+</section>
+
+<section>
+<h2>Not checked at all</h2>
+<ul><li>resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed</li><li>reachability</li><li>economic preconditions</li><li>state at any particular block</li><li>source-level reasoning</li><li>anything not covered by a placard</li></ul>
+</section>
+
+<section>
+<h2>The technical part</h2>
+<p class="dim" id="pins">register 16 placards v0xd7dea67cdf60b0bc &middot; anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json) &middot; body 11566B read, 53B of metadata excluded, 49 four-byte constants. These are the strings to quote when citing this sheet.</p>
+<table><tr><td>target</td><td><code>0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c</code></td></tr><tr><td>family</td><td><code>evm</code></td></tr><tr><td>code sha256</td><td><code>0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139</code></td></tr><tr><td>body bytes read</td><td><code>11566</code></td></tr><tr><td>metadata excluded</td><td><code>53 bytes (CBOR trailer, appended after compilation)</code></td></tr><tr><td>four-byte constants</td><td><code>49</code></td></tr><tr><td>register</td><td><code>16 placards v0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor</td><td><code>epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</code></td></tr><tr><td>register digest</td><td><code>0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor root</td><td><code>0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c</code></td></tr><tr><td>selector index</td><td><code>783 names, a convenience reading and not verification</code></td></tr></table>
+
+</section>
+
+<footer>
+<p>sheet sha256 <code>bc69aa76c9c7f68381dc2a93edade99f5903c27b88cbb25b5a6e9c52abd9104d</code></p>
+<p>Re-derive it with <code>hazmat verify --sheet &lt;this file&gt;</code> &mdash; the digest is over these bytes, so any edit shows up.
+To cite this in writing, quote the placard id, the code sha256 and the register digest, all above.</p>
+</footer>
+</main>
+</html>

@@ -9,45 +9,45 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 1852 >>
+<< /Length 3436 >>
 stream
 BT
 /F1 9 Tf 11.5 TL
 48 794 Td
 (HAZMAT SAFETY DATA SHEET) Tj T*
 () Tj T*
-(target 0xe1cE2345d25462996AE27F58E3e001245e043EA4 family evm) Tj T*
-(code sha256 0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1) Tj T*
-(register 16 placards body 522 bytes metadata 0 excluded 6 four-byte constants) Tj T*
-(assertion level: pattern match only; confirmation runs are separate) Tj T*
+(0xe1cE2345d25462996AE27F58E3e001245e043EA4 \(verified as ClausManagedProject, CounterV2\)) Tj T*
+() Tj T*
+(Read 522 bytes of deployed bytecode and checked it against 16 registered hazards. Nothing matched, which) Tj T*
+(is not the same as safe.) Tj T*
+() Tj T*
+(  What this is: It is a proxy: what you call goes to the logic at) Tj T*
+(                0xc2f10e8bdd63277a235b255cb1e840a34b50e98a, and that is what was read.) Tj T*
+(  What matched: Nothing. None of the 16 registered hazards are present in this bytecode.) Tj T*
+(  What that means: Unfamiliar rather than sound. The register is shaped after a small number of) Tj T*
+(                   projects, so a contract can be perfectly normal and still match nothing. A famous) Tj T*
+(                   example on this register: The DAO, EtherDelta and Fomo3D all match nothing.) Tj T*
+() Tj T*
+(ASSERTION LEVEL: PATTERN MATCH ONLY; CONFIRMATION RUNS ARE SEPARATE) Tj T*
+(A match is a candidate, not a clearance: this sheet fingerprints a contract against registered hazard) Tj T*
+(shapes, it does not audit it. A clean sheet is not the same as safe.) Tj T*
+() Tj T*
+(HAZARDS FOUND) Tj T*
+(None of the registered hazards are present. That is not the same as safe: the register is shaped after) Tj T*
+(a handful of projects, so this contract may simply be unfamiliar to it.) Tj T*
 () Tj T*
 (WHAT WAS READ) Tj T*
+(a match means the selectors a placard asks about are present. It does not mean reachable, and a clean) Tj T*
+(sheet is not a clearance.) Tj T*
 (placards checked 16 classes 7 selectors in code 6 the register asks about 0 otherwise unaccounted 6) Tj T*
-(  0x06661abd unindexed) Tj T*
-(  0x35420fd9 unindexed) Tj T*
-(  0x4e487b71 unindexed) Tj T*
-(  0xb326e4a9 unindexed) Tj T*
-(  0xc34c08e5 unindexed) Tj T*
-(  0xd09de08a unindexed) Tj T*
+(  0x06661abd unnamed) Tj T*
+(  0x35420fd9 unnamed) Tj T*
+(  0x4e487b71 Panic\(uint256\)) Tj T*
+(  0xb326e4a9 unnamed) Tj T*
+(  0xc34c08e5 unnamed) Tj T*
+(  0xd09de08a unnamed) Tj T*
 () Tj T*
-(SUBJECT) Tj T*
-() Tj T*
-(proxy 0xe1ce2345d25462996ae27f58e3e001245e043ea4) Tj T*
-(resolved via implementation\(\) getter) Tj T*
-(effective 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a) Tj T*
-(verified as ClausManagedProject \(exact_match\)) Tj T*
-(verified as CounterV2 \(match\)) Tj T*
-(ADDRESSES SCANNED) Tj T*
-(requested 0xe1ce2345d25462996ae27f58e3e001245e043ea4 12 selectors 1936 bytes) Tj T*
-(implementation 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a 6 selectors 522 bytes) Tj T*
-() Tj T*
-(ASSERTION) Tj T*
-(a match is a candidate, not a clearance. Nothing here claims the contract is safe.) Tj T*
-() Tj T*
-(PLACARDS) Tj T*
-(no placard matched. That is not the same as safe.) Tj T*
-() Tj T*
-(NOT CHECKED) Tj T*
+(NOT CHECKED AT ALL) Tj T*
 (  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
 (  - are labelled not followed) Tj T*
 (  - reachability) Tj T*
@@ -56,7 +56,25 @@ BT
 (  - source-level reasoning) Tj T*
 (  - anything not covered by a placard) Tj T*
 () Tj T*
-(cite the placard id, the code sha256 and the register digest.) Tj T*
+(THE TECHNICAL PART) Tj T*
+(target 0xe1cE2345d25462996AE27F58E3e001245e043EA4) Tj T*
+(family evm) Tj T*
+(code sha256 0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1) Tj T*
+(body bytes read 522) Tj T*
+(metadata excluded 0 bytes \(CBOR trailer, appended after compilation\)) Tj T*
+(four-byte constants 6) Tj T*
+(register 16 placards v0xd7dea67cdf60b0bc) Tj T*
+(anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c \(epoch-3.json\)) Tj T*
+(register digest 0xd7dea67cdf60b0bc) Tj T*
+(anchor root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c) Tj T*
+(selector index 783 names, a convenience reading and not verification) Tj T*
+() Tj T*
+(ADDRESSES SCANNED) Tj T*
+(a proxy reads as two rows: the proxy itself, and the implementation its logic came from) Tj T*
+(requested 0xe1ce2345d25462996ae27f58e3e001245e043ea4 12 selectors 1936 bytes) Tj T*
+(implementation 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a 6 selectors 522 bytes) Tj T*
+() Tj T*
+(Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact that carries its own digest; this PDF is the same report set for paper.) Tj T*
 ET
 endstream
 endobj
@@ -70,9 +88,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000002145 00000 n 
+0000003729 00000 n 
 trailer
 << /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-2242
+3826
 %%EOF

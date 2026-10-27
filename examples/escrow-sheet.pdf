@@ -3,66 +3,114 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Count 1 /Kids [3 0 R] >>
+<< /Type /Pages /Count 2 /Kids [3 0 R 5 0 R] >>
 endobj
 3 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2678 >>
+<< /Length 4576 >>
 stream
 BT
 /F1 9 Tf 11.5 TL
 48 794 Td
 (HAZMAT SAFETY DATA SHEET) Tj T*
 () Tj T*
-(target 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c family evm) Tj T*
-(code sha256 0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139) Tj T*
-(register 16 placards body 11566 bytes metadata 53 excluded 49 four-byte constants) Tj T*
-(assertion level: pattern match only; confirmation runs are separate) Tj T*
+(0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c \(verified as ClausTokenDealEscrow\)) Tj T*
+() Tj T*
+(Read 11,566 bytes of deployed bytecode and checked it against 16 registered hazards. 3 hazards are) Tj T*
+(present, reproduced against this very contract.) Tj T*
+() Tj T*
+(  What this is: It is a plain contract on mainnet, read from its bytecode.) Tj T*
+(  What matched: 3 of the 16 registered hazards are present: HZ-001 \(ordering\), HZ-009 \(ordering\), HZ-005) Tj T*
+(                \(stranded-value\).) Tj T*
+(  How sure: HZ-001, HZ-009, HZ-005 were reproduced against this exact contract, not a lookalike.) Tj T*
+(  The sharpest one: HZ-001: A still-valid action is destroyed by a permissionless trigger in the same) Tj T*
+(                    block) Tj T*
+(  What is at stake: one deal amount, which is the worker's entire payment on the affected deal.) Tj T*
+(  What to do about it: Bound the still-valid exit by the same clock as the permissionless trigger, or) Tj T*
+(                       document which exit is authoritative after the window.) Tj T*
+(  Also: Define the authoritative exit for the overlap, or bound both paths by the same clock.) Tj T*
+(  Also: Add a sweep for stray value, or document that it is donated.) Tj T*
+() Tj T*
+(ASSERTION LEVEL: PATTERN MATCH ONLY; CONFIRMATION RUNS ARE SEPARATE) Tj T*
+(A match is a candidate, not a clearance: this sheet fingerprints a contract against registered hazard) Tj T*
+(shapes, it does not audit it. A clean sheet is not the same as safe.) Tj T*
+() Tj T*
+(HAZARDS FOUND) Tj T*
+() Tj T*
+(HZ-001 A still-valid action is destroyed by a permissionless trigger in the same block) Tj T*
+(  class 2 ordering   CONFIRMED ON THIS TARGET) Tj T*
+(  Two exits are legal in the same block and pay opposite amounts. The transaction that lands first) Tj T*
+(  decides, and the losing exit cannot be repaired because the other is already dead from its own clock.) Tj T*
+(  What is at stake: one deal amount, which is the worker's entire payment on the affected deal.) Tj T*
+(  What to do: Bound the still-valid exit by the same clock as the permissionless trigger, or document) Tj T*
+(              which exit is authoritative after the window.) Tj T*
+(  Reproduced here: confirmations/HZ-001-c2292af8.json - a rebuild of the verified source and the probes) Tj T*
+(                   in it passed. Confirming behaviour, not intent.) Tj T*
+(  matched by selectors: 0xe4725ba1 0x7c7a9804 0x82cbf88b) Tj T*
+() Tj T*
+(HZ-005 Value arriving outside the accounting has no sweep) Tj T*
+(  class 7 stranded-value   CONFIRMED ON THIS TARGET) Tj T*
+(  A contract that pays out only from internal credits accepts forced native value or direct token) Tj T*
+(  transfers, counts them in no total, and offers no function to recover them. Accounting stays correct,) Tj T*
+(  so nothing breaks and nothing notices.) Tj T*
+(  What is at stake: the stranded amount itself, unbounded by any ceiling.) Tj T*
+(  What to do: Add a sweep for stray value, or document that it is donated.) Tj T*
+(  Reproduced here: confirmations/HZ-005-c2292af8.json - a rebuild of the verified source and the probes) Tj T*
+(                   in it passed. Confirming behaviour, not intent.) Tj T*
+(  matched by selectors: 0x70b6fbec 0xb12ae89c 0x9b40b785) Tj T*
+() Tj T*
+(HZ-009 Two permissionless exits are both legal in one block and pay opposite amounts) Tj T*
+(  class 2 ordering   CONFIRMED ON THIS TARGET) Tj T*
+(  Inside one block a stranger trigger and the buyer exit are both valid and settle the deal differently.) Tj T*
+(  Block ordering alone decides who is paid, and the loser cannot repair afterwards because the other) Tj T*
+(  path is already closed by its own clock.) Tj T*
+(  What is at stake: one deal: full price on one ordering, zero on the other.) Tj T*
+(  What to do: Define the authoritative exit for the overlap, or bound both paths by the same clock.) Tj T*
+(  Reproduced here: confirmations/HZ-009-c2292af8.json - a rebuild of the verified source and the probes) Tj T*
+(                   in it passed. Confirming behaviour, not intent.) Tj T*
+(  matched by selectors: 0xc9566ca9 0x7249fbb6 0xe4725ba1 0x7c7a9804) Tj T*
 () Tj T*
 (WHAT WAS READ) Tj T*
+(a match means the selectors a placard asks about are present. It does not mean reachable, and a clean) Tj T*
+(sheet is not a clearance.) Tj T*
 (placards checked 16 classes 7 selectors in code 49 the register asks about 9 otherwise unaccounted 40) Tj T*
-(  0x0256965f unindexed) Tj T*
-(  0x06fda65d unindexed) Tj T*
-(  0x0b135d3f unindexed) Tj T*
-(  0x12171d83 unindexed) Tj T*
-(  0x1919585b unindexed) Tj T*
+(  0x0256965f unnamed) Tj T*
+(  0x06fda65d unnamed) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 1956 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
+(  0x0b135d3f unnamed) Tj T*
+(  0x12171d83 unnamed) Tj T*
+(  0x1919585b unnamed) Tj T*
 (  0x23b872dd transferFrom\(address,address,uint256\)) Tj T*
-(  0x2cd44ac3 unindexed) Tj T*
-(  0x383630b7 unindexed) Tj T*
+(  0x2cd44ac3 unnamed) Tj T*
+(  0x383630b7 unnamed) Tj T*
 (  0x390d83ad resolve\(bytes32,uint256,bytes32,uint64,bytes\)) Tj T*
-(  0x4584712b unindexed) Tj T*
+(  0x4584712b unnamed) Tj T*
 (  0x48b44a76 runPlan\(bytes32,uint32\)) Tj T*
-(  0x4d342432 unindexed) Tj T*
+(  0x4d342432 unnamed) Tj T*
+(  0x4e487b71 Panic\(uint256\)) Tj T*
+(  0x51a6fad5 getDeal\(bytes32\)) Tj T*
+(  0x5274afe7 unnamed) Tj T*
+(  0x56891412 unnamed) Tj T*
+(  0x6f20b45d unnamed) Tj T*
+(  0x81cd872a unnamed) Tj T*
+(  0x84b0196e eip712Domain\(\)) Tj T*
+(  0x9f040b00 unnamed) Tj T*
+(  ... and 4 more) Tj T*
 () Tj T*
-(SUBJECT) Tj T*
-() Tj T*
-(contract 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c) Tj T*
-(verified as ClausTokenDealEscrow \(exact_match\)) Tj T*
-() Tj T*
-(ASSERTION) Tj T*
-(a match is a candidate, not a clearance. Nothing here claims the contract is safe.) Tj T*
-() Tj T*
-(PLACARDS) Tj T*
-() Tj T*
-(HZ-001  class 2 ordering  tier confirmed on this target  [scan is pattern]) Tj T*
-(  A still-valid action is destroyed by a permissionless trigger in the same block) Tj T*
-(  money: one deal amount, which is the worker's entire payment on the affected deal) Tj T*
-(  matched: 0xe4725ba1 0x7c7a9804 0x82cbf88b) Tj T*
-() Tj T*
-(HZ-005  class 7 stranded-value  tier confirmed on this target  [scan is pattern]) Tj T*
-(  Value arriving outside the accounting has no sweep) Tj T*
-(  money: the stranded amount itself, unbounded by any ceiling) Tj T*
-(  matched: 0x70b6fbec 0xb12ae89c 0x9b40b785) Tj T*
-(  absence checks: 3) Tj T*
-() Tj T*
-(HZ-009  class 2 ordering  tier confirmed on this target  [scan is pattern]) Tj T*
-(  Two permissionless exits are both legal in one block and pay opposite amounts) Tj T*
-(  money: one deal: full price on one ordering, zero on the other) Tj T*
-(  matched: 0xc9566ca9 0x7249fbb6 0xe4725ba1 0x7c7a9804) Tj T*
-() Tj T*
-(NOT CHECKED) Tj T*
+(NOT CHECKED AT ALL) Tj T*
 (  - resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons) Tj T*
 (  - are labelled not followed) Tj T*
 (  - reachability) Tj T*
@@ -71,23 +119,38 @@ BT
 (  - source-level reasoning) Tj T*
 (  - anything not covered by a placard) Tj T*
 () Tj T*
-(cite the placard id, the code sha256 and the register digest.) Tj T*
+(THE TECHNICAL PART) Tj T*
+(target 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c) Tj T*
+(family evm) Tj T*
+(code sha256 0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139) Tj T*
+(body bytes read 11566) Tj T*
+(metadata excluded 53 bytes \(CBOR trailer, appended after compilation\)) Tj T*
+(four-byte constants 49) Tj T*
+(register 16 placards v0xd7dea67cdf60b0bc) Tj T*
+(anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c \(epoch-3.json\)) Tj T*
+(register digest 0xd7dea67cdf60b0bc) Tj T*
+(anchor root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c) Tj T*
+(selector index 783 names, a convenience reading and not verification) Tj T*
+() Tj T*
+(Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact that carries its own digest; this PDF is the same report set for paper.) Tj T*
 ET
 endstream
 endobj
-5 0 obj
+7 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
 endobj
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000009 00000 n 
 0000000058 00000 n 
-0000000115 00000 n 
-0000000241 00000 n 
-0000002971 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000004875 00000 n 
+0000005001 00000 n 
+0000007009 00000 n 
 trailer
-<< /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
+<< /Size 8 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-3068
+7106
 %%EOF

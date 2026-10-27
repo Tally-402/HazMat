@@ -3,6 +3,17 @@
 Text-only by design: the sheet is a document. Layout is deterministic, so the
 same report always produces the same bytes, which is what makes it citable.
 """
+import re
+from . import sds
+
+
+def clean(value):
+    """Strip the few entities the HTML uses so the text version reads the same."""
+    return re.sub(r"&[a-z]+;", lambda m: {"&mdash;": "--", "&middot;": "*", "&rarr;": "->", "&ndash;": "-",
+                                         "&amp;": "&", "&lt;": "<", "&gt;": ">"}
+                  .get(m.group(0), m.group(0)), str(value))
+
+
 A4 = (595, 842)
 MARGIN = 48
 LEADING = 11.5
@@ -36,69 +47,98 @@ def wrap(text, width=WRAP):
     return lines or ['']
 
 
+def bullet_lines(label, text, indent=2, width=WRAP):
+    """A labelled paragraph with a hanging indent, so a wrapped line never repeats the label."""
+    prefix = ' ' * indent + (label + ': ' if label else '')
+    lines = wrap(clean(text), max(width - len(prefix), 24))
+    return [prefix + lines[0]] + [' ' * len(prefix) + line for line in lines[1:]]
+
+
 def capitalise(text):
     return text.upper() if len(text) < 60 and text.isascii() else text
 
 
 def lines_for(report):
-    """Every line of the document, in order, unwrapped to pages later."""
+    """Every line of the document, in order, unwrapped to pages later.
+
+    Same outline and same generated sentences as the HTML sheet, so the two cannot drift.
+    """
     out = ['HAZMAT SAFETY DATA SHEET', '']
-    out += wrap('target %s   family %s' % (report['target'], report.get('family', 'evm')))
-    out += wrap('code sha256 %s' % report['code_sha256'])
-    out += wrap('register %s placards   body %s bytes   metadata %s excluded   %s four-byte constants'
-                % (report['register_size'], report['stats']['body_bytes'],
-                   report['stats']['metadata_bytes'], report['stats']['push4_constants']))
-    out += wrap('assertion level: %s' % report['assertion']) + ['']
+    subject = report.get('subject') or {}
+    identity = ', '.join(v.get('name') for v in (subject.get('identity') or {}).values() if v.get('name'))
+    title = report['target'] + ('  (verified as %s)' % identity if identity else '')
+    out += wrap(title)
+    out += ['']
+    if report['matches']:
+        out += wrap('Read %s bytes of deployed bytecode and checked it against %s registered hazards. '
+                    '%d %s present%s.'
+                    % ('{:,}'.format(report['stats']['body_bytes']), report['register_size'], len(report['matches']),
+                       'hazard is' if len(report['matches']) == 1 else 'hazards are',
+                       ', reproduced against this very contract' if any(m.get('tier') == 'confirmed' and
+                       m.get('confirmed_on') for m in report['matches']) else ''))
+    else:
+        out += wrap('Read %s bytes of deployed bytecode and checked it against %s registered hazards. '
+                    'Nothing matched, which is not the same as safe.'
+                    % ('{:,}'.format(report['stats']['body_bytes']), report['register_size']))
+    out += ['']
+    for label, text in sds.summarise(report):
+        out += bullet_lines(label, text)
+    out += ['', 'ASSERTION LEVEL: ' + report['assertion'].upper()]
+    out += wrap('  A match is a candidate, not a clearance: this sheet fingerprints a contract against '
+                'registered hazard shapes, it does not audit it. A clean sheet is not the same as safe.', WRAP - 2)
+    out += ['', 'HAZARDS FOUND']
+    if not report['matches']:
+        out += wrap('  None of the registered hazards are present. That is not the same as safe: the register is '
+                    'shaped after a handful of projects, so this contract may simply be unfamiliar to it.', WRAP - 2)
+    for m in report['matches']:
+        here = (report.get('subject') or {}).get('effective') or report.get('target', '')
+        reproduced = [c for c in (m.get('confirmed_on') or []) if here and here.lower() in (c.get('target') or '').lower()]
+        out += ['']
+        out += wrap('%s  %s' % (m['id'], clean(m['title'])))
+        out.append('  class %s %s   %s' % (m['placard_class'], m.get('placard_class_name') or '',
+                                           'CONFIRMED ON THIS TARGET' if reproduced else '%s placard' % m.get('tier')))
+        if m.get('summary'):
+            out += ['  ' + line for line in wrap(clean(m['summary']), WRAP - 2)]
+        if m.get('money_bound', {}).get('expression'):
+            out += bullet_lines('What is at stake', clean(m['money_bound']['expression']).rstrip('.') + '.')
+        if m.get('fix'):
+            out += bullet_lines('What to do', m['fix'])
+        if reproduced:
+            record = (reproduced[0].get('confirmation') or {}).get('record')
+            if record:
+                out += bullet_lines('Reproduced here', clean(record) + ' - a rebuild of the verified source and '
+                                    'the probes in it passed. Confirming behaviour, not intent.')
+        precedent = (m.get('provenance') or {}).get('precedent')
+        if precedent:
+            out += ['  ' + line for line in wrap(clean(precedent).rstrip('.') + '.', WRAP - 2)]
+        out += bullet_lines('matched by selectors', ' '.join(m.get('matched_selectors') or []))
     cov = report.get('coverage') or {}
-    out.append('WHAT WAS READ')
-    out += wrap('placards checked %s   classes %s   selectors in code %s   the register asks about %s   otherwise unaccounted %s'
+    out += ['', 'WHAT WAS READ']
+    out += wrap(clean(cov.get('means', '')), WRAP)
+    out += wrap('placards checked %s   classes %s   selectors in code %s   the register asks about %s   '
+                'otherwise unaccounted %s'
                 % (cov.get('placards_checked', 0), len(cov.get('classes_checked', [])),
                    cov.get('selectors_in_code', 0), cov.get('selectors_the_register_asks_about', 0),
                    cov.get('selectors_otherwise_unaccounted', 0)))
-    for miss in (cov.get('unaccounted_sample') or [])[:12]:
-        out += ['  ' + line for line in wrap('%s %s' % (miss['selector'], miss['signature'] or 'unindexed'), WRAP - 3)]
-    subject = report.get('subject')
-    out += ['', 'SUBJECT', '']
-    if not subject:
-        out += wrap('raw code, not an address, so nothing was resolved')
-    else:
-        out += wrap('%s %s' % (subject.get('kind'), subject.get('requested')))
-        if subject.get('via'):
-            out += wrap('resolved via %s' % subject['via'])
-        if subject.get('effective') and subject['effective'] != subject.get('requested'):
-            out += wrap('effective %s' % subject['effective'])
-        for value in (subject.get('identity') or {}).values():
-            if value.get('name'):
-                out += wrap('verified as %s (%s)' % (value['name'], value.get('match') or 'match state unknown'))
+    for miss in (cov.get('unaccounted_sample') or [])[:20]:
+        out += ['  ' + line for line in wrap('%s %s' % (miss['selector'], miss['signature'] or 'unnamed'), WRAP - 3)]
+    if len(cov.get('unaccounted_sample') or []) > 20:
+        out.append('  ... and %d more' % (len(cov['unaccounted_sample']) - 20))
+    out += ['', 'NOT CHECKED AT ALL']
+    for item in report['not_checked']:
+        out += ['  - ' + line for line in wrap(clean(item), WRAP - 4)]
+    out += ['', 'THE TECHNICAL PART']
+    for label, value in sds.technical_facts(report):
+        out += wrap('  %-20s %s' % (label, value), WRAP)
     if len(report.get('scans') or []) > 1:
-        out.append('ADDRESSES SCANNED')
+        out += ['', 'ADDRESSES SCANNED']
+        out += wrap('  a proxy reads as two rows: the proxy itself, and the implementation its logic came from', WRAP - 2)
         for row in report['scans']:
             out += wrap('  %-16s %s  %s selectors  %s bytes' % (row.get('role'), row.get('at'),
                        (row.get('coverage') or {}).get('selectors_in_code', '?'),
                        (row.get('stats') or {}).get('code_bytes', '?')))
-    out += ['', 'ASSERTION']
-    out += wrap('a match is a candidate, not a clearance. Nothing here claims the contract is safe.')
-    out += ['', 'PLACARDS']
-    if not report['matches']:
-        out += wrap('no placard matched. That is not the same as safe.')
-    for m in report['matches']:
-        here = (report.get('subject') or {}).get('effective') or report.get('target', '')
-        reproduced = [c for c in (m.get('confirmed_on') or [])
-                      if here and here.lower() in (c.get('target') or '').lower()]
-        tier = 'confirmed on this target' if reproduced else m['tier']
-        out += ['', '%s  class %s %s  tier %s  [scan is %s]' % (m['id'], m['placard_class'],
-                                                                m.get('placard_class_name') or '', tier, m['assertion'])]
-        out += ['  ' + line for line in wrap(m['title'], WRAP - 2)]
-        if m.get('money_bound', {}).get('expression'):
-            out += ['  money: ' + line for line in wrap(m['money_bound']['expression'], WRAP - 9)]
-        if m.get('matched_selectors'):
-            out += ['  matched: ' + line for line in wrap(' '.join(m['matched_selectors']), WRAP - 11)]
-        if m.get('absent_checked'):
-            out.append('  absence checks: %d' % m['absent_checked'])
-    out += ['', 'NOT CHECKED']
-    for item in report['not_checked']:
-        out += ['  - ' + line for line in wrap(item, WRAP - 4)]
-    out += ['', 'cite the placard id, the code sha256 and the register digest.']
+    out += ['', 'Cite the placard id, the code sha256 and the register digest. The HTML sheet is the artifact '
+                'that carries its own digest; this PDF is the same report set for paper.']
     return out
 
 
