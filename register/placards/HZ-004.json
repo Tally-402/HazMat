@@ -39,15 +39,16 @@
       "revision_drift": "the deployed runtime is an earlier revision than the published source: withdraw(uint256,address) is in the current ABI and absent from the deployed code, and four deployed selectors match nothing in the current source, so the measured threshold describes the current build rather than provably this deployment",
       "confirmation": {
         "record": "confirmations/HZ-004-66fa2f84.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-004 --chain sepolia",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-004 --chain sepolia",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
-        "selector_agreement": "11/11, 60 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 11/11 identical to the deployed runtime, and 60 body byte(s) differ, length 0, and source verified on chain at 2026-10-12T07:00:28Z, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "11/11 identical",
         "probe_tests": [
           "test_AG002_vaultDeniesACorrectPolicyWithALargeConfiguration()"
         ],
         "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
-      }
+      },
+      "equivalence": "verified source from sourcify"
     }
   ],
   "fix": "Document the real ceiling for a vault policy, or size the envelope from the configuration length.",

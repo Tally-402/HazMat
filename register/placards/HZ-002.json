@@ -40,10 +40,10 @@
       "attacker_cost": "one queue plus one execute",
       "confirmation": {
         "record": "confirmations/HZ-002-892fa49d.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-002 --chain mainnet",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-002 --chain mainnet",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 2 test(s)",
-        "selector_agreement": "59/59, 227 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 59/59 identical to the deployed runtime, and 227 body byte(s) differ, length 0, and source verified on chain at 2026-10-12T21:24:16Z, and the placard's own probe passed 2 test(s)",
+        "selector_agreement": "59/59 identical",
         "probe_tests": [
           "test_AG003_control_scheduleAloneLeavesTheSignatureInvalid()",
           "test_AG003_preSignedFutureGenerationSurvivesAScheduleAndCancel()"

@@ -43,15 +43,16 @@
       "target": "ClausNativeVault 0x66fa2f848a9ea0be9be69f29b91c1d48b9dc95a4 chainId 11155111",
       "confirmation": {
         "record": "confirmations/HZ-008-66fa2f84.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-008 --chain sepolia",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-008 --chain sepolia",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 11 of 11 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
-        "selector_agreement": "11/11, 60 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 11/11 identical to the deployed runtime, and 60 body byte(s) differ, length 0, and source verified on chain at 2026-10-12T07:00:28Z, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "11/11 identical",
         "probe_tests": [
           "test_P1_precompileRecipientsAreNotInert()"
         ],
         "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
-      }
+      },
+      "equivalence": "verified source from sourcify"
     }
   ],
   "fix": "Fall back to a push that tolerates refusal, or document which recipient addresses are inert.",

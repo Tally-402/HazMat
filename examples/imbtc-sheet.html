@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8">
+<title>HazMat Safety Data Sheet 0x3212b29E33587A00FB1C83346f5dBFA69A458923</title>
+<style>
+ body{font:15px/1.5 ui-monospace,Menlo,monospace;margin:0;padding:2rem;background:#111;color:#e8e8e8}
+ h1{font-size:1.2rem;margin:0 0 .2rem} h2{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;color:#8a8a8a;margin:2rem 0 .4rem}
+ table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #2a2a2a;padding:.5rem .4rem;text-align:left;vertical-align:top}
+ .id{color:#ffb020;white-space:nowrap} code{color:#7fd1ff;word-break:break-all} ul{padding-left:1.2rem;color:#bdbdbd}
+ .banner{border:1px solid #444;padding:.6rem .8rem;margin:1rem 0;background:#181818}
+ .sel{color:#9b9b9b;font-size:.85em}
+</style>
+<h1>HazMat Safety Data Sheet</h1>
+<div>target <code>0x3212b29E33587A00FB1C83346f5dBFA69A458923</code> &middot; family evm</div>
+<div>subject contract <code>0x3212b29e33587a00fb1c83346f5dbfa69a458923</code> &middot; verified as IMBTC</div>
+
+<div>code sha256 <code>0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603</code></div>
+<div>register 16 placards v0xd7dea67cdf60b0bc &middot; body 22174B &middot; metadata 43B excluded &middot; 42 four-byte constants</div>
+<div>anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</div>
+<div class="banner"><b>Assertion level: pattern match only; confirmation runs are separate.</b> A match is a candidate, not a clearance. pattern match only; confirmation runs are separate match only</div>
+<h2>What was read</h2>
+<div class="banner">a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.</div>
+<table>
+<tr><th>placards checked</th><th>classes</th><th>selectors in code</th><th>the register asks about</th><th>otherwise unaccounted</th></tr>
+<tr><td>16</td><td>7</td><td>42</td><td>12</td><td>30</td></tr>
+</table>
+<h2>Unaccounted selectors (nearest misses)</h2>
+<ul class="sel"><li><code>0x06fdde03</code> name()</li><li><code>0x095ea7b3</code> approve(address,uint256)</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2d07953a</code> distributeRevenue()</li><li><code>0x3092afd5</code> removeMinter(address)</li><li><code>0x313ce567</code> decimals()</li><li><code>0x3ba0b9a9</code> exchangeRate()</li><li><code>0x3e9491a2</code> revenue()</li><li><code>0x45338d63</code> setRevenueAddress(address)</li><li><code>0x5c975abb</code> paused()</li><li><code>0x75ab9782</code> unindexed</li><li><code>0x8f32d59b</code> isOwner()</li><li><code>0x92ff0d31</code> transferable()</li><li><code>0x95d89b41</code> symbol()</li><li><code>0x983b2d56</code> addMinter(address)</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa271e1a</code> isMinter(address)</li><li><code>0xaabbb8ca</code> getInterfaceImplementer(address,bytes32)</li><li><code>0xb187984f</code> disableTransfer()</li><li><code>0xb410908d</code> revenueAddress()</li><li><code>0xd4ee1d90</code> newOwner()</li><li><code>0xd6644ff7</code> accuracyBalanceOf(address)</li><li><code>0xdcdc7dd0</code> mint(address,uint256,bytes,bytes)</li><li><code>0xdd62ed3e</code> allowance(address,address)</li></ul>
+<h2>Placards</h2>
+<table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th><th>matched by</th></tr>
+<tr><td class="id">HZ-016</td><td>6 asset-handling</td><td>A token that calls the recipient back mid-transfer drains a counterparty that settles after paying</td><td>pattern</td><td>up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020</td><td class="sel">0x9bd9bbc6 0x62ad1b83 0x06e48538 0x556f0dc7 0x959b8c3f 0xd95b6371</td></tr></table>
+<h2>Not checked</h2><ul><li>resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed</li><li>reachability</li><li>economic preconditions</li><li>state at any particular block</li><li>source-level reasoning</li><li>anything not covered by a placard</li></ul>
+<footer><p>sheet sha256 <code>5c41c93c2cf8dc651d14b75ac67dd791161c7eba4d1be9a20d87d783bd931dda</code> &middot; re-derive with <code>hazmat verify</code>; cite the id, the code sha256 and the register digest.</p></footer>

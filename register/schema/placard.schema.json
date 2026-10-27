@@ -152,6 +152,10 @@
             "type": "string"
           },
           "description": "sibling source files the verified bundle cannot carry, resolved from --source-root"
+        },
+        "fixture_note": {
+          "type": "string",
+          "description": "how the probe stands in for live state, if it does"
         }
       },
       "additionalProperties": false
@@ -188,6 +192,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "precedent": {
+          "type": "string",
+          "description": "prior art or incident this hazard is known from, if any"
         }
       },
       "additionalProperties": false

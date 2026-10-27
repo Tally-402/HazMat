@@ -1,0 +1,71 @@
+{
+  "chain_family": "evm",
+  "author": "Argus",
+  "created": "2026-10-26",
+  "tier": "confirmed",
+  "id": "HZ-016",
+  "placard_class": 6,
+  "placard_class_name": "asset-handling",
+  "title": "A token that calls the recipient back mid-transfer drains a counterparty that settles after paying",
+  "summary": "This token is an ERC777: transferring to a contract calls that contract back before the transfer returns, resolved through the ERC1820 registry, and the ERC777 send() additionally requires a contract recipient to have registered an implementer. A counterparty that credits on deposit and only clears the credit after paying out can therefore be re-entered by the recipient, paid twice out of one balance, and left unable to pay the next honest depositor. The token is not at fault and is behaving to spec. imBTC was the token in the Lendf.Me drain of 2020-04-19, roughly 25 million dollars in one re-entrancy against exactly this shape, which is why a token whose selector set says ERC777 is worth knowing about before it is accepted, not after.",
+  "matcher": {
+    "kind": "selector-set",
+    "require_all": [
+      "0x9bd9bbc6",
+      "0x62ad1b83",
+      "0x06e48538",
+      "0x556f0dc7"
+    ],
+    "require_any": [
+      "0x959b8c3f",
+      "0xd95b6371"
+    ],
+    "require_none_of": [],
+    "notes": "send(address,uint256,bytes) 0x9bd9bbc6, operatorSend(address,address,uint256,bytes,bytes) 0x62ad1b83, defaultOperators() 0x06e48538, granularity() 0x556f0dc7; require_any over authorizeOperator(address) 0x959b8c3f and isOperatorFor(address,address) 0xd95b6371. The four together are ERC777-specific rather than an ERC20 that happens to expose one of them. All selectors derived in-repo from the verified source and each confirmed present in the deployed runtime by hazmat derive (40 of 40 present)."
+  },
+  "money_bound": {
+    "kind": "per-event",
+    "expression": "up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020"
+  },
+  "reproduction": {
+    "kind": "forge",
+    "command": "python3 -m hazmat.confirm --placard HZ-016 --chain mainnet",
+    "source": "reproductions/HZ-016/Erc777CallbackReentry.t.sol (no forge-std, because the verified source is solc 0.5.0)",
+    "expected": "the callback fires with the payer and amount it expects; a pool that pays before clearing the credit is drained, the attacker is paid twice for one deposit and the honest depositor cannot exit; the same pool with the credit cleared first is safe; and the same pool with a hook-less token is safe. The probe runs against the rebuilt contract, with the live ERC1820 registry runtime etched to its canonical address, and the token deployed through its own constructor so its registry entries are real.",
+    "fixture_note": "two solc-0.5 constraints are worked around on purpose: forge rewrites new <imported contract>() into a form using payable(x), which 0.5.0 cannot parse, so the token is deployed with a bare create from vm.getCode; and the registry must be etched before deployment because the constructor registers itself in it."
+  },
+  "confirmed_on": [
+    {
+      "target": "imBTC 0x3212b29E33587A00FB1C83346f5dBFA69A458923 chainId 1",
+      "equivalence": "verified source from Sourcify, match on runtime (2024-08-08T15:01:56Z), IMBTC, optimizer off, byzantium",
+      "confirmation": {
+        "record": "confirmations/HZ-016-3212b29e.json",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-016 --chain mainnet",
+        "verdict": "confirmed",
+        "evidence": "rebuilt selector set 42/42 identical to the deployed runtime, and 0 body byte(s) differ, length 0, and source verified on chain at 2024-08-08T15:01:56Z, and the placard's own probe passed 4 test(s)",
+        "selector_agreement": "42/42 identical",
+        "probe_tests": [
+          "test_aHooklessTokenInTheSamePoolIsNotDrained()",
+          "test_aSettlingPoolIsDrainedAndTheOtherDepositorLosesOut()",
+          "test_settlingBeforePayingMakesTheSamePoolSafe()",
+          "test_theTokenCallsTheRecipientBackOnSend()"
+        ],
+        "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
+      }
+    }
+  ],
+  "fix": "Not a token bug: any contract that accepts this token must clear its credit before paying out, or re-enter-proof its payout path. Where the counterparty cannot be changed, deposit through a wrapper that uses transfer() and keeps the callback off the hot path.",
+  "provenance": {
+    "first_observed": "2026-10-26",
+    "specimen": "imBTC, mainnet",
+    "published_source": "IMBTC.sol (0.5.0)",
+    "deployed_verified": "0x3212b29E33587A00FB1C83346f5dBFA69A458923 chainId 1",
+    "evidence": [
+      "the runtime exposes the ERC777 callback surface, and the source resolves its hooks through ERC1820 at 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24",
+      "send() sets requireReceptionAck, so a contract recipient must register an implementer or the send reverts",
+      "the rebuild is byte-identical to the deployed runtime: 42 of 42 selectors, 0 body bytes differing",
+      "the probe was run against the rebuilt contract with the live registry runtime etched in, not against a stand-in"
+    ],
+    "precedent": "Lendf.Me, 2020-04-19, roughly 25M USD, re-entrancy through imBTC's ERC777 callback"
+  }
+}

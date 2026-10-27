@@ -261,8 +261,9 @@ def run(placard_id, target, register=None, chain='mainnet', workdir='work',
         raise ConfirmError('no such placard: %s' % placard_id)
     placard = placards[placard_id]
     target = normalise_target(target, placard)
-    if placard.get('tier') != 'confirmed':
-        raise ConfirmError('%s is tier %s, nothing to confirm' % (placard_id, placard.get('tier')))
+    # any tier can be run: the pipeline is the evidence and the tier is the claim, so a
+    # pattern placard is exactly how a claim earns `confirmed`. It is recorded, not assumed.
+    tier_at_run = placard.get('tier')
     if not placard.get('reproduction'):
         raise ConfirmError('%s has no reproduction' % placard_id)
 
@@ -271,7 +272,7 @@ def run(placard_id, target, register=None, chain='mainnet', workdir='work',
         shutil.rmtree(root)
     root.mkdir(parents=True)
 
-    record = {'placard': placard_id, 'target': target, 'chain': chain,
+    record = {'placard': placard_id, 'target': target, 'chain': chain, 'tier_at_run': tier_at_run,
               'chain_id': chains.chain_id(chain), 'stages': {}, 'verdict': 'blocked'}
     if not os.path.exists(forge):
         record['stages']['build'] = {'state': 'blocked', 'error': 'no forge at %s' % forge}
@@ -424,9 +425,95 @@ def _finish(record, root):
     return record
 
 
+def sync_placards(records='confirmations', register=None, dry_run=False):
+    """Fold confirmation records back into their placards.
+
+    A hand-written `equivalence` or `evidence` line is never overwritten: the machine
+    part (record path, verdict, selector agreement, probe test names) is upserted around
+    it. A verdict that is not a confirmation leaves the tier alone and is recorded as a
+    refutation, because the placard's own tier is a claim and this is the evidence.
+    """
+    register = Path(register or DEFAULT_REGISTER)
+    changed = []
+    for path in sorted(Path(records).glob('HZ-*.json')):
+        try:
+            rec = json.loads(path.read_text())
+        except ValueError:
+            continue
+        placard_path = register / ('%s.json' % rec.get('placard', ''))
+        if not placard_path.is_file() or not rec.get('target'):
+            continue
+        placard = json.loads(placard_path.read_text())
+        if rec['verdict'] not in ('confirmed', 'confirmed_with_selector_drift'):
+            placard['refuted_on'] = [{'target': rec['target'], 'record': path.name,
+                                      'verdict': rec['verdict'],
+                                      'reason': rec.get('reason') or _why(rec)}]
+            if not dry_run:
+                placard_path.write_text(json.dumps(placard, indent=2) + '\n')
+            changed.append((placard['id'], rec['verdict']))
+            continue
+        entry = next((e for e in placard.get('confirmed_on', []) if rec['target'] in e.get('target', '')), {})
+        entry['target'] = entry.get('target') or '%s chainId %s' % (rec['target'], rec.get('chain_id'))
+        entry['equivalence'] = entry.get('equivalence') or _equivalence(rec)
+        entry['confirmation'] = _confirmation(rec, path)
+        placard['confirmed_on'] = [e for e in placard.get('confirmed_on', []) if e is not entry] + [entry]
+        placard['tier'] = 'confirmed'
+        placard.pop('refuted_on', None)
+        if not dry_run:
+            placard_path.write_text(json.dumps(placard, indent=2) + '\n')
+        changed.append((placard['id'], rec['verdict']))
+    return changed
+
+
+def _equivalence(rec):
+    fetch = (rec.get('stages') or {}).get('fetch') or {}
+    settings = fetch.get('settings') or {}
+    parts = ['verified source from Sourcify, match on runtime (%s)' % (fetch.get('verified_at') or 'date unrecorded')]
+    if fetch.get('contract'):
+        parts.append(fetch['contract'])
+    if settings.get('compilerVersion'):
+        parts.append('solc %s' % settings['compilerVersion'])
+    optimizer = settings.get('optimizer') or {}
+    parts.append('optimizer %s' % ('off' if not optimizer.get('enabled') else 'on'))
+    if settings.get('evmVersion'):
+        parts.append(settings['evmVersion'])
+    return ', '.join(parts)
+def _confirmation(rec, path):
+    """The machine half of a confirmation, taken from the record's own stages."""
+    compare = (rec.get('stages') or {}).get('compare') or {}
+    probe = (rec.get('stages') or {}).get('probe') or {}
+    fetch = (rec.get('stages') or {}).get('fetch') or {}
+    deployed, rebuilt = compare.get('selectors_deployed'), compare.get('selectors_rebuilt')
+    agreement = None
+    if deployed is not None and rebuilt is not None:
+        agreement = '%d/%d' % (rebuilt, deployed)
+        if rebuilt == deployed:
+            agreement = '%d/%d identical' % (rebuilt, deployed)
+    evidence = []
+    if agreement:
+        evidence.append('rebuilt selector set %s to the deployed runtime' % agreement)
+    if compare.get('body_bytes_differing') is not None:
+        evidence.append('%s body byte(s) differ, length %s'
+                        % (compare['body_bytes_differing'], compare.get('body_length_delta')))
+    if fetch.get('verified_at'):
+        evidence.append('source verified on chain at %s' % fetch['verified_at'])
+    evidence.append('the placard\'s own probe passed %d test(s)' % len(probe.get('passed') or []))
+    return {'record': str(path), 'command': 'python3 -m hazmat.cli confirm --placard %s --chain %s'
+            % (rec['placard'], rec.get('chain')), 'verdict': rec['verdict'],
+            'evidence': ', and '.join(evidence), 'selector_agreement': agreement,
+            'probe_tests': probe.get('passed') or [],
+            'not_a_fork': 'the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state'}
+def _why(rec):
+    for name, stage in (rec.get('stages') or {}).items():
+        if stage.get('state') not in ('ok', None):
+            return '%s stage: %s' % (name, stage.get('error') or stage.get('hint') or stage['state'])
+    return None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog='hazmat confirm')
-    parser.add_argument('--placard', required=True)
+    parser.add_argument('--sync', action='store_true', help='fold records back into the placards')
+    parser.add_argument('--placard', default=None)
     parser.add_argument('--target', default=None, help='an address, or a label containing one; defaults to the placard confirmed_on target')
     parser.add_argument('--register', default=None)
     parser.add_argument('--chain', default='mainnet', choices=sorted(chains.CHAINS))
@@ -443,6 +530,14 @@ def main(argv=None):
                         help='extra verified source to fetch into the same tree, for probes touching more than the target')
     parser.add_argument('--rpc', default=None)
     args = parser.parse_args(argv)
+    if args.sync and not args.placard:
+        changed = sync_placards(register=args.register)
+        for placard_id, verdict in changed:
+            print('%s  %s' % (placard_id, verdict))
+        print('%d placard(s) synced from confirmations/' % len(changed))
+        return 0
+    if not args.placard:
+        parser.error('--placard is required unless --sync')
     libs = {}
     for item in args.lib:
         if '=' not in item:

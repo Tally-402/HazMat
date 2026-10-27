@@ -36,17 +36,18 @@
       "target": "ClausProjectWallet 0x182905eea41b06f63adef50cee6f104255474ecf chainId 11155111, all six ABI functions present in the runtime",
       "confirmation": {
         "record": "confirmations/HZ-007-182905ee.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-007 --chain sepolia",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-007 --chain sepolia",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 25 of 25 identical to the deployed runtime, and the placard's own probe passed 3 test(s)",
-        "selector_agreement": "25/25, 222 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 25/25 identical to the deployed runtime, and 222 body byte(s) differ, length 0, and source verified on chain at 2026-10-12T06:17:52Z, and the placard's own probe passed 3 test(s)",
+        "selector_agreement": "25/25 identical",
         "probe_tests": [
           "test_W1_control_totalIsAHardStopWithoutRenewal()",
           "test_W1a_inPlaceRenewalResetsTheSpendCapUnderTheSameId()",
           "test_W1b_renewalKillsPaymentsSignedUnderTheOldGeneration()"
         ],
         "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
-      }
+      },
+      "equivalence": "verified source from sourcify"
     }
   ],
   "fix": "State that renewal is an allowance reset, or carry the window across renewals.",

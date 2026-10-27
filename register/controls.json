@@ -61,6 +61,28 @@
         "HZ-013",
         "HZ-014"
       ]
+    },
+    {
+      "label": "imBTC mainnet (ERC777, the 2020 Lendf.Me token)",
+      "family": "evm",
+      "target": "0x3212b29E33587A00FB1C83346f5dBFA69A458923",
+      "expect": [
+        "HZ-016"
+      ]
+    },
+    {
+      "label": "The DAO mainnet (2016 reentrancy, no placard yet)",
+      "family": "evm",
+      "target": "0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413",
+      "expect": []
+    },
+    {
+      "label": "WETH9 mainnet",
+      "family": "evm",
+      "target": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "expect": [
+        "HZ-015"
+      ]
     }
   ]
 }

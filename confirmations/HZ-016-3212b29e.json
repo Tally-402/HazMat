@@ -1,0 +1,115 @@
+{
+  "chain": "mainnet",
+  "chain_id": 1,
+  "forge": {
+    "path": "~/.foundry/versions/foundry-rs/foundry/v1.8.6/forge",
+    "version": "forge Version: 1.8.6"
+  },
+  "placard": "HZ-016",
+  "source_root": "~/code/claus-network-specimen/contracts/src",
+  "stages": {
+    "build": {
+      "exit_code": 0,
+      "foundry_toml": "[profile.default]\nsrc = \"src\"\ntest = \"test\"\nlibs = [\"lib\"]\nout = \"out\"\ncache_path = \"cache\"\nauto_detect_remappings = false\nremappings = [\"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\", \"forge-std/=lib/forge-std/src/\"]\nsolc = \"~/Library/Application Support/svm/0.5.0/solc-0.5.0\"\nevm_version = \"byzantium\"",
+      "log_tail": "Compiling 1 files with Solc 0.5.0\nSolc 0.5.0 finished in 67.89ms\nCompiler run successful!\nWarning: unable to lint. Solar only supports Solidity versions >=0.8.0\n",
+      "state": "ok"
+    },
+    "compare": {
+      "artifact": "IMBTC.sol/IMBTC.json",
+      "body_bytes_differing": 0,
+      "body_length_delta": 0,
+      "deployed_body_bytes": 22174,
+      "deployed_bytes": 22217,
+      "note": "immutables live in the deployed body, so byte differences here are expected; the selector set is the portable signal",
+      "rebuilt_body_bytes": 22174,
+      "rebuilt_bytes": 22217,
+      "selectors_deployed": 42,
+      "selectors_extra_in_rebuild": [],
+      "selectors_missing_from_rebuild": [],
+      "selectors_rebuilt": 42,
+      "state": "ok"
+    },
+    "fetch": {
+      "contract": "IMBTC",
+      "fetches": [
+        {
+          "address": "0x3212b29E33587A00FB1C83346f5dBFA69A458923",
+          "compiler": "0.5.0+commit.1d4f565a",
+          "contract": "IMBTC",
+          "creation_match": "match",
+          "fetched_on_chain": 1,
+          "files": [
+            {
+              "bundle_key": "IMBTC.sol",
+              "path": "src/IMBTC.sol",
+              "sha256": "be1cd59ab87bc5d97e830f55ec80e629f55318fffee76177b054bc648b03ad58"
+            }
+          ],
+          "match": "match",
+          "runtime_match": "match",
+          "settings": {
+            "evmVersion": "byzantium",
+            "libraries": {},
+            "optimizer": {
+              "enabled": false,
+              "runs": 200
+            },
+            "remappings": []
+          },
+          "sources": 1,
+          "verified_at": "2024-08-08T15:01:56Z"
+        }
+      ],
+      "settings": {
+        "evmVersion": "byzantium",
+        "libraries": {},
+        "optimizer": {
+          "enabled": false,
+          "runs": 200
+        },
+        "remappings": []
+      },
+      "solc_local": "~/Library/Application Support/svm/0.5.0/solc-0.5.0",
+      "state": "ok",
+      "verified_at": "2024-08-08T15:01:56Z"
+    },
+    "libs": {
+      "files_added": 48,
+      "state": "ok",
+      "supplied": {
+        "forge-std": "~/code/claus-network-specimen/contracts/lib/forge-std",
+        "openzeppelin-contracts": "~/code/claus-network-specimen/contracts/lib/openzeppelin-contracts"
+      }
+    },
+    "probe": {
+      "exit_codes": [
+        0
+      ],
+      "failed": [],
+      "log_tail": "== Erc777CallbackReentry.t.sol\nCompiling 2 files with Solc 0.5.0\nSolc 0.5.0 finished in 63.86ms\nCompiler run successful with warnings:\nWarning: Function state mutability can be restricted to pure\ntest/Erc777CallbackReentry.t.sol:263:5: Warning: Function state mutability can be restricted to pure\n    function tokensReceived(address, address, address, uint256, bytes calldata, bytes calldata) external { }\n    ^------------------------------------------------------------------------------------------------------^\n\nRan 4 tests for test/Erc777CallbackReentry.t.sol:Erc777CallbackReentry\n[PASS] test_aHooklessTokenInTheSamePoolIsNotDrained() (gas: 1880188)\n[PASS] test_aSettlingPoolIsDrainedAndTheOtherDepositorLosesOut() (gas: 1097649)\n[PASS] test_settlingBeforePayingMakesTheSamePoolSafe() (gas: 1064379)\n[PASS] test_theTokenCallsTheRecipientBackOnSend() (gas: 765570)\nSuite result: ok. 4 passed; 0 failed; 0 skipped; finished in 6.18ms (4.00ms CPU time)\n\nRan 1 test suite in 9.31ms (6.18ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)\n",
+      "match_test": null,
+      "missing_lib_hint": null,
+      "passed": [
+        "test_aHooklessTokenInTheSamePoolIsNotDrained()",
+        "test_aSettlingPoolIsDrainedAndTheOtherDepositorLosesOut()",
+        "test_settlingBeforePayingMakesTheSamePoolSafe()",
+        "test_theTokenCallsTheRecipientBackOnSend()"
+      ],
+      "sources": [
+        "Erc777CallbackReentry.t.sol"
+      ],
+      "state": "ok"
+    },
+    "supplement": {
+      "files": [],
+      "skipped": "a file the bundle already carries is never overwritten",
+      "state": "ok"
+    }
+  },
+  "target": "0x3212b29E33587A00FB1C83346f5dBFA69A458923",
+  "target_code_bytes": 22217,
+  "target_code_sha256": "0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603",
+  "tier_at_run": "pattern",
+  "verdict": "confirmed",
+  "workdir": "work/HZ-016-3212b29e"
+}

@@ -40,15 +40,16 @@
       "target": "ClausApprovalExecutor 0x892FA49D0c38E949DEb827Db66590fbaEAA34af8 chainId 1, all 15 derived selectors present",
       "confirmation": {
         "record": "confirmations/HZ-010-892fa49d.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-010 --chain mainnet",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-010 --chain mainnet",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-12), rebuilt with the record's own compiler settings, rebuilt selector set 59 of 59 identical to the deployed runtime, and the placard's own probe passed 1 test(s)",
-        "selector_agreement": "59/59, 227 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 59/59 identical to the deployed runtime, and 227 body byte(s) differ, length 0, and source verified on chain at 2026-10-12T21:24:16Z, and the placard's own probe passed 1 test(s)",
+        "selector_agreement": "59/59 identical",
         "probe_tests": [
           "test_A1_cancelWithNoPendingRecoveryKillsAQueuedApproval()"
         ],
         "not_a_fork": "the probe deploys the rebuilt contract locally with live parameters; not a fork of chain state"
-      }
+      },
+      "equivalence": "verified source from sourcify"
     }
   ],
   "fix": "Scope the generation bump to the approval named, or document that a cancel clears the project queue.",

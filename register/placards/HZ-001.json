@@ -34,10 +34,10 @@
       "victim_loss": "one maximum-sized deal",
       "confirmation": {
         "record": "confirmations/HZ-001-c2292af8.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-001 --chain mainnet",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-001 --chain mainnet",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (exact_match on runtime, verified 2026-10-14), rebuilt with the record's own compiler settings, rebuilt selector set 49 of 49 identical to the deployed runtime, and the placard's own probe passed 3 test(s)",
-        "selector_agreement": "49/49, 394 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 49/49 identical to the deployed runtime, and 394 body byte(s) differ, length 0, and source verified on chain at 2026-10-14T23:05:16Z, and the placard's own probe passed 3 test(s)",
+        "selector_agreement": "49/49 identical",
         "probe_tests": [
           "test_LIVE1_control_acceptAfterTheWindowPaysInFull()",
           "test_LIVE2_strangerTimeoutPaysZeroAndKillsTheBuyersAccept()",

@@ -40,10 +40,10 @@
       "equivalence": "verified source is a single file, WETH9.sol, solc 0.4.19",
       "confirmation": {
         "record": "confirmations/HZ-015-c02aaa39.json",
-        "command": "python3 -m hazmat.confirm --placard HZ-015 --chain mainnet",
+        "command": "python3 -m hazmat.cli confirm --placard HZ-015 --chain mainnet",
         "verdict": "confirmed",
-        "evidence": "verified source fetched from Sourcify (match on runtime, verified 2024-08-08), rebuilt with the record's own compiler settings, rebuilt selector set 12 of 12 identical to the deployed runtime, and the placard's own probe passed 4 test(s)",
-        "selector_agreement": "12/12, 0 body bytes differing, length delta 0",
+        "evidence": "rebuilt selector set 12/12 identical to the deployed runtime, and 0 body byte(s) differ, length 0, and source verified on chain at 2024-08-08T13:28:37Z, and the placard's own probe passed 4 test(s)",
+        "selector_agreement": "12/12 identical",
         "probe_tests": [
           "test_aContractWithNoPayableFallbackReverts()",
           "test_aFallbackThatWritesStorageReverts()",

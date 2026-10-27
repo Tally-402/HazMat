@@ -106,3 +106,45 @@ Pricing, payment plumbing, accounts, a human-review tier, insurance data product
 - Publishing an epoch does not invalidate older ones. A sheet is verified against the epoch
   it names, and a proof into a closed epoch is computed from that epoch's recorded leaves,
   because today's register can no longer reproduce an old tree.
+
+## A known-vulnerable contract, and what it taught the register
+
+Nine mainnet contracts with documented exploits were scanned from bytecode alone (Parity
+WalletLibrary, The DAO, Euler V1, Fomo3D, EtherDelta, Beanstalk, Nomad Replica, a Vyper
+reentrancy pool, imBTC). **No placard fired on any of them.** That is the honest state of a
+register authored from three codebases: the classic exploit classes are reentrancy, oracle
+and unprotected-initialiser shaped, and a selector-set fingerprint can only speak to those
+when the selector set itself encodes the hazard.
+
+HZ-016 closes the largest of those gaps with a real precedent: an ERC777 token calls a
+contract recipient back mid-transfer, so any counterparty that credits first and settles
+after paying can be re-entered. imBTC was the token in the Lendf.Me drain of 2020-04-19
+(~25M USD). The placard is confirmed against imBTC, byte-identical rebuild included.
+
+Also measured: the Parity WalletLibrary has **no code at all** now - it selfdestructed in
+the 2017 freeze, so `eth_getCode` returns empty and every wallet that delegatecalled it
+froze. Nothing in the register speaks to "the delegatecall target is gone"; it fires
+nothing there, correctly.
+
+### Fixture lessons (solc 0.5, forge 1.8)
+
+- `new <contract from an import>()` is rewritten by forge into a form wrapped in
+  `payable(x)`, and the conversion function `payable(x)` does not exist until solc 0.6.
+  With a 0.5.0 bundle the only way through is `vm.getCode` plus a bare `create`.
+- The ERC1820 registry must be etched to its canonical address *before* deploying anything
+  whose constructor registers itself in it, or the constructor reverts on a codeless call.
+- A contract recipient of an ERC777 `send` must register an implementer, so a fixture has
+  to register its actors itself - the registry requires the account to be its own manager.
+
+### Machinery changed
+
+- `confirm` runs against any tier now: the pipeline is the evidence and the tier is the
+  claim, so a pattern placard is exactly how a claim earns `confirmed`. Previously a
+  pattern placard could never be confirmed at all.
+- `confirm --sync` folds records back into their placards: tier, confirmation block,
+  selector agreement and probe test names, all taken from the record. Hand-written
+  `equivalence` and `evidence` lines are preserved.
+- Controls now include a **negative control on a famously vulnerable contract** (The DAO
+  expects nothing) and imBTC (expects exactly HZ-016). Nine controls in total.
+- `scripts/build-selector-index.py` rebuilds the name index from verified sources and
+  merges rather than replaces, so a name never disappears when a work directory is cleaned.

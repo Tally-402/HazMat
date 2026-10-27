@@ -9,7 +9,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2615 >>
+<< /Length 2609 >>
 stream
 BT
 /F1 9 Tf 11.5 TL
@@ -18,11 +18,11 @@ BT
 () Tj T*
 (target 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c family evm) Tj T*
 (code sha256 0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139) Tj T*
-(register 15 placards body 11566 bytes metadata 53 excluded 49 four-byte constants) Tj T*
+(register 16 placards body 11566 bytes metadata 53 excluded 49 four-byte constants) Tj T*
 (assertion level: pattern match only; confirmation runs are separate) Tj T*
 () Tj T*
 (WHAT WAS READ) Tj T*
-(placards checked 15 classes 7 selectors in code 49 the register asks about 9 otherwise unaccounted 40) Tj T*
+(placards checked 16 classes 7 selectors in code 49 the register asks about 9 otherwise unaccounted 40) Tj T*
 (  0x0256965f unindexed) Tj T*
 (  0x06fda65d unindexed) Tj T*
 (  0x0b135d3f unindexed) Tj T*
@@ -34,7 +34,7 @@ BT
 (  0x390d83ad resolve\(bytes32,uint256,bytes32,uint64,bytes\)) Tj T*
 (  0x4584712b unindexed) Tj T*
 (  0x48b44a76 runPlan\(bytes32,uint32\)) Tj T*
-(  0x4d342432 maximumDeal\(\)) Tj T*
+(  0x4d342432 unindexed) Tj T*
 () Tj T*
 (SUBJECT) Tj T*
 () Tj T*
@@ -85,9 +85,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000002908 00000 n 
+0000002902 00000 n 
 trailer
 << /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-3005
+2999
 %%EOF
