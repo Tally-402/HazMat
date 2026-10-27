@@ -103,7 +103,7 @@ A clean sheet is not the same as safe.</div>
 
 <section>
 <h2>The technical part</h2>
-<p class="dim" id="pins">register {register} placards v{register_digest} &middot; anchor {anchor} &middot; body {body}B read, {meta}B of metadata excluded, {consts} four-byte constants. These are the strings to quote when citing this sheet.</p>
+<p class="dim" id="pins">register {register} placards v{register_digest} · anchor {anchor} · body {body}B read, {meta}B of metadata excluded, {consts} four-byte constants. These are the strings to quote when citing this sheet.</p>
 <table>{technical}</table>
 {scans}
 </section>
@@ -303,14 +303,15 @@ def hazard_card(match, report):
     return ''.join(parts)
 
 
-def render(report):
+def present(report):
+    """The generated prose, in one place, so the sheet and the app cannot drift.
+
+    Returns plain strings (no markup) plus per-hazard blocks; both renderers escape their own.
+    """
     coverage = report.get('coverage') or {}
     matches = by_importance(report)
     subject = report.get('subject') or {}
     identity = ', '.join(v.get('name') for v in (subject.get('identity') or {}).values() if v.get('name'))
-    headline = html.escape(report['target'])
-    if identity:
-        headline += ' <span class="badge">verified as %s</span>' % html.escape(identity)
     if matches:
         standfirst = ('Read %s bytes of deployed bytecode and checked it against %d registered hazards. '
                       '%d %s present%s.' % ('{:,}'.format(report['stats']['body_bytes']), report['register_size'],
@@ -322,26 +323,75 @@ def render(report):
         standfirst = ('Read %s bytes of deployed bytecode and checked it against %d registered hazards. '
                       'Nothing matched, which is not the same as safe.'
                       % ('{:,}'.format(report['stats']['body_bytes']), report['register_size']))
-    badges = ['%s on %s' % (subject.get('kind', 'target'),
-                            html.escape(subject.get('chain') or report.get('chain') or 'chain unstated')),
-              '%s bytes of code' % report['stats']['body_bytes'],
-              '%s of %s hazards' % (len(matches), report['register_size']),
-              anchor_line(report)]
+    hazards = []
+    for match in matches:
+        reproduced = reproduced_here(match, report)
+        badges = ['class %s %s' % (match['placard_class'], match.get('placard_class_name') or '')]
+        if reproduced:
+            badges.append('confirmed on this target')
+        else:
+            badges.append('%s placard' % match.get('tier', 'pattern'))
+        if match.get('absent_checked'):
+            badges.append('%d absence checks' % match['absent_checked'])
+        record = (reproduced[0].get('confirmation') or {}).get('record') if reproduced else None
+        hazards.append({'id': match['id'], 'title': match['title'], 'class': match['placard_class'],
+                        'class_name': match.get('placard_class_name') or '', 'badges': badges,
+                        'summary': match.get('summary') or '', 'fix': match.get('fix') or '',
+                        'tier': match.get('tier'), 'confirmed_here': bool(reproduced),
+                        'money': (match.get('money_bound') or {}).get('expression') or '',
+                        'precedent': (match.get('provenance') or {}).get('precedent') or '',
+                        'evidence': ('Reproduced here: %s - a rebuild of the verified source and the probes in '
+                                     'it passed. Confirming behaviour, not intent.' % record) if record else '',
+                        'matched_by': match.get('matched_selectors') or []})
+    return {
+        'headline': report['target'] + (' (verified as %s)' % identity if identity else ''),
+        'identity': identity,
+        'standfirst': standfirst,
+        'badges': ['%s on %s' % (subject.get('kind', 'target'),
+                                 subject.get('chain') or report.get('chain') or 'chain unstated'),
+                   '%s bytes of code' % report['stats']['body_bytes'],
+                   '%s of %s hazards' % (len(matches), report['register_size']),
+                   anchor_line(report)],
+        'summary': [{'label': label, 'text': text} for label, text in summarise(report)],
+        'hazards': hazards,
+        'subject_plain': subject_plain(report),
+        'coverage_means': coverage.get('means', ''),
+        'coverage_note': ('%s of the %s selectors in this contract are asked about by some placard; the other %s '
+                          'are listed so you can see what was skipped.'
+                          % (coverage.get('selectors_the_register_asks_about', 0),
+                             coverage.get('selectors_in_code', 0), coverage.get('selectors_otherwise_unaccounted', 0))),
+        'not_checked': list(report.get('not_checked') or []),
+        'pins': ('register %d placards v%s \u00b7 anchor %s \u00b7 body %sB read, %sB of metadata excluded, '
+                 '%s four-byte constants' % (report['register_size'], report.get('register_digest', 'unpinned'),
+                                             anchor_line(report), report['stats']['body_bytes'],
+                                             report['stats']['metadata_bytes'], report['stats']['push4_constants'])),
+        'technical': [{'label': k, 'value': str(v)} for k, v in technical_facts(report)],
+    }
+
+
+def render(report):
+    coverage = report.get('coverage') or {}
+    matches = by_importance(report)
+    subject = report.get('subject') or {}
+    identity = ', '.join(v.get('name') for v in (subject.get('identity') or {}).values() if v.get('name'))
+    prose = present(report)
+    headline = html.escape(report['target'])
+    if prose['identity']:
+        headline += ' <span class="badge">verified as %s</span>' % html.escape(prose['identity'])
+    standfirst = prose['standfirst']
+    badges = prose['badges']
     page = PAGE.format(
         style=STYLE, target=html.escape(report['target']), headline=headline, standfirst=standfirst,
         badges=''.join('<span class="badge">%s</span>' % html.escape(str(b)) for b in badges),
         subject=subject_line(report), assertion=html.escape(report['assertion']),
-        summary=''.join('<li><b>%s</b>%s %s</li>' % (html.escape(label), ':' if label else '', text)
-                        for label, text in summarise(report)),
+        summary=''.join('<li><b>%s</b>%s %s</li>' % (html.escape(b['label']), ':' if b['label'] else '', b['text'])
+                        for b in prose['summary']),
         hazards_heading='Hazards found' if matches else 'Hazards found',
         hazards=''.join(hazard_card(m, report) for m in matches) if matches else
                 '<p>None of the registered hazards are present. That is not the same as safe: the register is '
                 'shaped after a handful of projects, so this contract may simply be unfamiliar to it.</p>',
         coverage_means=html.escape(coverage.get('means', '')),
-        coverage_note=('%s of the %s selectors in this contract are asked about by some placard; the other %s are '
-                       'listed below so you can see what was skipped.'
-                       % (coverage.get('selectors_the_register_asks_about', 0), coverage.get('selectors_in_code', 0),
-                          coverage.get('selectors_otherwise_unaccounted', 0))),
+        coverage_note=html.escape(prose['coverage_note']),
         checked=coverage.get('placards_checked', 0), classes=len(coverage.get('classes_checked', [])),
         in_code=coverage.get('selectors_in_code', 0), asked=coverage.get('selectors_the_register_asks_about', 0),
         unaccounted=coverage.get('selectors_otherwise_unaccounted', 0),

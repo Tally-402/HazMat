@@ -576,6 +576,21 @@ class Api(unittest.TestCase):
         for view in ('registerView', 'placardView', 'anchorsView', 'aboutView'):
             self.assertIn(view, page)
 
+    def test_the_api_carries_the_same_sentences_as_the_sheet(self):
+        """The app renders generated prose from the API; if the two ever diverge, one of them lies."""
+        url = ('%s/scan?chain=mainnet&target=0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c' % self.base)
+        payload = json.loads(self.urllib.urlopen(url, timeout=30).read())
+        sheet = self.urllib.urlopen('%s/sheet?chain=mainnet&target=0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c'
+                                    % self.base, timeout=30).read().decode()
+        self.assertIn('presentation', payload)
+        self.assertIn(payload['presentation']['standfirst'], sheet)
+        for bullet in payload['presentation']['summary']:
+            self.assertIn(bullet['text'], sheet)
+        for hazard in payload['presentation']['hazards']:
+            self.assertIn(hazard['title'], sheet)
+            self.assertIn(hazard['fix'], sheet)
+        self.assertIn(payload['presentation']['pins'], sheet)
+
     def test_the_register_endpoint_lists_every_placard_and_the_anchor(self):
         got = self.get('/api/register')
         self.assertEqual(got['count'], 16)

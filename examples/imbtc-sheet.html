@@ -70,7 +70,7 @@ A clean sheet is not the same as safe.</div>
 <tr><th>placards checked</th><th>classes</th><th>selectors in code</th><th>the register asks about</th><th>otherwise unaccounted</th></tr>
 <tr><td class="num">16</td><td class="num">7</td><td class="num">42</td><td class="num">12</td><td class="num">30</td></tr>
 </table>
-<p class="dim">12 of the 42 selectors in this contract are asked about by some placard; the other 30 are listed below so you can see what was skipped.</p>
+<p class="dim">12 of the 42 selectors in this contract are asked about by some placard; the other 30 are listed so you can see what was skipped.</p>
 <details><summary>Unaccounted selectors &mdash; the nearest misses (24). These are in the code and no registered hazard asks about them.</summary>
 <ul class="sel"><li><code>0x06fdde03</code> name()</li><li><code>0x095ea7b3</code> approve(address,uint256)</li><li><code>0x23b872dd</code> transferFrom(address,address,uint256)</li><li><code>0x2d07953a</code> distributeRevenue()</li><li><code>0x3092afd5</code> removeMinter(address)</li><li><code>0x313ce567</code> decimals()</li><li><code>0x3ba0b9a9</code> exchangeRate()</li><li><code>0x3e9491a2</code> revenue()</li><li><code>0x45338d63</code> setRevenueAddress(address)</li><li><code>0x5c975abb</code> paused()</li><li><code>0x75ab9782</code> tokensToSend(address,address,address,uint256,bytes,bytes)</li><li><code>0x8f32d59b</code> isOwner()</li><li><code>0x92ff0d31</code> transferable()</li><li><code>0x95d89b41</code> symbol()</li><li><code>0x983b2d56</code> addMinter(address)</li><li><code>0xa9059cbb</code> transfer(address,uint256)</li><li><code>0xaa271e1a</code> isMinter(address)</li><li><code>0xaabbb8ca</code> getInterfaceImplementer(address,bytes32)</li><li><code>0xb187984f</code> disableTransfer()</li><li><code>0xb410908d</code> revenueAddress()</li><li><code>0xd4ee1d90</code> newOwner()</li><li><code>0xd6644ff7</code> accuracyBalanceOf(address)</li><li><code>0xdcdc7dd0</code> mint(address,uint256,bytes,bytes)</li><li><code>0xdd62ed3e</code> allowance(address,address)</li></ul></details>
 </section>
@@ -82,13 +82,13 @@ A clean sheet is not the same as safe.</div>
 
 <section>
 <h2>The technical part</h2>
-<p class="dim" id="pins">register 16 placards v0xd7dea67cdf60b0bc &middot; anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json) &middot; body 22174B read, 43B of metadata excluded, 42 four-byte constants. These are the strings to quote when citing this sheet.</p>
+<p class="dim" id="pins">register 16 placards v0xd7dea67cdf60b0bc · anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json) · body 22174B read, 43B of metadata excluded, 42 four-byte constants. These are the strings to quote when citing this sheet.</p>
 <table><tr><td>target</td><td><code>0x3212b29E33587A00FB1C83346f5dBFA69A458923</code></td></tr><tr><td>family</td><td><code>evm</code></td></tr><tr><td>code sha256</td><td><code>0xddb50063c72473b19188a335c6c7a6072b2899657c980147d37045fccb9c0603</code></td></tr><tr><td>body bytes read</td><td><code>22174</code></td></tr><tr><td>metadata excluded</td><td><code>43 bytes (CBOR trailer, appended after compilation)</code></td></tr><tr><td>four-byte constants</td><td><code>42</code></td></tr><tr><td>register</td><td><code>16 placards v0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor</td><td><code>epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)</code></td></tr><tr><td>register digest</td><td><code>0xd7dea67cdf60b0bc</code></td></tr><tr><td>anchor root</td><td><code>0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c</code></td></tr><tr><td>selector index</td><td><code>783 names, a convenience reading and not verification</code></td></tr></table>
 
 </section>
 
 <footer>
-<p>sheet sha256 <code>e7355c264fda7797fc95b3f7355e445c7ae57671fa3df01b4345a685366ebba6</code></p>
+<p>sheet sha256 <code>04a5827dba0a128ef35e58585be822e8b3fd1d07b888b7af546065d612b0315f</code></p>
 <p>Re-derive it with <code>hazmat verify --sheet &lt;this file&gt;</code> &mdash; the digest is over these bytes, so any edit shows up.
 To cite this in writing, quote the placard id, the code sha256 and the register digest, all above.</p>
 </footer>

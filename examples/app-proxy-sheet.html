@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HazMat</title>
+<style>
+ :root{
+  --bg:#0e0f11; --panel:#15171a; --line:#262a2f; --ink:#e9ecef; --dim:#9aa0a6; --acc:#ffb020; --ok:#69db7c;
+  --c1:#ff6b6b; --c2:#ffa94d; --c3:#ffd43b; --c4:#8ce99a; --c5:#38d9a9; --c6:#4dabf7; --c7:#9775fa; --c8:#f783ac; --c9:#ced4da}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+ header{display:flex;gap:1rem;align-items:baseline;padding:1rem 1.4rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+ header b{color:var(--acc);letter-spacing:.06em}
+ nav a{color:var(--dim);text-decoration:none;margin-right:.9rem} nav a:hover,nav a.on{color:var(--ink)}
+ main{max-width:62rem;margin:0 auto;padding:1.4rem}
+ h1{font-size:1.15rem;margin:.2rem 0 .6rem} h2{font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:1.8rem 0 .5rem}
+ input,select,button{font:inherit;padding:.5rem .6rem;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:3px}
+ button{cursor:pointer} button:hover{border-color:var(--acc)}
+ button.primary{background:var(--acc);color:#111;border-color:var(--acc);font-weight:700}
+ .row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+ .note{color:var(--dim);max-width:44rem}
+ table{border-collapse:collapse;width:100%} th,td{border-bottom:1px solid var(--line);padding:.45rem .4rem;text-align:left;vertical-align:top}
+ th{color:var(--dim);font-weight:400;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+ code{color:#7fd1ff;word-break:break-all} a.card,tr.clickable{cursor:pointer}
+ .chip{display:inline-block;padding:.05rem .4rem;border:1px solid;border-radius:999px;font-size:.78rem;white-space:nowrap}
+ .card{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:.8rem;margin:.6rem 0}
+ .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.6rem}
+ .big{font-size:1.5rem}
+ .warn{border-color:#5c4b1a;background:#1b1710}
+ iframe{width:100%;height:34rem;border:1px solid var(--line);background:#111;border-radius:4px}
+ footer{color:var(--dim);padding:2rem 1.4rem;border-top:1px solid var(--line);font-size:.85rem}
+ .sp{color:var(--dim)} .err{color:var(--c1)} .small{font-size:.85rem}
+ .prose{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62}
+ .lede{border-bottom:2px solid var(--line);padding-bottom:1rem;margin-bottom:1.2rem}
+ .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+ .lede h1{font-size:1.7rem;line-height:1.25;margin:.35rem 0 .5rem;letter-spacing:-.01em}
+ .lede-p{font-size:1.05rem;margin:.5rem 0}
+ .facts{display:flex;flex-wrap:wrap;gap:.35rem .8rem;margin:.7rem 0 0}
+ .badge{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:.05rem .5rem;font-size:.72rem;color:var(--dim);white-space:nowrap}
+ .badge.good{border-color:var(--ok);color:var(--ok)}
+ .banner{border-left:3px solid var(--acc)}
+ ul.summary{padding-left:1.1rem;max-width:46rem} ul.summary li{margin:.35rem 0}
+ .haz{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:.9rem 1rem;margin:.8rem 0}
+ .haz-title{font-weight:600;margin:.4rem 0}
+ .haz p{margin:.45rem 0;max-width:48rem}
+ details{margin:.6rem 0} summary{cursor:pointer}
+ details table{margin-top:.5rem}
+</style>
+<header><b>HAZMAT</b>
+ <nav>
+  <a href="#/">scan</a><a href="#/register">register</a><a href="#/anchors">anchors</a><a href="#/about">about</a>
+ </nav>
+ <span class="sp" id="anchorTag" style="margin-left:auto"></span>
+</header>
+<main id="main"></main>
+<footer>read-only. matched means the selectors a placard asks about are present, not that the contract is safe.
+ <span id="regline"></span></footer>
+<script>
+// baked payloads: a file:// page cannot reach the server these views normally fetch from
+const SEED = {"/scan?chain=mainnet&target=0xe1cE2345d25462996AE27F58E3e001245e043EA4": {"target": "0xe1cE2345d25462996AE27F58E3e001245e043EA4", "family": "evm", "subject": {"requested": "0xe1ce2345d25462996ae27f58e3e001245e043ea4", "chain": "mainnet", "kind": "proxy", "effective": "0xc2f10e8bdd63277a235b255cb1e840a34b50e98a", "via": "implementation() getter", "evidence": ["implementation() returned 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a"], "targets": [{"address": "0xe1ce2345d25462996ae27f58e3e001245e043ea4", "role": "requested"}, {"address": "0xc2f10e8bdd63277a235b255cb1e840a34b50e98a", "role": "implementation"}], "identity": {"0xe1ce2345d25462996ae27f58e3e001245e043ea4": {"state": "verified", "name": "ClausManagedProject", "compiler": "0.8.27+commit.40a35a09", "verified_at": "2026-10-13T22:28:09Z", "match": "exact_match"}, "0xc2f10e8bdd63277a235b255cb1e840a34b50e98a": {"state": "verified", "name": "CounterV2", "compiler": "0.8.27+commit.40a35a09", "verified_at": "2026-10-13T22:09:08Z", "match": "match"}}}, "scans": [{"at": "0xe1ce2345d25462996ae27f58e3e001245e043ea4", "stats": {"code_bytes": 1936, "body_bytes": 1883, "metadata_bytes": 53, "push4_constants": 12}, "matches": [], "coverage": {"method": "bytecode fingerprint only; no source or ABI required", "means": "a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.", "placards_checked": 16, "classes_checked": [2, 3, 4, 5, 6, 7, 8], "selectors_in_code": 12, "selectors_the_register_asks_about": 1, "selectors_otherwise_unaccounted": 11, "covered": ["0x5c60da1b"], "unaccounted_sample": [{"selector": "0x1bb22965", "signature": null}, {"selector": "0x36faf403", "signature": null}, {"selector": "0x3fafa127", "signature": null}, {"selector": "0x439fab91", "signature": null}, {"selector": "0x4e487b71", "signature": "Panic(uint256)"}, {"selector": "0x54fd4d50", "signature": null}, {"selector": "0x605551bd", "signature": null}, {"selector": "0x6c70bee9", "signature": null}, {"selector": "0xbc0a3981", "signature": null}, {"selector": "0xc34c08e5", "signature": null}, {"selector": "0xfe63b973", "signature": null}], "named_index_size": 783}, "code_sha256": "0x78c1bcfad66e121c8bf9e714edd99261cab792cacf4a82d1ab7d092937436365", "identity": {"state": "verified", "name": "ClausManagedProject", "compiler": "0.8.27+commit.40a35a09", "verified_at": "2026-10-13T22:28:09Z", "match": "exact_match"}, "role": "requested"}, {"at": "0xc2f10e8bdd63277a235b255cb1e840a34b50e98a", "stats": {"code_bytes": 522, "body_bytes": 522, "metadata_bytes": 0, "push4_constants": 6}, "matches": [], "coverage": {"method": "bytecode fingerprint only; no source or ABI required", "means": "a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.", "placards_checked": 16, "classes_checked": [2, 3, 4, 5, 6, 7, 8], "selectors_in_code": 6, "selectors_the_register_asks_about": 0, "selectors_otherwise_unaccounted": 6, "covered": [], "unaccounted_sample": [{"selector": "0x06661abd", "signature": null}, {"selector": "0x35420fd9", "signature": null}, {"selector": "0x4e487b71", "signature": "Panic(uint256)"}, {"selector": "0xb326e4a9", "signature": null}, {"selector": "0xc34c08e5", "signature": null}, {"selector": "0xd09de08a", "signature": null}], "named_index_size": 783}, "code_sha256": "0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1", "identity": {"state": "verified", "name": "CounterV2", "compiler": "0.8.27+commit.40a35a09", "verified_at": "2026-10-13T22:09:08Z", "match": "match"}, "role": "implementation"}], "coverage": {"method": "bytecode fingerprint only; no source or ABI required", "means": "a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.", "placards_checked": 16, "classes_checked": [2, 3, 4, 5, 6, 7, 8], "selectors_in_code": 6, "selectors_the_register_asks_about": 0, "selectors_otherwise_unaccounted": 6, "covered": [], "unaccounted_sample": [{"selector": "0x06661abd", "signature": null}, {"selector": "0x35420fd9", "signature": null}, {"selector": "0x4e487b71", "signature": "Panic(uint256)"}, {"selector": "0xb326e4a9", "signature": null}, {"selector": "0xc34c08e5", "signature": null}, {"selector": "0xd09de08a", "signature": null}], "named_index_size": 783}, "register_anchor": {"epoch": 3, "root": "0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c", "register_digest": "0xd7dea67cdf60b0bc", "file": "epoch-3.json"}, "code_sha256": "0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1", "register_size": 16, "stats": {"code_bytes": 522, "body_bytes": 522, "metadata_bytes": 0, "push4_constants": 6}, "matches": [], "assertion": "pattern match only; confirmation runs are separate", "register_digest": "0xd7dea67cdf60b0bc", "not_checked": ["resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed", "reachability", "economic preconditions", "state at any particular block", "source-level reasoning", "anything not covered by a placard"], "presentation": {"headline": "0xe1cE2345d25462996AE27F58E3e001245e043EA4 (verified as ClausManagedProject, CounterV2)", "identity": "ClausManagedProject, CounterV2", "standfirst": "Read 522 bytes of deployed bytecode and checked it against 16 registered hazards. Nothing matched, which is not the same as safe.", "badges": ["proxy on mainnet", "522 bytes of code", "0 of 16 hazards", "epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)"], "summary": [{"label": "What this is", "text": "It is a proxy: what you call goes to the logic at 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a, and that is what was read."}, {"label": "What matched", "text": "Nothing. None of the 16 registered hazards are present in this bytecode."}, {"label": "What that means", "text": "Unfamiliar rather than sound. The register is shaped after a small number of projects, so a contract can be perfectly normal and still match nothing. A famous example on this register: The DAO, EtherDelta and Fomo3D all match nothing."}], "hazards": [], "subject_plain": "a proxy: what you call goes to the logic at 0xc2f10e8bdd63277a235b255cb1e840a34b50e98a, and that is what was read", "coverage_means": "a match means the selectors a placard asks about are present. It does not mean reachable, and a clean sheet is not a clearance.", "coverage_note": "0 of the 6 selectors in this contract are asked about by some placard; the other 6 are listed so you can see what was skipped.", "not_checked": ["resolution is best effort: unknown proxy patterns, diamond facets and beacons pointing at beacons are labelled not followed", "reachability", "economic preconditions", "state at any particular block", "source-level reasoning", "anything not covered by a placard"], "pins": "register 16 placards v0xd7dea67cdf60b0bc \u00b7 anchor epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json) \u00b7 body 522B read, 0B of metadata excluded, 6 four-byte constants", "technical": [{"label": "target", "value": "0xe1cE2345d25462996AE27F58E3e001245e043EA4"}, {"label": "family", "value": "evm"}, {"label": "code sha256", "value": "0x9251b2adbf675d67bf9be858847910353b8c175af8aaa4c2f4573912891ba6a1"}, {"label": "body bytes read", "value": "522"}, {"label": "metadata excluded", "value": "0 bytes (CBOR trailer, appended after compilation)"}, {"label": "four-byte constants", "value": "6"}, {"label": "register", "value": "16 placards v0xd7dea67cdf60b0bc"}, {"label": "anchor", "value": "epoch 3 root 0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c (epoch-3.json)"}, {"label": "register digest", "value": "0xd7dea67cdf60b0bc"}, {"label": "anchor root", "value": "0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c"}, {"label": "selector index", "value": "783 names, a convenience reading and not verification"}]}}, "/api/register": {"count": 16, "placards": [{"id": "HZ-001", "placard_class": 2, "placard_class_name": "ordering", "title": "A still-valid action is destroyed by a permissionless trigger in the same block", "tier": "confirmed", "money": "one deal amount, which is the worker's entire payment on the affected deal"}, {"id": "HZ-002", "placard_class": 3, "placard_class_name": "authority", "title": "Cancelling a signer recovery re-validates approvals pre-signed for a predictable generation", "tier": "confirmed", "money": "no money moves; the gain is control of a live read-only module that consumers trust"}, {"id": "HZ-003", "placard_class": 3, "placard_class_name": "authority", "title": "Cancelling an owner-transfer proposal bumps the generation again, so pre-signed approvals stay dead", "tier": "confirmed", "money": "no money moves; upgrades stay suspended and approvals need re-signing"}, {"id": "HZ-004", "placard_class": 4, "placard_class_name": "availability", "title": "A configuration size the project accepts exceeds the gas envelope that evaluates it", "tier": "confirmed", "money": "deposits are denied to a correct policy, so capacity is unreachable; withdrawals are unaffected"}, {"id": "HZ-005", "placard_class": 7, "placard_class_name": "stranded-value", "title": "Value arriving outside the accounting has no sweep", "tier": "confirmed", "money": "the stranded amount itself, unbounded by any ceiling"}, {"id": "HZ-006", "placard_class": 5, "placard_class_name": "encoding", "title": "A delivered response is admitted at one size and refused one byte over, and a non-canonical header is refused", "tier": "confirmed", "money": "a policy that is correct but one byte over the enforced shape cannot admit deposits"}, {"id": "HZ-007", "placard_class": 3, "placard_class_name": "authority", "title": "Renewing a live session in place resets its spending window under the same session id", "tier": "confirmed", "money": "the per-window allowance, reset on demand while the total survives, so the effective spend between revocations is limited by the session total and not by the window"}, {"id": "HZ-008", "placard_class": 6, "placard_class_name": "asset-handling", "title": "A value paying out to a precompile-range address reverts because the recipient refuses the call", "tier": "confirmed", "money": "one withdrawal, recoverable only by an owner action once the recipient address is changed"}, {"id": "HZ-009", "placard_class": 2, "placard_class_name": "ordering", "title": "Two permissionless exits are both legal in one block and pay opposite amounts", "tier": "confirmed", "money": "one deal: full price on one ordering, zero on the other"}, {"id": "HZ-010", "placard_class": 3, "placard_class_name": "authority", "title": "A permissionless cancel invalidates queued approvals it does not name", "tier": "confirmed", "money": "no money moves; the loss is work and the queue position of every approval for that project"}, {"id": "HZ-011", "placard_class": 8, "placard_class_name": "upgrade-lifecycle", "title": "A proxy keeps its whole upgrade authority in the runtime and nothing on-chain delays it", "tier": "pattern", "money": "every balance the proxy holds, reachable by swapping the implementation"}, {"id": "HZ-012", "placard_class": 5, "placard_class_name": "encoding", "title": "A transparent proxy answers admin selectors that collide with the implementation namespace", "tier": "pattern", "money": "the admin branch bypasses the implementation for the caller that matches it"}, {"id": "HZ-013", "placard_class": 3, "placard_class_name": "authority", "title": "Pause is gated by a single owner with no two-step handover", "tier": "pattern", "money": "every balance of the token, including value held inside other contracts, is unspendable while paused"}, {"id": "HZ-014", "placard_class": 3, "placard_class_name": "authority", "title": "An external allow/deny list can freeze balances without touching the contract", "tier": "pattern", "money": "any balance of the token, including value sitting inside an escrow or vault that holds it"}, {"id": "HZ-015", "placard_class": 6, "placard_class_name": "asset-handling", "title": "A wrapped-native payout forwards with a stipend, so a smart-contract recipient can block its own withdrawal", "tier": "confirmed", "money": "the withdrawal amount, stuck until the recipient is changed or upgraded"}, {"id": "HZ-016", "placard_class": 6, "placard_class_name": "asset-handling", "title": "A token that calls the recipient back mid-transfer drains a counterparty that settles after paying", "tier": "confirmed", "money": "up to the credited balance a naive counterparty is holding; about 25M USD in one event against imBTC in 2020"}], "digest": "0xd7dea67cdf60b0bc", "anchor": {"epoch": 3, "root": "0xed6a388e080b234215fcd1d0fc845207714daece4261c0ff9d7e39ce45c5a26c", "register_digest": "0xd7dea67cdf60b0bc", "file": "epoch-3.json"}}};
+for (const [path, body] of Object.entries(SEED)) {
+  const url = new URL(path, 'http://seeded');
+  SEED[url.pathname + url.search] = body;
+}
+const realFetch = window.fetch;
+window.fetch = async (input, init) => {
+  const url = new URL(String(input), 'http://seeded');
+  const hit = SEED[url.pathname + url.search];
+  if (hit) return { ok: true, status: 200, json: async () => hit };
+  return realFetch ? realFetch(input, init) : { ok: false, status: 404, json: async () => ({ error: 'unseeded' }) };
+};
+if (!location.hash) history.replaceState(null, '', '#/scan/mainnet/0xe1cE2345d25462996AE27F58E3e001245e043EA4');
+</script>
+<script>
+const CLASSES={1:'extraction',2:'ordering',3:'authority',4:'availability',5:'encoding',6:'asset-handling',7:'stranded-value',8:'upgrade-lifecycle',9:'lifecycle-state'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const chip=(c,extra='')=>`<span class="chip" style="color:var(--c${c});border-color:var(--c${c)};${extra}">${c} ${esc(CLASSES[c]||'')}</span>`;
+const get=async u=>{const r=await fetch(u);const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);return j};
+
+async function scanView(chain, address){
+  const main=document.getElementById('main');
+  main.innerHTML=`<h1>scan a contract</h1>
+   <p class="note">Paste an address (or raw 0x bytecode). You get matched placards, what was actually read, and a sheet you can hand to someone.</p>
+   <form class="row" id="f">
+     <input id="t" size="44" placeholder="0x address or 0x bytecode" value="${esc(address||'')}">
+     <select id="c">${['mainnet','base','arbitrum','optimism','sepolia'].map(x=>`<option${x===chain?' selected':''}>${x}</option>`).join('')}</select>
+     <button class="primary">scan</button>
+   </form>
+   <p class="note" id="examples">try: <a href="#/scan/mainnet/0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c">the escrow HZ-001 was found on</a></p>
+   <div id="out"></div>`;
+  document.getElementById('f').onsubmit=e=>{e.preventDefault();location.hash=`#/scan/${document.getElementById('c').value}/${document.getElementById('t').value.trim()}`};
+  if(!address) return;
+  const out=document.getElementById('out'); out.innerHTML='<p class="note">reading chain…</p>';
+  let d; try{ d=await get(`/scan?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}`); }
+  catch(e){ out.innerHTML=`<div class="card warn"><b class="err">blocked</b><div class="note">${esc(e.message)}</div></div>`; return }
+  const cov=d.coverage||{}, ms=d.matches||[], sub=d.subject||{}, P=d.presentation||{};
+  const idents=Object.entries(sub.identity||{}).map(([a,v])=>`${esc(a.slice(0,10))} ${esc(v.name||v.state||'')}`).join(' · ');
+  const subjectCard = sub.kind? `<p class="sp small prose">${esc(sub.kind)} <code>${esc(sub.requested)}</code>
+    ${sub.via?` · resolved via ${esc(sub.via)}`:''}
+    ${sub.effective&&sub.effective!==sub.requested?` · logic at <code>${esc(sub.effective)}</code>`:''}
+    ${idents?` · ${idents}`:''}</p>` : '';
+  const sheetHref=`/sheet?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}`;
+  out.innerHTML=`
+   <article class="lede">
+     <div class="kicker">hazmat · safety data sheet</div>
+     <h1>${esc(d.target)}</h1>
+     <p class="lede-p prose">${esc(P.standfirst||'')}</p>
+     <div class="facts">${(P.badges||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join('')}</div>
+     ${subjectCard}
+     <div class="row" style="margin-top:.7rem">
+       <a class="card" href="${sheetHref}" target="_blank">open sheet</a>
+       <a class="card" href="/pdf?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}">pdf</a>
+       <span class="card" id="perm">permalink</span>
+     </div>
+   </article>
+   <div class="card banner"><b>Assertion level: ${esc(d.assertion||'')}.</b> A match is a candidate, not a clearance:
+    this fingerprints a contract against registered hazard shapes, it does not audit it.
+    A clean sheet is not the same as safe.</div>
+   <h2>summary</h2>
+   <ul class="summary prose">${(P.summary||[]).map(b=>`<li>${b.label?`<b>${esc(b.label)}:</b> `:''}${esc(b.text)}</li>`).join('')}</ul>
+   <h2>hazards found</h2>
+   ${(P.hazards||[]).map(h=>`<div class="haz" style="border-left:3px solid var(--c${h.class})">
+      <div class="row"><a href="#/placard/${esc(h.id)}"><b>${esc(h.id)}</b></a>${chip(h.class)}
+        ${h.badges.map(b=>`<span class="badge${b==='confirmed on this target'?' good':''}">${esc(b)}</span>`).join('')}</div>
+      <div class="haz-title">${esc(h.title)}</div>
+      ${h.summary?`<p class="prose">${esc(h.summary)}</p>`:''}
+      ${h.money?`<p class="prose"><b>What is at stake:</b> ${esc(h.money.replace(/\.$/,''))}.</p>`:''}
+      ${h.fix?`<p class="prose"><b>What to do:</b> ${esc(h.fix)}</p>`:''}
+      ${h.evidence?`<p class="sp small">${esc(h.evidence)}</p>`:''}
+      ${h.precedent?`<p class="sp prose small">${esc(h.precedent)}</p>`:''}
+      <p class="sp small">matched by <code>${esc((h.matched_by||[]).join(' '))}</code></p>
+     </div>`).join('') || `<div class="card"><p class="prose">None of the registered hazards are present.
+      That is not the same as safe: the register is shaped after a handful of projects, so this contract may
+      simply be unfamiliar to it.</p></div>`}
+   <h2>what was read</h2>
+   <p class="prose">${esc(P.coverage_means||cov.means||'')}</p>
+   <div class="grid">
+     <div class="card"><div class="big">${cov.selectors_in_code}</div><div class="sp">selectors in code</div></div>
+     <div class="card"><div class="big">${cov.selectors_the_register_asks_about}</div><div class="sp">the register asks about</div></div>
+     <div class="card"><div class="big">${cov.selectors_otherwise_unaccounted}</div><div class="sp">unaccounted</div></div>
+     <div class="card"><div class="big">${esc((d.register_anchor||{}).epoch||'-')}</div><div class="sp">anchor epoch</div></div>
+   </div>
+   <p class="sp small prose">${esc(P.coverage_note||'')}</p>
+   <details><summary>unaccounted selectors &mdash; the nearest misses (${(cov.unaccounted_sample||[]).length}). These are in the code and no registered hazard asks about them.</summary>
+   <table>${(cov.unaccounted_sample||[]).map(u=>`<tr><td><code>${esc(u.selector)}</code></td><td class="sp">${esc(u.signature||'unnamed')}</td></tr>`).join('')}</table></details>
+   <h2>not checked at all</h2>
+   <ul class="prose">${(P.not_checked||d.not_checked||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+   <h2>the technical part</h2>
+   <p class="sp small">${esc(P.pins||'')}</p>
+   <table>${(P.technical||[]).map(t=>`<tr><td class="sp">${esc(t.label)}</td><td><code>${esc(t.value)}</code></td></tr>`).join('')}</table>
+   <h2>the sheet as a document</h2><iframe src="${sheetHref}" title="sheet"></iframe>`;
+  document.getElementById('perm').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href);document.getElementById('perm').textContent='copied'};
+}
+
+async function registerView(){
+  const r=await get('/api/register'); const main=document.getElementById('main');
+  main.innerHTML=`<h1>the register</h1>
+   <p class="note">Append-only, cited like a CVE. <b>pattern</b> is a bytecode match and only a candidate; <b>confirmed</b> came with a reproduction that ran and a rebuilt runtime whose selector set matches the deployed code.</p>
+   <table><tr><th>id</th><th>class</th><th>hazard</th><th>tier</th><th>money</th></tr>
+   ${r.placards.map(p=>`<tr class="clickable" onclick="location.hash='#/placard/${esc(p.id)}'">
+     <td><b>${esc(p.id)}</b></td><td>${chip(p.placard_class)}</td><td>${esc(p.title)}</td>
+     <td class="sp">${esc(p.tier)}</td><td class="sp">${esc(p.money)}</td></tr>`).join('')}</table>
+   <p class="note">${r.count} placards · epoch ${esc((r.anchor||{}).epoch||'none')} ${esc((r.anchor||{}).root||'')}</p>`;
+}
+
+async function placardView(id){
+  const p=await get('/api/placard/'+encodeURIComponent(id)); const main=document.getElementById('main');
+  const c=p.confirmation||{};
+  main.innerHTML=`<h1>${esc(p.id)} ${chip(p.placard_class)}</h1>
+   <div class="card">${esc(p.title)}<div class="note">${esc(p.summary)}</div></div>
+   <h2>matcher</h2><div class="card"><code>${esc((p.matcher.require_all||[]).join(' '))}</code>
+    ${(p.matcher.require_none_of||[]).length?`<div class="sp">absent check over ${p.matcher.require_none_of.length} signatures</div>`:''}
+    <div class="note">${esc(p.matcher.notes||'')}</div></div>
+   <h2>money</h2><div class="card">${esc((p.money_bound||{}).expression||'n/a')}</div>
+   <h2>reproduction</h2><div class="card"><code>${esc((p.reproduction||{}).command||'')}</code>
+     <div class="sp">${esc((p.reproduction||{}).expected||'')}</div></div>
+   ${c.verdict?`<h2>confirmation</h2><div class="card"><b>${esc(c.verdict)}</b>
+     <div class="sp">${esc(c.evidence||'')}</div><div class="sp">${esc(c.selector_agreement||'')}</div>
+     <div class="sp">record <code>${esc(c.record||'')}</code></div></div>`:''}
+   <h2>provenance</h2><div class="card"><div class="sp">${esc((p.provenance||{}).specimen||'')}</div>
+     <div class="sp">${esc((p.provenance||{}).published_source||'')}</div>
+     <ul class="note">${((p.provenance||{}).evidence||[]).map(e=>`<li>${esc(e)}</li>`).join('')}</ul></div>
+   <h2>anchor</h2><div id="proof" class="card">checking…</div>`;
+  try{ const pr=await get('/api/proof?placard='+encodeURIComponent(id));
+    document.getElementById('proof').innerHTML=`epoch ${esc(pr.epoch)} · leaf <code>${esc(pr.leaf)}</code>
+     <div class="sp">${pr.proof.length} proof steps · root <code>${esc(pr.root)}</code></div>
+     <div class="sp">${pr.verified?'proof verifies against the published root':'PROOF DOES NOT VERIFY'}</div>`;
+  }catch(e){ document.getElementById('proof').textContent=e.message }
+}
+
+async function anchorsView(){
+  const a=await get('/api/anchors'); const main=document.getElementById('main');
+  main.innerHTML=`<h1>anchors</h1>
+   <p class="note">One merkle root per epoch. Leaf = keccak256 of a placard's canonical json; pairs are sorted before hashing so a proof needs no side flags; an odd level sorts and then duplicates its last node. <code>anchors/HazMatAnchor.sol</code> implements the same fold on-chain and a forge test checks it against this prover.</p>
+   ${a.epochs.map(e=>`<div class="card"><b>epoch ${esc(e.epoch)}</b> <span class="sp">${esc(e.placards)} placards · register v${esc(e.register_digest)}</span>
+     <div><code>${esc(e.root)}</code></div></div>`).join('')||'<p class="note">no epoch published yet</p>'}
+   <h2>prove a placard</h2><div class="card"><input id="pl" placeholder="HZ-001" size="12">
+    <div id="proofout" class="sp"></div></div>`;
+  document.getElementById('pl').oninput=async e=>{
+    const el=document.getElementById('proofout'); const id=e.target.value.trim().toUpperCase(); if(!id) return el.textContent='';
+    try{ const p=await get('/api/proof?placard='+id);
+      el.innerHTML=`leaf <code>${esc(p.leaf)}</code> · ${p.proof.length} steps · root <code>${esc(p.root)}</code> · ${p.verified?'<span style="color:var(--ok)">verifies</span>':'<span class="err">fails</span>'}`;
+    }catch(err){ el.textContent=err.message }
+  };
+}
+
+function aboutView(){
+  document.getElementById('main').innerHTML=`<h1>what this is, and what it is not</h1>
+   <div class="card"><b>two tiers.</b> <b>pattern</b> is a bytecode match: cheap, no source needed, and only a candidate. <b>confirmed</b> means the placard ships a reproduction that ran, and the source was rebuilt with the record's own compiler settings to a selector set identical to the deployed runtime.</div>
+   <div class="card"><b>nothing claims safety.</b> A match means the selectors a placard asks about are present. It does not mean the hazard is reachable, and a clean sheet mostly means unfamiliar.</div>
+   <div class="card"><b>what a sheet always states.</b> Bytes read, selectors extracted, how many the register asked about, which ones nothing accounts for, the register's digest and anchor epoch. Evidence of what was read, not just what matched.</div>
+   <div class="card"><b>read-only.</b> No wallet, no signature, no broadcast. Code is read from a public RPC; sheets are self-contained and carry their own digest, re-derivable with <code>hazmat verify</code>.</div>
+   <div class="card"><b>the corpus is small.</b> Ten placards shaped after a handful of projects. Breadth, not machinery, is the limit.</div>`;
+}
+
+function route(){
+  const h=location.hash.replace(/^#/,'')||'/'; const parts=h.split('/').filter(Boolean);
+  document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#/'+parts[0]||(!parts.length&&a.getAttribute('href')==='#/')));
+  if(!parts.length) return scanView('mainnet','');
+  if(parts[0]==='scan') return scanView(parts[1]||'mainnet', parts[2]||'');
+  if(parts[0]==='register') return registerView();
+  if(parts[0]==='placard') return placardView(parts[1]);
+  if(parts[0]==='anchors') return anchorsView();
+  if(parts[0]==='about') return aboutView();
+  return scanView('mainnet','');
+}
+
+async function boot(){
+  try{ const r=await fetch('/api/register').then(r=>r.json());
+    document.getElementById('anchorTag').textContent = r.anchor? 'epoch '+r.anchor.epoch : 'no epoch';
+    document.getElementById('regline').textContent = ' register '+r.count+' placards v'+(r.digest||'');
+  }catch(e){}
+  route();
+}
+addEventListener('hashchange',route); boot();
+</script>
+</html>

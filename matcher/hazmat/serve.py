@@ -165,7 +165,9 @@ class Handler(BaseHTTPRequestHandler):
         except OSError as exc:
             return self._fail('rpc unreachable: %s' % exc)
         if path == '/scan':
-            return self._send(json.dumps(report, indent=2, sort_keys=True), 'application/json')
+            # the generated prose rides along so the app renders the same sentences as the sheet
+            payload = dict(report, presentation=sds.present(report))
+            return self._send(json.dumps(payload, indent=2, sort_keys=True), 'application/json')
         page, digest = sds.render(report)
         if path == '/sheet':
             return self._send(page)

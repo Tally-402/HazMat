@@ -28,7 +28,22 @@
  .warn{border-color:#5c4b1a;background:#1b1710}
  iframe{width:100%;height:34rem;border:1px solid var(--line);background:#111;border-radius:4px}
  footer{color:var(--dim);padding:2rem 1.4rem;border-top:1px solid var(--line);font-size:.85rem}
- .sp{color:var(--dim)} .err{color:var(--c1)}
+ .sp{color:var(--dim)} .err{color:var(--c1)} .small{font-size:.85rem}
+ .prose{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.62}
+ .lede{border-bottom:2px solid var(--line);padding-bottom:1rem;margin-bottom:1.2rem}
+ .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+ .lede h1{font-size:1.7rem;line-height:1.25;margin:.35rem 0 .5rem;letter-spacing:-.01em}
+ .lede-p{font-size:1.05rem;margin:.5rem 0}
+ .facts{display:flex;flex-wrap:wrap;gap:.35rem .8rem;margin:.7rem 0 0}
+ .badge{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:.05rem .5rem;font-size:.72rem;color:var(--dim);white-space:nowrap}
+ .badge.good{border-color:var(--ok);color:var(--ok)}
+ .banner{border-left:3px solid var(--acc)}
+ ul.summary{padding-left:1.1rem;max-width:46rem} ul.summary li{margin:.35rem 0}
+ .haz{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:.9rem 1rem;margin:.8rem 0}
+ .haz-title{font-weight:600;margin:.4rem 0}
+ .haz p{margin:.45rem 0;max-width:48rem}
+ details{margin:.6rem 0} summary{cursor:pointer}
+ details table{margin-top:.5rem}
 </style>
 <header><b>HAZMAT</b>
  <nav>
@@ -61,40 +76,62 @@ async function scanView(chain, address){
   const out=document.getElementById('out'); out.innerHTML='<p class="note">reading chain…</p>';
   let d; try{ d=await get(`/scan?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}`); }
   catch(e){ out.innerHTML=`<div class="card warn"><b class="err">blocked</b><div class="note">${esc(e.message)}</div></div>`; return }
-  const cov=d.coverage||{}, ms=d.matches||[], sub=d.subject||{};
+  const cov=d.coverage||{}, ms=d.matches||[], sub=d.subject||{}, P=d.presentation||{};
   const idents=Object.entries(sub.identity||{}).map(([a,v])=>`${esc(a.slice(0,10))} ${esc(v.name||v.state||'')}`).join(' · ');
-  const subjectCard = sub.kind? `<div class="card" style="border-color:#3a3f45">
-    <div class="row"><b>${esc(sub.kind)}</b><span class="sp">${esc(sub.requested)}</span></div>
-    ${sub.via?`<div class="sp">resolved via ${esc(sub.via)}</div>`:''}
-    ${sub.effective&&sub.effective!==sub.requested?`<div>logic at <code>${esc(sub.effective)}</code></div>`:''}
-    ${idents?`<div class="sp">${idents}</div>`:''}
-    ${(sub.evidence||[]).map(e=>`<div class="sp">${esc(e)}</div>`).join('')}
-    ${sub.kind==='possible-proxy'?`<div class="sp">the code delegatecalls but no pointer was found, so the logic may sit somewhere this resolver cannot see</div>`:''}
-   </div>` : '';
-  out.innerHTML=subjectCard+`
-   <div class="card"><div class="row"><b>${ms.length} placard${ms.length===1?'':'s'} matched</b><span class="sp">${esc(d.family)} · ${cov.selectors_in_code} selectors read · ${cov.placards_checked} placards checked</span></div>
-    <div class="note">${esc(cov.means||'')}</div>
-    <div class="row" style="margin-top:.6rem">
-      <a class="card" href="/sheet?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}" target="_blank">open sheet</a>
-      <a class="card" href="/pdf?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}">pdf</a>
-      <span class="card" id="perm">permalink</span>
-    </div></div>
-   ${ms.map(m=>`<div class="card" style="border-left:3px solid var(--c${m.placard_class})">
-      <div class="row"><a href="#/placard/${esc(m.id)}"><b>${esc(m.id)}</b></a>${chip(m.placard_class)}<span class="sp">${esc(m.tier)} placard · assertion: ${esc(m.assertion)}</span>${(m.confirmed_on||[]).some(c=>address&&(c.target||'').toLowerCase().includes(address.toLowerCase()))?'<b>confirmed on this target</b>':''}</div>
-      <div>${esc(m.title)}</div>
-      <div class="sp">money: ${esc((m.money_bound||{}).expression||'n/a')}</div>
-      <div class="sp">matched by <code>${esc((m.matched_selectors||[]).join(' '))}</code>${m.role&&m.role!=='requested'?` on the ${esc(m.role)} <code>${esc((m.at||'').slice(0,10))}</code>`:''}</div></div>`).join('') || '<div class="card"><b>no placard matched</b><div class="note">that is not the same as safe. The register has '+cov.placards_checked+' placards and they are shaped after a small number of projects, so a clean sheet mostly means unfamiliar, not sound.</div></div>'}
+  const subjectCard = sub.kind? `<p class="sp small prose">${esc(sub.kind)} <code>${esc(sub.requested)}</code>
+    ${sub.via?` · resolved via ${esc(sub.via)}`:''}
+    ${sub.effective&&sub.effective!==sub.requested?` · logic at <code>${esc(sub.effective)}</code>`:''}
+    ${idents?` · ${idents}`:''}</p>` : '';
+  const sheetHref=window.SHEET_HREF||`/sheet?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}`;
+  out.innerHTML=`
+   <article class="lede">
+     <div class="kicker">hazmat · safety data sheet</div>
+     <h1>${esc(d.target)}</h1>
+     <p class="lede-p prose">${esc(P.standfirst||'')}</p>
+     <div class="facts">${(P.badges||[]).map(b=>`<span class="badge">${esc(b)}</span>`).join('')}</div>
+     ${subjectCard}
+     <div class="row" style="margin-top:.7rem">
+       <a class="card" href="${sheetHref}" target="_blank">open sheet</a>
+       <a class="card" href="/pdf?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}">pdf</a>
+       <span class="card" id="perm">permalink</span>
+     </div>
+   </article>
+   <div class="card banner"><b>Assertion level: ${esc(d.assertion||'')}.</b> A match is a candidate, not a clearance:
+    this fingerprints a contract against registered hazard shapes, it does not audit it.
+    A clean sheet is not the same as safe.</div>
+   <h2>summary</h2>
+   <ul class="summary prose">${(P.summary||[]).map(b=>`<li>${b.label?`<b>${esc(b.label)}:</b> `:''}${esc(b.text)}</li>`).join('')}</ul>
+   <h2>hazards found</h2>
+   ${(P.hazards||[]).map(h=>`<div class="haz" style="border-left:3px solid var(--c${h.class})">
+      <div class="row"><a href="#/placard/${esc(h.id)}"><b>${esc(h.id)}</b></a>${chip(h.class)}
+        ${h.badges.map(b=>`<span class="badge${b==='confirmed on this target'?' good':''}">${esc(b)}</span>`).join('')}</div>
+      <div class="haz-title">${esc(h.title)}</div>
+      ${h.summary?`<p class="prose">${esc(h.summary)}</p>`:''}
+      ${h.money?`<p class="prose"><b>What is at stake:</b> ${esc(h.money.replace(/\.$/,''))}.</p>`:''}
+      ${h.fix?`<p class="prose"><b>What to do:</b> ${esc(h.fix)}</p>`:''}
+      ${h.evidence?`<p class="sp small">${esc(h.evidence)}</p>`:''}
+      ${h.precedent?`<p class="sp prose small">${esc(h.precedent)}</p>`:''}
+      <p class="sp small">matched by <code>${esc((h.matched_by||[]).join(' '))}</code></p>
+     </div>`).join('') || `<div class="card"><p class="prose">None of the registered hazards are present.
+      That is not the same as safe: the register is shaped after a handful of projects, so this contract may
+      simply be unfamiliar to it.</p></div>`}
    <h2>what was read</h2>
+   <p class="prose">${esc(P.coverage_means||cov.means||'')}</p>
    <div class="grid">
      <div class="card"><div class="big">${cov.selectors_in_code}</div><div class="sp">selectors in code</div></div>
      <div class="card"><div class="big">${cov.selectors_the_register_asks_about}</div><div class="sp">the register asks about</div></div>
      <div class="card"><div class="big">${cov.selectors_otherwise_unaccounted}</div><div class="sp">unaccounted</div></div>
      <div class="card"><div class="big">${esc((d.register_anchor||{}).epoch||'-')}</div><div class="sp">anchor epoch</div></div>
    </div>
-   <h2>unaccounted selectors (nearest misses)</h2>
-   <table>${(cov.unaccounted_sample||[]).map(u=>`<tr><td><code>${esc(u.selector)}</code></td><td class="sp">${esc(u.signature||'unindexed')}</td></tr>`).join('')}</table>
-   <h2>sheet</h2><iframe src="/sheet?chain=${encodeURIComponent(chain)}&target=${encodeURIComponent(address)}" title="sheet"></iframe>
-   <p class="note">code sha256 <code>${esc(d.code_sha256)}</code> · register ${esc(d.register_size)} placards v${esc(d.register_digest||'')}</p>`;
+   <p class="sp small prose">${esc(P.coverage_note||'')}</p>
+   <details><summary>unaccounted selectors &mdash; the nearest misses (${(cov.unaccounted_sample||[]).length}). These are in the code and no registered hazard asks about them.</summary>
+   <table>${(cov.unaccounted_sample||[]).map(u=>`<tr><td><code>${esc(u.selector)}</code></td><td class="sp">${esc(u.signature||'unnamed')}</td></tr>`).join('')}</table></details>
+   <h2>not checked at all</h2>
+   <ul class="prose">${(P.not_checked||d.not_checked||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+   <h2>the technical part</h2>
+   <p class="sp small">${esc(P.pins||'')}</p>
+   <table>${(P.technical||[]).map(t=>`<tr><td class="sp">${esc(t.label)}</td><td><code>${esc(t.value)}</code></td></tr>`).join('')}</table>
+   <h2>the sheet as a document</h2><iframe src="${sheetHref}" title="sheet"></iframe>`;
   document.getElementById('perm').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(location.href);document.getElementById('perm').textContent='copied'};
 }
 
