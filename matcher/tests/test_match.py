@@ -535,8 +535,9 @@ class Mark(unittest.TestCase):
         from hazmat import pdf
         report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
         body = pdf.render_pdf(report)
-        self.assertIn(b'/Subtype /Image', body)
-        self.assertEqual(body.count(b'/XObject'), 1)            # page one, and nowhere else
+        self.assertEqual(body.count(b'/Subtype /Image'), 1)     # one image object, exactly
+        self.assertEqual(body.count(b'/XObject <<'), 1)         # referenced by page one only
+        self.assertLess(body.index(b'/XObject <<'), body.index(b'/Subtype /Image'))
         self.assertEqual(pdf.render_pdf(report), body)          # still deterministic
 
     def test_without_the_asset_the_document_still_renders(self):
