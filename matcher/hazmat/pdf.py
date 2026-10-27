@@ -82,8 +82,12 @@ def lines_for(report):
     if not report['matches']:
         out += wrap('no placard matched. That is not the same as safe.')
     for m in report['matches']:
-        out += ['', '%s  class %s %s  tier %s  [%s]' % (m['id'], m['placard_class'],
-                                                        m.get('placard_class_name') or '', m['tier'], m['assertion'])]
+        here = (report.get('subject') or {}).get('effective') or report.get('target', '')
+        reproduced = [c for c in (m.get('confirmed_on') or [])
+                      if here and here.lower() in (c.get('target') or '').lower()]
+        tier = 'confirmed on this target' if reproduced else m['tier']
+        out += ['', '%s  class %s %s  tier %s  [scan is %s]' % (m['id'], m['placard_class'],
+                                                                m.get('placard_class_name') or '', tier, m['assertion'])]
         out += ['  ' + line for line in wrap(m['title'], WRAP - 2)]
         if m.get('money_bound', {}).get('expression'):
             out += ['  money: ' + line for line in wrap(m['money_bound']['expression'], WRAP - 9)]

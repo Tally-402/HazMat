@@ -29,7 +29,8 @@ PAGE = """<!doctype html><meta charset="utf-8">
 <div>code sha256 <code>{sha}</code></div>
 <div>register {register} placards v{register_digest} &middot; body {body}B &middot; metadata {meta}B excluded &middot; {consts} four-byte constants</div>
 <div>anchor {anchor}</div>
-<div class="banner"><b>Assertion level: {assertion}.</b> A match is a candidate, not a clearance. {note}</div>
+<div class="banner"><b>Assertion level: {assertion}.</b> A match is a candidate, not a clearance. {note}
+A placard's own tier is in its row and says whether it was ever reproduced against a live target.</div>
 <h2>What was read</h2>
 <div class="banner">{coverage}</div>
 <table>
@@ -105,12 +106,23 @@ def scan_table(report):
 
 def render(report):
     rows = []
+    here_address = (report.get('subject') or {}).get('effective') or report.get('target', '')
     for m in report['matches']:
         selectors = ' '.join(m.get('matched_selectors') or [])
+        # the placard's own tier, not the scan's assertion level: a user has to be able to see
+        # that this hazard was reproduced, and against which target
+        tier = html.escape(m.get('tier') or 'pattern')
+        reproduced = [c for c in (m.get('confirmed_on') or [])
+                      if here_address and here_address.lower() in (c.get('target') or '').lower()]
+        if reproduced:
+            tier = 'confirmed <b>on this target</b>'
+            record = (reproduced[0].get('confirmation') or {}).get('record')
+            if record:
+                tier += ' <code>%s</code>' % html.escape(record)
         rows.append('<tr><td class="id">{}</td><td>{} {}</td><td>{}</td><td>{}</td><td>{}</td>'
                     '<td class="sel">{}{}</td></tr>'.format(
                         html.escape(m['id']), m['placard_class'], html.escape(m.get('placard_class_name') or ''),
-                        html.escape(m['title']), html.escape(m['assertion']),
+                        html.escape(m['title']), tier,
                         html.escape(m.get('money_bound', {}).get('expression', 'n/a')),
                         html.escape(selectors),
                         (' &middot; %d absence checks' % m['absent_checked']) if m.get('absent_checked') else ''))
@@ -121,7 +133,7 @@ def render(report):
                        register_digest=html.escape(report.get('register_digest', 'unpinned')),
                        body=report['stats']['body_bytes'], meta=report['stats']['metadata_bytes'],
                        consts=report['stats']['push4_constants'], assertion=html.escape(report['assertion']),
-                       note=html.escape(report['assertion'] + ' match only' if report['matches'] else 'nothing matched'),
+                       note=html.escape('%d placard(s) matched' % len(report['matches']) if report['matches'] else 'nothing matched'),
                        rows='\n'.join(rows),
                        notchecked=''.join('<li>%s</li>' % html.escape(x) for x in report['not_checked']),
                        anchor=html.escape(anchor_line(report)), sheet=PLACEHOLDER,

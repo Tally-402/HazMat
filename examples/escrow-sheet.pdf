@@ -9,7 +9,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 2609 >>
+<< /Length 2678 >>
 stream
 BT
 /F1 9 Tf 11.5 TL
@@ -46,18 +46,18 @@ BT
 () Tj T*
 (PLACARDS) Tj T*
 () Tj T*
-(HZ-001  class 2 ordering  tier confirmed  [pattern]) Tj T*
+(HZ-001  class 2 ordering  tier confirmed on this target  [scan is pattern]) Tj T*
 (  A still-valid action is destroyed by a permissionless trigger in the same block) Tj T*
 (  money: one deal amount, which is the worker's entire payment on the affected deal) Tj T*
 (  matched: 0xe4725ba1 0x7c7a9804 0x82cbf88b) Tj T*
 () Tj T*
-(HZ-005  class 7 stranded-value  tier confirmed  [pattern]) Tj T*
+(HZ-005  class 7 stranded-value  tier confirmed on this target  [scan is pattern]) Tj T*
 (  Value arriving outside the accounting has no sweep) Tj T*
 (  money: the stranded amount itself, unbounded by any ceiling) Tj T*
 (  matched: 0x70b6fbec 0xb12ae89c 0x9b40b785) Tj T*
 (  absence checks: 3) Tj T*
 () Tj T*
-(HZ-009  class 2 ordering  tier confirmed  [pattern]) Tj T*
+(HZ-009  class 2 ordering  tier confirmed on this target  [scan is pattern]) Tj T*
 (  Two permissionless exits are both legal in one block and pay opposite amounts) Tj T*
 (  money: one deal: full price on one ordering, zero on the other) Tj T*
 (  matched: 0xc9566ca9 0x7249fbb6 0xe4725ba1 0x7c7a9804) Tj T*
@@ -85,9 +85,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000002902 00000 n 
+0000002971 00000 n 
 trailer
 << /Size 6 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-2999
+3068
 %%EOF
