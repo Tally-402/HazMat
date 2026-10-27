@@ -88,6 +88,24 @@ def lines_for(report):
     out += ['', 'ASSERTION LEVEL: ' + report['assertion'].upper()]
     out += wrap('  A match is a candidate, not a clearance: this sheet fingerprints a contract against '
                 'registered hazard shapes, it does not audit it. A clean sheet is not the same as safe.', WRAP - 2)
+    out += ['', 'ANSWERS TO THE USUAL QUESTIONS']
+    out += wrap('  read from the selectors this contract exposes, not from its docs. Every answer says what it '
+                'cannot tell you.', WRAP - 2)
+    for item in sds.present(report)['answers']:
+        out += ['', '  ' + item['question']]
+        out += ['    ' + line for line in wrap(clean(item['answer']), WRAP - 4)]
+        out += ['    ' + line for line in wrap('seen: ' + (', '.join(item['evidence']) or
+                                                            'no matching selector, so this is its shape'), WRAP - 4)]
+        out += ['    ' + line for line in wrap('not answered here: ' + item['cannot'], WRAP - 4)]
+        if item.get('related'):
+            out.append('    related hazard: ' + ', '.join(item['related']))
+    out += ['', '  BOTTOM LINE']
+    out += wrap('    ' + clean(sds.present(report)['bottom_line']), WRAP - 4)
+    checklist = sds.present(report)['checklist']
+    if checklist:
+        out += ['', '  BEFORE YOU TRUST IT, CHECK']
+        for item in checklist:
+            out += ['    - ' + line for line in wrap(clean(item), WRAP - 6)]
     out += ['', 'HAZARDS FOUND']
     if not report['matches']:
         out += wrap('  None of the registered hazards are present. That is not the same as safe: the register is '

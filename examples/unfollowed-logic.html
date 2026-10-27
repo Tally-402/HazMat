@@ -24,6 +24,9 @@ small,.dim{color:var(--dim)}
 .badge.bad{border-color:var(--warn);color:var(--warn)}
 .banner{background:var(--panel);border-left:3px solid var(--acc);padding:.7rem .9rem;margin:1.2rem 0;font-size:.92rem}
 .hazard{border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;margin:1.1rem 0}
+.qa{border-left:2px solid var(--line);padding:.1rem 0 .1rem .9rem;margin:1.1rem 0}
+.qa h3{margin:.2rem 0 .2rem;font-size:1rem}
+.qa p{margin:.25rem 0}
 .hazard h3{margin-top:0}
 .hazard .id{font-weight:600;color:var(--acc)}
 .hazard .why{border-left:2px solid var(--line);padding-left:.7rem;margin:.6rem 0;color:var(--dim);font-size:.94rem}
@@ -61,6 +64,19 @@ A clean sheet is not the same as safe.</div>
 </section>
 
 <section>
+<h2>Answers to the usual questions</h2>
+<p class="dim">Read from the selectors this contract exposes, not from its docs. Every answer says what it
+cannot tell you.</p>
+<div class="qa"><h3>What is this?</h3><p>It is a proxy: calls are forwarded to logic held at another address. Everything below is read from the bytecode it exposes, not from its docs.</p><p class="dim small">Seen: no matching selector, so this is the shape of the contract</p><p class="dim small">Not answered here: Whether it is any good, and who wrote it.</p></div><div class="qa"><h3>Can the rules change under me?</h3><p>Yes. This is a proxy or it exposes upgrade entry points, so the code that runs can be replaced while the address, and anything you have deposited, stays put. The rules you read today are not guaranteed to be the rules tomorrow.</p><p class="dim small">Seen: the scan resolved this as a possible-proxy</p><p class="dim small">Not answered here: Who holds the upgrade key, and whether there is a delay before a change takes effect.</p> <p class="dim small">Related hazard: <a href="#HZ-011">HZ-011</a> <a href="#HZ-012">HZ-012</a></p></div><div class="qa"><h3>Who is in charge?</h3><p>No owner or admin function is exposed here. Either nothing is configurable, or the power sits behind a proxy or another contract this scan could not follow.</p><p class="dim small">Seen: no matching selector, so this is the shape of the contract</p><p class="dim small">Not answered here: Which of those two it is.</p></div>
+<p class="banner"><b>Bottom line:</b> Nothing in this register matched, so it is unfamiliar rather than cleared. 16 hazards were checked; the ones that fired nowhere include reentrancy, ordering and authority shapes. Nothing here says safe.</p>
+</section>
+
+<section>
+<h2>Before you trust it, check</h2>
+<ul><li>Find out who can upgrade it, and whether there is a delay.</li></ul>
+</section>
+
+<section>
 <h2>Hazards found</h2>
 <p>None of the registered hazards are present. That is not the same as safe: the register is shaped after a handful of projects, so this contract may simply be unfamiliar to it.</p>
 </section>
@@ -90,7 +106,7 @@ A clean sheet is not the same as safe.</div>
 </section>
 
 <footer>
-<p>sheet sha256 <code>7357f207204865fda0f9d60087b5f1f768e9e96d4dbc6055484845a0bcfd6e30</code></p>
+<p>sheet sha256 <code>15b128ebc570600916a91e92914061374499e2457641bda43eed9059beb00b65</code></p>
 <p>Re-derive it with <code>hazmat verify --sheet &lt;this file&gt;</code> &mdash; the digest is over these bytes, so any edit shows up.
 To cite this in writing, quote the placard id, the code sha256 and the register digest, all above.</p>
 </footer>

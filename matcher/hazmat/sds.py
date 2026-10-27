@@ -15,6 +15,8 @@ import re
 import sys
 from pathlib import Path
 
+from . import capabilities
+
 PLACEHOLDER = '{SHEET}'
 DIGEST_LINE = re.compile(r'sheet sha256 <code>([0-9a-f]{64})</code>')
 
@@ -41,6 +43,9 @@ small,.dim{color:var(--dim)}
 .badge.bad{border-color:var(--warn);color:var(--warn)}
 .banner{background:var(--panel);border-left:3px solid var(--acc);padding:.7rem .9rem;margin:1.2rem 0;font-size:.92rem}
 .hazard{border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;margin:1.1rem 0}
+.qa{border-left:2px solid var(--line);padding:.1rem 0 .1rem .9rem;margin:1.1rem 0}
+.qa h3{margin:.2rem 0 .2rem;font-size:1rem}
+.qa p{margin:.25rem 0}
 .hazard h3{margin-top:0}
 .hazard .id{font-weight:600;color:var(--acc)}
 .hazard .why{border-left:2px solid var(--line);padding-left:.7rem;margin:.6rem 0;color:var(--dim);font-size:.94rem}
@@ -89,6 +94,19 @@ A clean sheet is not the same as safe.</div>
 <section>
 <h2>Summary</h2>
 <ul>{summary}</ul>
+</section>
+
+<section>
+<h2>Answers to the usual questions</h2>
+<p class="dim">Read from the selectors this contract exposes, not from its docs. Every answer says what it
+cannot tell you.</p>
+{answers}
+<p class="banner"><b>Bottom line:</b> {bottom_line}</p>
+</section>
+
+<section>
+<h2>Before you trust it, check</h2>
+<ul>{checklist}</ul>
 </section>
 
 <section>
@@ -365,6 +383,9 @@ def present(report):
                    '%s of %s hazards' % (len(matches), report['register_size']),
                    anchor_line(report)],
         'summary': [{'label': label, 'text': text} for label, text in summarise(report)],
+        'answers': capabilities.answers(report),
+        'checklist': capabilities.what_to_check(report),
+        'bottom_line': capabilities.bottom_line(report),
         'hazards': hazards,
         'subject_plain': subject_plain(report),
         'coverage_means': coverage.get('means', ''),
@@ -399,6 +420,20 @@ def render(report):
         subject=subject_line(report), assertion=html.escape(report['assertion']),
         summary=''.join('<li><b>%s</b>%s %s</li>' % (html.escape(b['label']), ':' if b['label'] else '', b['text'])
                         for b in prose['summary']),
+        answers=''.join(
+            '<div class="qa"><h3>{question}</h3><p>{answer}</p>'
+            '<p class="dim small">Seen: {evidence}</p>'
+            '<p class="dim small">Not answered here: {cannot}</p>{related}</div>'.format(
+                question=html.escape(item['question']), answer=item['answer'],
+                evidence=html.escape(', '.join(item['evidence'])) if item['evidence']
+                else 'no matching selector, so this is the shape of the contract',
+                cannot=html.escape(item['cannot']),
+                related=(' <p class="dim small">Related hazard: %s</p>' % ' '.join(
+                    '<a href="#%s">%s</a>' % (html.escape(r), html.escape(r)) for r in item['related']))
+                if item.get('related') else '')
+            for item in prose['answers']),
+        bottom_line=html.escape(prose['bottom_line']),
+        checklist=''.join('<li>%s</li>' % html.escape(item) for item in prose['checklist']),
         hazards_heading='Hazards found' if matches else 'Hazards found',
         hazards=''.join(hazard_card(m, report) for m in matches) if matches else
                 '<p>None of the registered hazards are present. That is not the same as safe: the register is '

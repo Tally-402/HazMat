@@ -222,6 +222,7 @@ def coverage(code, placards, register_dir):
         'selectors_the_register_asks_about': len(covered),
         'selectors_otherwise_unaccounted': len(uncovered),
         'covered': ['0x' + c for c in covered],
+        'selectors_present': ['0x' + c for c in constants],      # everything the code exposes
         'unaccounted_sample': [{'selector': '0x' + c, 'signature': names.get(c)} for c in uncovered[:24]],
         'named_index_size': len(names),
     }

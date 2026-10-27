@@ -46,6 +46,9 @@ img.mark{width:32px;height:32px;background:#e8e8e8;border-radius:4px;padding:2px
  .haz p{margin:.45rem 0;max-width:48rem}
  details{margin:.6rem 0} summary{cursor:pointer}
  details table{margin-top:.5rem}
+.qa{border-left:2px solid var(--line);padding:.1rem 0 .3rem .8rem;margin:1rem 0}
+.qa h3{margin:.1rem 0 .3rem;font-size:1rem}
+.qa p{margin:.2rem 0}
 </style>
 <link rel="icon" href="/logo.png">
 <header><img class="mark" src="/logo.png" alt="HazMat" width="32" height="32"><b>HAZMAT</b>
@@ -104,6 +107,17 @@ async function scanView(chain, address){
     A clean sheet is not the same as safe.</div>
    <h2>summary</h2>
    <ul class="summary prose">${(P.summary||[]).map(b=>`<li>${b.label?`<b>${esc(b.label)}:</b> `:''}${esc(b.text)}</li>`).join('')}</ul>
+   <h2>answers to the usual questions</h2>
+   <p class="sp small prose">Read from the selectors this contract exposes, not from its docs. Every answer says what it cannot tell you.</p>
+   ${(P.answers||[]).map(a=>`<div class="qa">
+      <h3>${esc(a.question)}</h3><p class="prose">${esc(a.answer)}</p>
+      <p class="sp small">seen: ${esc((a.evidence||[]).join(', ')||'no matching selector, so this is its shape')}</p>
+      <p class="sp small">not answered here: ${esc(a.cannot)}</p>
+      ${(a.related||[]).length?`<p class="sp small">related hazard: ${a.related.map(r=>`<a href="#/placard/${esc(r)}">${esc(r)}</a>`).join(' ')}</p>`:''}
+     </div>`).join('')}
+   <div class="card banner"><b>Bottom line:</b> <span class="prose">${esc(P.bottom_line||'')}</span></div>
+   <h2>before you trust it, check</h2>
+   <ul class="prose">${(P.checklist||[]).map(c=>`<li>${esc(c)}</li>`).join('')}</ul>
    <h2>hazards found</h2>
    ${(P.hazards||[]).map(h=>`<div class="haz" style="border-left:3px solid var(--c${h.class})">
       <div class="row"><a href="#/placard/${esc(h.id)}"><b>${esc(h.id)}</b></a>${chip(h.class)}

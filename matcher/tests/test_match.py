@@ -552,6 +552,71 @@ class Mark(unittest.TestCase):
             logo.MARK = original
 
 
+def got_of(report):
+    from hazmat import capabilities as caps
+    return caps.answers(report)
+
+
+class Capabilities(unittest.TestCase):
+    """The answers are fingerprints with copy attached: test the copy like code."""
+
+    def probe(self, signatures, kind='contract'):
+        """Fire the answers for a made-up contract that exposes exactly these signatures."""
+        from hazmat import capabilities as caps
+        present = [caps.sig(text)[0] for text in signatures]
+        report = {'coverage': {'selectors_present': present}, 'subject': {'kind': kind},
+                  'matches': [], 'register_size': 16}
+        return got_of(report)
+
+    def test_an_erc777_is_told_the_recipient_is_called_back(self):
+        got = self.probe(['granularity()', 'defaultOperators()'])
+        hooks = [a for a in got if a['id'] == 'hooks']
+        self.assertEqual(len(hooks), 1)
+        self.assertEqual(hooks[0]['related'], ['HZ-016'])
+        self.assertIn('called back', hooks[0]['answer'])
+
+    def test_a_proxy_is_told_the_rules_can_change_even_without_upgrade_selectors(self):
+        got = self.probe([], kind='proxy')
+        upgrade = [a for a in got if a['id'] == 'upgrade']
+        self.assertEqual(len(upgrade), 1)
+        self.assertIn('proxy', ' '.join(upgrade[0]['evidence']))
+
+    def test_no_owner_selector_gives_the_honest_answer_not_silence(self):
+        got = self.probe([])
+        self.assertIn('no_owner', [a['id'] for a in got])
+        self.assertNotIn('owner', [a['id'] for a in got])
+
+    def test_the_two_step_sentence_follows_the_code(self):
+        with_two_step = self.probe(['owner()', 'acceptOwnership()'])
+        without = self.probe(['owner()'])
+        self.assertIn('two steps', [a for a in with_two_step if a['id'] == 'owner'][0]['answer'])
+        self.assertIn('single transaction', [a for a in without if a['id'] == 'owner'][0]['answer'])
+
+    def test_every_answer_says_what_it_cannot_tell_you(self):
+        got = self.probe(['owner()', 'pause()'])
+        self.assertTrue(got)
+        for item in got:
+            self.assertTrue(item['cannot'].strip().endswith('.'))
+            self.assertGreater(len(item['answer']), 40)
+
+    def test_the_shape_answer_describes_a_token(self):
+        got = self.probe(['totalSupply()', 'balanceOf(address)', 'transfer(address,uint256)'])
+        self.assertIn('a token contract', got[0]['answer'])
+
+    def test_the_sheet_and_the_pdf_both_carry_every_question(self):
+        from hazmat import pdf
+        report = match.scan('0x' + '63e4725ba1' + '637c7a9804' + '6382cbf88b', REGISTER, as_='code')
+        prose = sds.present(report)
+        page, _ = sds.render(report)
+        body = pdf.render_pdf(report).decode('latin-1')
+        self.assertTrue(prose['answers'])
+        for item in prose['answers']:
+            self.assertIn(item['question'], page)
+            self.assertIn(item['cannot'], page)
+            self.assertIn(item['question'], body)
+        self.assertIn(prose['bottom_line'], page)
+
+
 class Schema(unittest.TestCase):
     def test_the_validator_catches_what_ci_would_catch(self):
         import sys as _sys
@@ -626,6 +691,9 @@ class Api(unittest.TestCase):
         self.assertIn(payload['presentation']['standfirst'], sheet)
         for bullet in payload['presentation']['summary']:
             self.assertIn(bullet['text'], sheet)
+        for item in payload['presentation']['answers']:
+            self.assertIn(item['question'], sheet)
+            self.assertIn(item['answer'], sheet)
         for hazard in payload['presentation']['hazards']:
             self.assertIn(hazard['title'], sheet)
             self.assertIn(hazard['fix'], sheet)
