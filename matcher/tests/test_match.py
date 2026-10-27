@@ -601,7 +601,39 @@ class Capabilities(unittest.TestCase):
 
     def test_the_shape_answer_describes_a_token(self):
         got = self.probe(['totalSupply()', 'balanceOf(address)', 'transfer(address,uint256)'])
-        self.assertIn('a token contract', got[0]['answer'])
+        shape = [a for a in got if a['id'] == 'shape'][0]
+        self.assertIn('a token contract', shape['answer'])
+
+    def test_the_first_question_is_whether_anything_was_found(self):
+        got = self.probe(['totalSupply()', 'balanceOf(address)', 'transfer(address,uint256)'])
+        self.assertEqual(got[0]['id'], 'vulnerabilities')
+        self.assertTrue(got[0]['answer'].startswith('No - and that means less than it sounds'))
+        self.assertIn('not evidence of soundness', got[0]['answer'])
+
+    def test_a_matched_but_undemonstrated_shape_is_called_a_candidate(self):
+        from hazmat import capabilities as caps
+        report = {'coverage': {'selectors_present': []}, 'subject': {'kind': 'contract'}, 'register_size': 16,
+                  'matches': [{'id': 'HZ-013', 'title': 'Pause is gated by a single owner', 'confirmed_on': []}]}
+        got = caps.answers(report)[0]
+        self.assertIn('nothing has been proven exploitable', got['answer'])
+        self.assertIn('HZ-013', got['answer'])
+        self.assertNotIn('reproduced against', got['answer'])
+
+    def test_a_demonstrated_hazard_says_which_address_it_was_reproduced_on(self):
+        from hazmat import capabilities as caps
+        target = '0xabc0000000000000000000000000000000000001'
+        report = {'coverage': {'selectors_present': []}, 'subject': {'kind': 'contract', 'requested': target,
+                                                                     'effective': target}, 'register_size': 16,
+                  'matches': [{'id': 'HZ-016', 'title': 'A token that calls the recipient back',
+                               'confirmed_on': [{'target': target}]}]}
+        got = caps.answers(report)[0]
+        self.assertIn('reproduced against this exact contract', got['answer'])
+        self.assertIn('Nothing else matched', got['answer'])
+        # and for a proxy it names the implementation rather than claiming the proxy itself was proven
+        report['subject'] = {'kind': 'proxy', 'requested': '0xdead000000000000000000000000000000000001',
+                             'effective': target}
+        got = caps.answers(report)[0]
+        self.assertIn('the logic this address points at', got['answer'])
 
     def test_the_sheet_and_the_pdf_both_carry_every_question(self):
         from hazmat import pdf

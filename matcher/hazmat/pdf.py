@@ -24,6 +24,10 @@ WRAP = 104
 MAX_LINES = int((A4[1] - 2 * MARGIN) / LEADING)
 
 
+ASCII = {'\u2014': '-', '\u2013': '-', '\u00b7': '-', '\u2019': "'", '\u2018': "'",
+         '\u201c': '"', '\u201d': '"', '\u2026': '...', '\u2192': '->', '\u00a0': ' '}
+
+
 def escape(text):
     out = []
     for ch in str(text):
@@ -31,6 +35,8 @@ def escape(text):
             out.append('\\' + ch)
         elif 32 <= ord(ch) < 127:
             out.append(ch)
+        elif ch in ASCII:
+            out.append(ASCII[ch])
         else:
             out.append('?')
     return ''.join(out)

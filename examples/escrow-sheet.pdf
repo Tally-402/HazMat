@@ -9,7 +9,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> /XObject << /Im0 10 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 4183 >>
+<< /Length 4420 >>
 stream
 q 40 0 0 40 507 758 cm /Im0 Do Q
 BT
@@ -42,6 +42,26 @@ BT
 (read from the selectors this contract exposes, not from its docs. Every answer says what it cannot) Tj T*
 (tell you.) Tj T*
 () Tj T*
+(  Did you find any vulnerabilities in the contract?) Tj T*
+(    No audit happened, so "found" is the wrong word. But HZ-001, HZ-005 and HZ-009 are not shapes: the) Tj T*
+(    behaviour was reproduced against this exact contract, not a lookalike - a still-valid action is) Tj T*
+(    destroyed by a permissionless trigger in the same block. That makes it a demonstrated hazard rather) Tj T*
+(    than a candidate; it becomes a finding when somebody shows it is reachable, and a bug when the code) Tj T*
+(    is not meant to behave that way. Nothing else matched.) Tj T*
+(    seen: no matching selector, so this is its shape) Tj T*
+(    not answered here: Whether anything here is reachable, and whether it is a bug rather than a) Tj T*
+(    decision. Presence is not proof; absence is not clearance.) Tj T*
+() Tj T*
+(  So is it safe to use?) Tj T*
+(    Unknown, and this sheet will not pretend otherwise. What it can say is narrow and true: which hazard) Tj T*
+(    shapes are present \(3\), which behaviours have been demonstrated \(a placard that says confirmed\), and) Tj T*
+(    which classes the code does not match at all. What it cannot say is whether any of them is) Tj T*
+(    reachable, whether the economics make it exploitable, or whether a hazard is a bug or a deliberate) Tj T*
+(    choice - intent is not in the bytecode.) Tj T*
+(    seen: no matching selector, so this is its shape) Tj T*
+(    not answered here: The honest one: the state of the owner key, what you have approved, and what) Tj T*
+(    happens to the contract after this block.) Tj T*
+() Tj T*
 (  What is this?) Tj T*
 (    It is a contract verified as ClausTokenDealEscrow on mainnet. Everything below is read from the) Tj T*
 (    bytecode it exposes, not from its docs.) Tj T*
@@ -59,6 +79,18 @@ BT
 (    approved, not what the contract can do on its own.) Tj T*
 (    seen: 0x23b872dd transferFrom\(address,address,uint256\)) Tj T*
 (    not answered here: What you have approved right now - that is state, not bytecode.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4156 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
 () Tj T*
 (  BOTTOM LINE) Tj T*
 (3 of 16 registered hazards are present \(HZ-001, HZ-005, HZ-009\). That is the fingerprint, not a) Tj T*
@@ -79,18 +111,6 @@ BT
 (  decides, and the losing exit cannot be repaired because the other is already dead from its own clock.) Tj T*
 (  What is at stake: one deal amount, which is the worker's entire payment on the affected deal.) Tj T*
 (  What to do: Bound the still-valid exit by the same clock as the permissionless trigger, or document) Tj T*
-ET
-endstream
-endobj
-5 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 6 0 R >>
-endobj
-6 0 obj
-<< /Length 3526 >>
-stream
-BT
-/F1 9 Tf 11.5 TL
-48 794 Td
 (              which exit is authoritative after the window.) Tj T*
 (  Reproduced here: confirmations/HZ-001-c2292af8.json - a rebuild of the verified source and the probes) Tj T*
 (                   in it passed. Confirming behaviour, not intent.) Tj T*
@@ -135,6 +155,18 @@ BT
 (  0x48b44a76 runPlan\(bytes32,uint32\)) Tj T*
 (  0x4d342432 unnamed) Tj T*
 (  0x4e487b71 Panic\(uint256\)) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 1538 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
 (  0x51a6fad5 getDeal\(bytes32\)) Tj T*
 (  0x5274afe7 unnamed) Tj T*
 (  0x56891412 unnamed) Tj T*
@@ -155,18 +187,6 @@ BT
 () Tj T*
 (THE TECHNICAL PART) Tj T*
 (target 0xc2292af8b51109a27a4b4e28e9cf9f3aede4190c) Tj T*
-ET
-endstream
-endobj
-7 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 8 0 R >>
-endobj
-8 0 obj
-<< /Length 829 >>
-stream
-BT
-/F1 9 Tf 11.5 TL
-48 794 Td
 (family evm) Tj T*
 (code sha256 0x879c36efa00134685fc0a1c55c7e19be0aa85602afde66b7ff93f9fb1a85e139) Tj T*
 (body bytes read 11566) Tj T*
@@ -201,14 +221,14 @@ xref
 0000000058 00000 n 
 0000000127 00000 n 
 0000000280 00000 n 
-0000004515 00000 n 
-0000004641 00000 n 
-0000008219 00000 n 
-0000008345 00000 n 
-0000009225 00000 n 
-0000009322 00000 n 
+0000004752 00000 n 
+0000004878 00000 n 
+0000009086 00000 n 
+0000009212 00000 n 
+0000010802 00000 n 
+0000010899 00000 n 
 trailer
 << /Size 11 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-9985
+11562
 %%EOF

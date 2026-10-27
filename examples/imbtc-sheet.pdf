@@ -9,7 +9,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> /XObject << /Im0 10 0 R >> >> /Contents 4 0 R >>
 endobj
 4 0 obj
-<< /Length 4216 >>
+<< /Length 4424 >>
 stream
 q 40 0 0 40 507 758 cm /Im0 Do Q
 BT
@@ -43,6 +43,26 @@ BT
 (read from the selectors this contract exposes, not from its docs. Every answer says what it cannot) Tj T*
 (tell you.) Tj T*
 () Tj T*
+(  Did you find any vulnerabilities in the contract?) Tj T*
+(    No audit happened, so "found" is the wrong word. But HZ-016 is not a shape: the behaviour was) Tj T*
+(    reproduced against this exact contract, not a lookalike - a token that calls the recipient back) Tj T*
+(    mid-transfer drains a counterparty that settles after paying. That makes it a demonstrated hazard) Tj T*
+(    rather than a candidate; it becomes a finding when somebody shows it is reachable, and a bug when) Tj T*
+(    the code is not meant to behave that way. Nothing else matched.) Tj T*
+(    seen: no matching selector, so this is its shape) Tj T*
+(    not answered here: Whether anything here is reachable, and whether it is a bug rather than a) Tj T*
+(    decision. Presence is not proof; absence is not clearance.) Tj T*
+() Tj T*
+(  So is it safe to use?) Tj T*
+(    Unknown, and this sheet will not pretend otherwise. What it can say is narrow and true: which hazard) Tj T*
+(    shapes are present \(1\), which behaviours have been demonstrated \(a placard that says confirmed\), and) Tj T*
+(    which classes the code does not match at all. What it cannot say is whether any of them is) Tj T*
+(    reachable, whether the economics make it exploitable, or whether a hazard is a bug or a deliberate) Tj T*
+(    choice - intent is not in the bytecode.) Tj T*
+(    seen: no matching selector, so this is its shape) Tj T*
+(    not answered here: The honest one: the state of the owner key, what you have approved, and what) Tj T*
+(    happens to the contract after this block.) Tj T*
+() Tj T*
 (  What is this?) Tj T*
 (    It is a token contract verified as IMBTC. Everything below is read from the bytecode it exposes, not) Tj T*
 (    from its docs.) Tj T*
@@ -59,6 +79,18 @@ BT
 (  Can transfers be switched off entirely?) Tj T*
 (    Yes. Transfers can be turned on and off as a switch, which is how some tokens spend their first days) Tj T*
 (    restricted to a whitelist.) Tj T*
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4362 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
 (    seen: 0xb187984f disableTransfer\(\), 0xf1b50c1d enableTransfer\(\), 0x92ff0d31 transferable\(\)) Tj T*
 (    not answered here: Whether it is currently on, and who can flip it.) Tj T*
 () Tj T*
@@ -79,18 +111,6 @@ BT
 (  Can whoever runs it take the money?) Tj T*
 (    Partly, and on purpose: there are admin paths to move value out \(a sweep, a rescue, or a revenue) Tj T*
 (    redirect\). They usually cannot touch your balance directly, but they can change where the money) Tj T*
-ET
-endstream
-endobj
-5 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 6 0 R >>
-endobj
-6 0 obj
-<< /Length 4504 >>
-stream
-BT
-/F1 9 Tf 11.5 TL
-48 794 Td
 (    goes.) Tj T*
 (    seen: 0x2d07953a distributeRevenue\(\), 0x45338d63 setRevenueAddress\(address\)) Tj T*
 (    not answered here: Whether those paths can reach your funds or only the contract's own leftovers.) Tj T*
@@ -135,6 +155,18 @@ BT
 (  the credit after paying out can therefore be re-entered by the recipient, paid twice out of one) Tj T*
 (  balance, and left unable to pay the next honest depositor. The token is not at fault and is behaving) Tj T*
 (  to spec. imBTC was the token in the Lendf.Me drain of 2020-04-19, roughly 25 million dollars in one) Tj T*
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 3518 >>
+stream
+BT
+/F1 9 Tf 11.5 TL
+48 794 Td
 (  re-entrancy against exactly this shape, which is why a token whose selector set says ERC777 is worth) Tj T*
 (  knowing about before it is accepted, not after.) Tj T*
 (  What is at stake: up to the credited balance a naive counterparty is holding; about 25M USD in one) Tj T*
@@ -155,18 +187,6 @@ BT
 (  0x095ea7b3 approve\(address,uint256\)) Tj T*
 (  0x23b872dd transferFrom\(address,address,uint256\)) Tj T*
 (  0x2d07953a distributeRevenue\(\)) Tj T*
-ET
-endstream
-endobj
-7 0 obj
-<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 9 0 R >> >> /Contents 8 0 R >>
-endobj
-8 0 obj
-<< /Length 2008 >>
-stream
-BT
-/F1 9 Tf 11.5 TL
-48 794 Td
 (  0x3092afd5 removeMinter\(address\)) Tj T*
 (  0x313ce567 decimals\(\)) Tj T*
 (  0x3ba0b9a9 exchangeRate\(\)) Tj T*
@@ -230,14 +250,14 @@ xref
 0000000058 00000 n 
 0000000127 00000 n 
 0000000280 00000 n 
-0000004548 00000 n 
-0000004674 00000 n 
-0000009230 00000 n 
-0000009356 00000 n 
-0000011416 00000 n 
-0000011513 00000 n 
+0000004756 00000 n 
+0000004882 00000 n 
+0000009296 00000 n 
+0000009422 00000 n 
+0000012992 00000 n 
+0000013089 00000 n 
 trailer
 << /Size 11 /Root 1 0 R /Info << /Producer (HazMat) >> >>
 startxref
-12176
+13752
 %%EOF
