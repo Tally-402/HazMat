@@ -80,7 +80,7 @@ async function scanView(chain, address){
       <span class="card" id="perm">permalink</span>
     </div></div>
    ${ms.map(m=>`<div class="card" style="border-left:3px solid var(--c${m.placard_class})">
-      <div class="row"><a href="#/placard/${esc(m.id)}"><b>${esc(m.id)}</b></a>${chip(m.placard_class)}<span class="sp">${esc(m.tier)} placard · assertion: ${esc(m.assertion)}</span></div>
+      <div class="row"><a href="#/placard/${esc(m.id)}"><b>${esc(m.id)}</b></a>${chip(m.placard_class)}<span class="sp">${esc(m.tier)} placard · assertion: ${esc(m.assertion)}</span>${(m.confirmed_on||[]).some(c=>address&&(c.target||'').toLowerCase().includes(address.toLowerCase()))?'<b>confirmed on this target</b>':''}</div>
       <div>${esc(m.title)}</div>
       <div class="sp">money: ${esc((m.money_bound||{}).expression||'n/a')}</div>
       <div class="sp">matched by <code>${esc((m.matched_selectors||[]).join(' '))}</code>${m.role&&m.role!=='requested'?` on the ${esc(m.role)} <code>${esc((m.at||'').slice(0,10))}</code>`:''}</div></div>`).join('') || '<div class="card"><b>no placard matched</b><div class="note">that is not the same as safe. The register has '+cov.placards_checked+' placards and they are shaped after a small number of projects, so a clean sheet mostly means unfamiliar, not sound.</div></div>'}
